@@ -1,30 +1,30 @@
 # Installation of RasPBX
 *RasPBX installation for beginners*
 
-A few years ago I came across a very interesting project from some guy, who [created a GSM bridge between two RasPBX hosts](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html) and who wanted to make free long distance calls from Brazil to Germany with the help of his RaspberryPi. That sounded just cool, but other project were waiting for me at that time and I didn't had a time for that. Until now.
+A few years ago I came across a very interesting project from some guy, who [created a GSM bridge between two RasPBX hosts](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html) and who wanted to make free long distance calls from Brazil to Germany with the help of his RaspberryPi. That sounded just cool, but other projects were waiting for me at that time and I didn't have time for that. Until now.
 
-So, what are we intend to do? I am going to show you, how you can install telephony server *Asterisk* on a small computer *RaspberryPi* in order to be able to make calls from your computer or smartphone to ordinary phone numbers. So basically, you will end up literally with your own PBX in your pocket. Actually no, because RaspberryPi needs to be connected to power supply and network, and you would look weird with cables going into your pocket, but you get the idea.
+So, what do we intend to do? I am going to show you, how you can install the [*Asterisk*](https://www.asterisk.org/) telephony server on a small single board computer [*RaspberryPi*](https://www.raspberrypi.org/) in order to be able to make calls from your computer or smartphone to ordinary phone numbers. So basically, you will literally end up with your own PBX in your pocket. Actually no, because RaspberryPi needs to be connected to a power supply and network, and you would look weird with cables going into your pocket, but you get the idea.
 
-But why would you do that? Well, besides from this sounds like a really cool project and you like hacking and learning, you can cover some interesting scenarios like:
+But why would you do that? Well, besides that this sounds like a really cool project and you like hacking and learning, you can cover some interesting scenarios like:
 - You have a small company and you would like to have your own PBX with the ability to call outside.
 - Because of COVID-19, you would like that your employees can work at home, but have company phones.
 - You would like to have the ability that your customers can call you and use your own automated voice system for customer support.
-- You would like to have free telephone (audio and video) calls through internet, but on your own infrastructure.
-- You are living in one country, but you have business and mobile phone from the other country. And roaming between these two countries is expensive, so you would like to be able to use internet to relay your calls between these two countries via internet for free.
+- You would like to have free telephone (audio and video) calls through the internet, but on your own infrastructure.
+- You live in one country, but you have business and a mobile phone from the other country. And roaming between these two countries is expensive, so you would like to be able to use the internet to relay your calls between these two countries via the internet for free.
 - You are travelling abroad and would like to reduce roaming costs, but be accessible on your home mobile number for calls and SMS messages.
 - You are travelling abroad, but would like your mobile operator to think you are located at your home (i. e. hide your location data). 
 
-For me, most important scenario is, that I would like to travel abroad (in the countries with high roaming costs), and be able to receive calls and SMS messages to my home mobile number. So if I receive a SMS message from my bank, I want that this SMS is delivered to my e-mail address. I would also like to be able to send SMS messages back to my bank. I would like to be able to receive phone calls and if I am without internet connection, the person calling me should be able to leave me a voice message which will be then delivered into my e-mail address. And of course, I would like to be able to call them back from my number.
+For me, the most important scenario is, that I would like to travel abroad (in the countries with high roaming costs), and be able to receive calls and SMS messages to my home mobile number. So if I receive a SMS message from my bank, I want this SMS to be delivered to my e-mail address. I would also like to be able to send SMS messages back to my bank. I would like to be able to receive phone calls and if I am without internet connection, the person calling me should be able to leave me a voice message which will be then delivered into my e-mail address. And of course, I would like to be able to call them back from my number.
 
 <img src="034_target_setup.png" alt="What do we want to do" width="300"/>
 
-So in this article I will show you how you can do that. More specifically, how to install RasPBX to RaspberryPi, install USB dongle and create a trunk to mobile phone network through that dongle for your endpoints. Sounds complicated? Well, it turns out, it is not.
+So in this article I will show you how you can do that. More specifically, how to install RasPBX to RaspberryPi, install a USB dongle and create a trunk to mobile phone network through that dongle for your endpoints. Sounds complicated? Well, it turns out, it is not.
 
-But first things first. RaspberryPi, RasPBX, Asterisk, FreePBX, USB dongle, trunks, endpoints... what are you talking about???
+But first thing's first. RaspberryPi, RasPBX, Asterisk, FreePBX, USB dongle, trunks, endpoints... what are you talking about???
 
 ## Basic concepts
 
-So, very brief explanation of basic concepts. **RaspberryPi** is a small computer, which was originally developed for the promotion of teaching computer science in schools. However, project evolved, and today there are several models of RaspberryPi available, with all kinds of accessories. But the most important thing is, that RaspberryPi computers are relatively cheap (they cost between 40 and 100 EUR, depending of the model and accessories you want to buy) and that they are a great tool for learning new things. So, every true *hacker* - and here we are using term hacker in a positive way, so by *hacker* we mean *an expert at programming and solving problems with a computer* - should have one (or *more*) of these devices in his or her *arsenal*. For running RasPBX, you will need RaspberryPi 3 or RaspberryPi 4, additionally you would like to buy strong enough power supply (3A) and a case for your RaspberryPi. If your power supply is not strong enough, your RaspberryPi will not be able to handle the GSM dongle power consumption, and it will start rebooting. In that case, you will need to buy powered USB hub.
+So, very brief explanation of basic concepts. **RaspberryPi** is a small computer, which was originally developed for the promotion of teaching computer science in schools. However, the project evolved, and today there are several models of RaspberryPi available, with all kinds of accessories. But the most important thing is that RaspberryPi computers are relatively cheap (they cost between 40 and 100 EUR, depending of the model and accessories you want to buy) and that they are a great tool for learning new things. So, every true *hacker* - and here we are using term hacker in a positive way, so by *hacker* we mean *an expert at programming and solving problems with a computer* - should have one (or *more*) of these devices in his or her *arsenal*. For running RasPBX, you will need a RaspberryPi 3 or a RaspberryPi 4, additionally you would like to buy a strong enough power supply (5V 3A) and a case for your RaspberryPi. If your power supply is not strong enough, your RaspberryPi will not be able to handle the GSM dongle power consumption, and it will start rebooting. In that case, you will need to buy a powered USB hub.
 
 **RasPBX** is an operating system for your RaspberryPi, based on a Debian Linux, which has integrated Asterisk and FreePBX software, so you don't need to install them by yourself. You can [download RasPBX](http://www.raspberry-asterisk.org/downloads/) from the project's official website, and here I am using version *10-10-2020* (*raspbx-10-10-2020.zip*), which has included Asterisk 16.13.0 and FreePBX 15.0.16.75. BTW, if you noticed the word *Linux* - yes, RasPBX **is** opensource and completely free. Just click download and you are good to go.
 
@@ -32,48 +32,48 @@ So, very brief explanation of basic concepts. **RaspberryPi** is a small compute
 
 **FreePBX** is web-based open-source graphical user interface (GUI) that manages Asterisk. Any yes, it is also opensource and free.
 
-**USB dongle** in RasPBX is a special USB device, actually USB modem in which you can insert SIM card and then connect this modem to a computer (in our case RaspberryPi) through USB port. There are several USB modems available, but not all are working with RasPBX. Compatible USB modems should be unlocked and must have voice capability enabled. You can buy one from the [list of officially supported](https://github.com/bg111/asterisk-chan-dongle/wiki/Requirements-and-Limitations). They cost around 20 EUR, you can also buy used one, but if it is not unlocked, you will need to use [DC Unlocker](https://www.dc-unlocker.com/downloads/DC_unlocker_software), which will cost you some additional money. (And *DC Unlocker* works only on Windows). I have used **Huawei E1752C**, but you can consider buying some other from the supported models. BTW, instead of USB dongle, you can setup RasPBX to be paired with mobile phone via Bluetooth connection and you can make calls through that connection, but I didn't tested that.
+**USB dongle** in RasPBX is a special USB device, actually a USB modem in which you can insert a SIM card and then connect this modem to a computer (in our case a RaspberryPi) through a USB port. There are several USB modems available, but not all work with RasPBX. Compatible USB modems should be unlocked and must have voice capability enabled. You can buy one from the [list of officially supported](https://github.com/bg111/asterisk-chan-dongle/wiki/Requirements-and-Limitations). They cost around 20 EUR. You can also buy used one, but if it is not unlocked, you will need to use [DC Unlocker](https://www.dc-unlocker.com/downloads/DC_unlocker_software), which will cost you some additional money. (And *DC Unlocker* only work on Windows). I have used **Huawei E1752C**, but you can consider buying another supported model. BTW, instead of an USB dongle, you can setup RasPBX to be paired with a mobile phone via a Bluetooth connection and you can make calls through that connection, but I didn't test that.
 
-Of course, you will need a SIM card, and before you insert SIM card in your USB modem, you should **disable SIM card's PIN**. You can do this with your phone, if you don't know how just be *a hacker* and use a search engine. :)
+Of course, you will need a SIM card, and before you insert the SIM card in your USB modem, you should **disable the SIM card's PIN**. You can do this with your phone, if you don't know how just be *a hacker* and use a search engine. :)
 
-In telecom, trunking is used to connect two systems together. To put it simply, a **trunk** is a connection from your system (PBX) to other telephone system. From that trunk you can route outgoing and incoming calls.
+In telecom, trunking is used to connect two systems together. To put it simply, a **trunk** is a connection from your system (PBX) to another telephone system. From that trunk you can route outgoing and incoming calls.
 
-**Endpoint** is basically your internal phone number (in your PBX), which is used by softphones (VoIP clients) and physical phones. Internally, you can use any numbering, but I decided to use internal PBX numbers like *1000*, *2000*, *3000*, etc.
+An **endpoint** is basically your internal phone number (in your PBX), which is used by softphones (VoIP clients) and physical phones. Internally, you can use any numbering, but I decided to use internal PBX numbers like *1000*, *2000*, *3000*, etc.
 
 *Enough talking, let's hack it together!*
 
 ## What you will need
 
 As we already mentioned, you will need:
-- RaspberryPi 3 or RaspberryPi 4 (I have tested both, however, RPi4 is much more powerful and can handle up to 200 concurrent phone calls (really, [I am not joking](https://www.youtube.com/watch?v=dVGf3HrKZl4)). I suggest you buy RPi4 with 4 or 8 GB RAM);
-- power supply for RaspberryPi (3A or more), case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and of a little bit more quality); 
-- compatible USB dongle (I am using Huawei E1752C);
+- A RaspberryPi 3 or RaspberryPi 4 (I have tested both, however, the RPi4 is much more powerful and can handle up to 200 concurrent phone calls (really, [I am not joking](https://www.youtube.com/watch?v=dVGf3HrKZl4)). I suggest you buy a RPi4 with 4 or 8 GB RAM);
+- a power supply for the RaspberryPi (3A 5V or more), a case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and a little bit higher quality); 
+- a compatible USB dongle (I am using the Huawei E1752C);
 - RasPBX, which you can freely [download from the official project's website](http://www.raspberry-asterisk.org/downloads/) (I am using version 10-10-2020);
 - internet connection.
 
-Additionally I am also using my own VPN network, and I will show you, how to fence your PBX inside VPN network. I am using OpenVPN, with several security enhancements, hardened cryptography settings, etc. But I am not going to talk about how to set up your own VPN network, I will just assume you already have one. If you don't, you can hire me to set up one for you.
+Additionally I am also using my own VPN network, and I will show you how to fence your PBX inside the VPN network. I am using OpenVPN, with several security enhancements, hardened cryptography settings, etc. But I am not going to talk about how to set up your own VPN network, I will just assume you already have one. If you don't, you can hire me to set up one for you.
 
 *So let's start.*
 
 ## Installation of the operating system
 
-First we will take a look into the installation of a basic system. Since it is Linux, it helps, if you are familiar with Linux, but if you are not, just follow the installation instructions and you will be fine. However, I assume you already know how to use terminal and how to login to a remote Linux system using SSH. Hint: under Windows you can use PuTTY or built-in SSH client from Windows command prompt.
+First we will take a look into the installation of a basic system. Since it is Linux, it helps if you are familiar with Linux, but if you are not, just follow the installation instructions and you will be fine. However, I assume you already know how to use terminal and how to login to a remote Linux system using SSH. Hint: under Windows you can use PuTTY or the built-in SSH client from Windows command prompt.
 
-**Also, please note, that I am using Ubuntu Linux as my main operating system, and setting up some things (like SSH connections) are a little bit different under Linux and Windows. But don't worry, you can always use your favourite search engine and learn something new. (Or maybe you can start using Linux?)**
+**Also, please note that I am using Ubuntu Linux as my main operating system, and setting up some things (like SSH connections) are a little bit different under Linux and Windows. But don't worry, you can always use your favourite search engine and learn something new. (Or maybe you can start using Linux?)**
 
-### Write RasPBX image to a SD card
+### Write the RasPBX image to a SD card
 
-After you download RasPBX file *raspbx-10-10-2020.zip* you should unzip it and write .IMG file to your SD card. For this I prefer Ubuntu's **Disks** tool, but if you are using other operating systems, just perform online search and find which tools can you use for that.
+After you download the RasPBX file *raspbx-10-10-2020.zip* you should unzip it and write the .IMG file to your SD card. For this I prefer Ubuntu's **Disks** tool, but if you are using other operating systems, just perform an online search and find out which tools can you use for that.
 
 <img src="001_SD_card.png" alt="Disks utility" width="300"/>
 
-Then insert SD card into RaspberryPi. SIM card in your USB dongle. Connect USB dongle to RaspberryPi. Connect your network cable... And finally - connect the RaspberryPi to power supply.
+Then insert the SD card into the RaspberryPi and the SIM card in your USB dongle. Connect the USB dongle to the RaspberryPi. Connect your network cable... And finally - connect the RaspberryPi to the power supply.
 
 ### Log in to the RasPBX device
 
-After booting the RaspberryPi device, we need to find out it's IP address. There are several ways how to do that, but a true hacker would prefer command line tool **nmap**.
+After booting the RaspberryPi device, we need to find out it's IP address. There are several ways to do that, but a true hacker would prefer the **nmap** command line tool.
 
-So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you and your Raspberry are connected, in my case it was `192.168.1.0/24`, but your local network settings may be different), and look for a device like that: 
+So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you and your Raspberry are connected, in my case it was `192.168.1.0/24`, but your local network settings may be different), and look for a device like this: 
 
     Nmap scan report for 192.168.1.150
     Host is up (0.0091s latency).
@@ -86,14 +86,14 @@ So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you an
     445/tcp  open  microsoft-ds
     8088/tcp open  radan-http
 
-Now you can connect to a device via **SSH**. Username is **root** and default password is **raspberry**: `ssh root@192.168.1.150`. You will need to confirm the identity of RaspberryPi's SSH key:
+Now you can connect to a device via **SSH**. The username is **root** and the default password is **raspberry**: `ssh root@192.168.1.150`. You will need to confirm the identity of RaspberryPi's SSH key:
 
     The authenticity of host '192.168.1.150 (192.168.1.150)' can't be established.
     ECDSA key fingerprint is SHA256:vtE5/xxxxxxxxxxxxxxxxxxACyoanxxxxxxxxxxxmDQ.
     Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
     Warning: Permanently added '192.168.1.150' (ECDSA) to the list of known hosts.
 
-...and after successful login, we can see welcome screen on your RasPBX device:
+...and after a successful login, we can see the welcome screen on your RasPBX device:
 
     Linux raspbx 5.4.51-v7l+ #1333 SMP Mon Aug 10 16:51:40 BST 2020 armv7l
     
@@ -125,21 +125,21 @@ First, change the password with the command `passwd`.
 
 Then create new SSH host keys in order to have individual keys for your setup: `regen-hostkeys`.
 
-Then configure your timezone: `configure-timezone`. Since I am living in Slovenia, Europe, I set it to `Europe/Ljubljana`.
+Then configure your timezone: `configure-timezone`. Since I live in Slovenia, Europe, I set it to `Europe/Ljubljana`.
 
 <img src="002_configure_locales.png" alt="Reconfiguring locales" width="300"/>
 
 Then you should reconfigure locales: `dpkg-reconfigure locales`. In my case I added support for Slovenian local settings (`sl_SI.UTF-8 UTF-8`), and for default locale I selected `en_GB.UTF-8`.
 
-Then it is time for security upgrades. For this we can use `raspbx-upgrade` comand, however, running this command will return us an error. Error message says *error occurred during the signature verification*, and that is because of one expired GPG key used to digitally sign some RaspPBX packages:
+Then it is time for security upgrades. We can use the `raspbx-upgrade` comand for this, however, running this command will return an error. The error message says *error occurred during the signature verification*, and that is because of an expired GPG key used to digitally sign some RaspPBX packages:
 
     The following signatures were invalid: EXPKEYSIG B188E2B695BD4743 DEB.SURY.ORG Automatic Signing Key <deb@sury.org>
     Reading package lists... Done
     E: Repository 'http://raspbian.raspberrypi.org/raspbian buster InRelease' changed its 'Suite' value from 'stable' to 'oldstable'
 
-So we need to download and install new signing key with a command: `wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg`.
+So we need to download and install the new signing key with the following command: `wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg`.
 
-Now we can update the repositories with `apt update`. However, we will see some warnings, which will be gone after we will install all upgrades to the system:
+Now we can update the repositories with `apt update`. However, we will see some warnings, which will be gone after we install all of the upgrades to the system:
 
     E: Repository 'https://packages.sury.org/php buster InRelease' changed its 'Suite' value from '' to 'buster'
     N: This must be accepted explicitly before updates for this repository can be applied. See apt-secure(8) manpage for details.
@@ -156,45 +156,45 @@ Here we should also answer **Yes** (type y and press enter).
 
 Then we can upgrade all the software with `apt upgrade` command, and finally remove unused program packages with `apt autoremove`.
 
-Since now, we can safely use `raspbx-upgrade`, which is basically just a script performing update and upgrade commands in one step.
+Now we can safely use `raspbx-upgrade`, which is basically just a script performing the update and upgrade commands in one step.
 
-Finally, we can run `raspi-config` in order to expand the filesystem to all SD card. Unfortunately `raspi-config` will ask us some silly question, because it could not determine the default user, but we can just press enter and that is it. Then you should select the option `Advanced Options` and finally `Expand Filesystem`.
+Finally, we can run `raspi-config` in order to expand the filesystem to the whole SD card. Unfortunately `raspi-config` will ask us some silly questions, because it could not determine the default user, but we can just press enter and that's it. Then you should select the option `Advanced Options` and finally `Expand Filesystem`.
 
 After it is done, it will ask us to reboot, and we would willingly do that, of course.
 
-Basic configuration of the operating system is now over.
+The basic configuration of the operating system is now over.
 
 ## PBX installation and configuration
 
-After the reboot, we would need to remove the identity of the old SSH key on our computer (where from we are connecting to RasPBX). Why? Because in previous SSH session we issued `regen-hostkeys` command to create new SSH host keys, that's why.
+After the reboot, we would need to remove the identity of the old SSH key on our computer (where from we are connecting to RasPBX). Why? Because in the previous SSH session we issued the `regen-hostkeys` command to create new SSH host keys, that's why.
  
-On my Ubuntu system I said: `ssh-keygen -f "/home/matej/.ssh/known_hosts" -R "192.168.1.150"`, those using Windows systems need to figure this by yourself.
+On my Ubuntu system I said: `ssh-keygen -f "/home/matej/.ssh/known_hosts" -R "192.168.1.150"`. Those using Windows systems need to figure this by themselves.
 
 Now we can make a SSH connection to our RasPBX: `ssh root@192.168.1.150`.
 
-### Setting up e-mail system
+### Setting up the e-mail system
 
-First, we will set up e-mail system, because our RasPBX is sending us and our users e-mails. Since RasPBX is using *exim* mail server, we should issue the following command: `dpkg-reconfigure exim4-config`.
+First, we will set up the e-mail system, because our RasPBX sends us and our users e-mails. Since RasPBX is using the *exim* mail server, we should issue the following command: `dpkg-reconfigure exim4-config`.
 
-Now we are guided through different settings. On the first configuration page se should select "*mail sent by smarthost; received via SMTP or fetchmail*".
+Now we are guided through different settings. On the first configuration page we should select "*mail sent by smarthost; received via SMTP or fetchmail*".
 
 <img src="003_mail_server1.png" alt="Configuring mail" width="300"/>
 
-On the following pages we can just keep the default values by pressing enter. We keep doing so until we reach the page starting with the "*Please enter the IP address or the host name of a mail server...*" Here we need to enter the SMTP hostname of our email provider. Since I am also using my own mail server, I have entered settings of my mail server, but you can also use GMail or some other mail provider (preferably not one from the big evil tech companies).
+On the following pages we can just keep the default values by pressing enter. We keep doing so until we reach the page starting with the "*Please enter the IP address or the host name of a mail server...*" Here we need to enter the SMTP hostname of our email provider. Since I also use my own mail server, I have entered the settings of my mail server, but you can also use GMail or some other mail provider (preferably not one from the big evil tech companies).
 
 <img src="004_mail_server2.png" alt="Configuring mail" width="300"/>
 
-Anyway, here is a little trick: you need to enter the FQDN name and port of your mail server divided by double colon. For example: `mail.myserver.si::587` - please note the double colon (`::`) between FQDN and the port. Oh, and for those *non-hackers* not knowing what FQDN stands for - it means *fully qualified domain name*, so it is basically a domain name that specifies location of your mail server exact location in the tree hierarchy of the Domain Name System.
+Anyway, here is a little trick: you need to enter the FQDN name and port of your mail server delimited by a double colon. For example: `mail.example.com::587` - please note the double colon (`::`) between FQDN and the port. Oh, and for the *non-hackers* not knowing what FQDN stands for - it means *fully qualified domain name*, so it is basically a domain name that specifies the location of your mail server exact location in the tree hierarchy of the Domain Name System.
 
-Till the rest of the configuration, we can just keep accepting the default values.
+For the rest of the configuration, we can just keep accepting the default values.
 
 In case you entered something stupid or forgot to set your e-mail provider's server (*as it happened to me...*), just re-run the `dpkg-reconfigure exim4-config` command again.
 
-Then, edit the file `/etc/exim4/passwd.client`. I am using *nano* text editor, but you can use your own favourite text editor. For those, not familiar with Linux, when you are done editing text file, you press ctrl-x, *nano* will ask you whether to save changes ("*Save modified buffer?*") to which you of course say **y** (Yes), and then *nano* will ask you to which file changes should be saved, and you just press enter (to save the changes in currently opened file) and that is it.
+Then, edit the file `/etc/exim4/passwd.client`. I am using the *nano* text editor, but you can use your own favourite text editor. For those unfamiliar with Linux, when you are done editing the text file, you press ctrl-x and *nano* will ask you whether to save the changes ("*Save modified buffer?*") to which you of course say **y** (Yes), and then *nano* will ask you which file changes should be saved to, and you just press enter (to save the changes in the currently opened file) and that is it.
 
 So, we say: `nano /etc/exim4/passwd.client`
 
-...and at the bottom of this file we add our credentials in the following format:
+...and at the bottom of the file we add our credentials in the following format:
 
     SMTP_HOSTNAME:USERNAME:PASSWORD
 
@@ -202,9 +202,9 @@ So in my case I entered:
 
     mail.xxxxx.si:obvestilo@xxxxx.si:XXXYYYXXX
 
-I have mentioned that I am from Slovenia, so I configured e-mail address `obvestilo@...,` which in English means `notification@...`. Because,... well, because RasPBX will be sending me notifications, right?
+I mentioned that I am from Slovenia, so I configured the e-mail address `obvestilo@...,` which means `notification@...` in English . Because,... well, because RasPBX will be sending me notifications, right?
 
-Please note that in most cases, the SMTP hostname used in this configuration file is identical to the hostname used as smarthost in exim4 configuration. If e-mail fails to work, specify the reverse lookup of your email provider’s SMTP host IP address here.
+Please note that in most cases, the SMTP hostname used in this configuration file is identical to the hostname used as the smarthost in the exim4 configuration. If the e-mail fails to work, specify the reverse lookup of your email provider’s SMTP host IP address here.
 
 Also, some email providers require you to use sender addresses identical to one of the public email addresses of your account. In this case, edit file `/etc/email-addresses` with the command:
 
@@ -219,61 +219,61 @@ This configures the sender address of all outgoing e-mail to your e-mail address
 
 Now we configured everything, so we just need to activate our configuration with command: `update-exim4.conf`.
 
-Now we can test if sending of e-mails is working. Enter the command: `send_test_email matej.kovacic@xxxxx.si`, hold your breath, and... a test e-mail should reach your inbox shortly.
+Now we can test if sending e-mails works. Enter the command: `send_test_email matej.kovacic@xxxxx.si`, hold your breath, and... a test e-mail should reach your inbox shortly.
 
 After you receive the e-mail message saying "*This is a test. If you can read this, email delivery from your Raspberry Pi works.*", you can grab your coffee. Or a beer, if you prefer. Now, it is a time for the next step.
 
 ### Set up VPN client
 
-As I mentioned, we will fence our RasPBX into a VPN network. In that case, RasPBX and VoIP clients (physical telephones and VoIP softphones) will be closed in a VPN network, so communications among them will take place inside a secured VPN network only. This is especially important if you do not set up TLS encryption and enforce SRTP and/or ZRTP encryption protocols. On the other hand, devices closed in a VPN network are usually easier to manage and more secure - if you can ensure security of a VPN network.
+As I mentioned, we will fence our RasPBX into a VPN network. In that case, the RasPBX and VoIP clients (physical telephones and VoIP softphones) will be closed in a VPN network, so the communication among them will take place inside a secured VPN network only. This is especially important if you do not set up the TLS encryption and enforce SRTP and/or ZRTP encryption protocols. On the other hand, devices closed in a VPN network are usually easier to manage and more secure - if you can ensure the security of the VPN network.
 
-However, using VPN for encryption of a VoIP data could be a little problematic. Research has shown, that using encrypted VBR (variable bit rate) encoding could pose a security risk. Why? Because when using SRTP encryption with voice streams compressed using variable bit rate (VBR) codecs, the length of the compressed data packets depend on the characteristics of the speech signal. In other words, different sounds are encoded differently, and this small variations in packet sizes can be observed, and that could be used to reconstruct ("decrypt") encrypted data. This may sound very academic, but [the researchers have shown](https://www.cs.jhu.edu/~fabian/papers/oakland08.pdf), that in specific circumstances phrases in a voice call could be recognised despite the encryption. (In short, researchers have shown that the lengths of encrypted VoIP packets can be used to identify the pre-recorded phrases spoken within a call.) So if you plan to do something really stupid (meaning: illegal) with your RasPBX, you should stop thinking about it right now.
+However, using a VPN for encryption of VoIP data could be a little problematic. Research has shown that using encrypted VBR (variable bit rate) encoding could pose a security risk. Why? Because when using the SRTP encryption with voice streams compressed using variable bit rate (VBR) codecs, the length of the compressed data packets depend on the characteristics of the speech signal. In other words, different sounds are encoded differently, and these small variations in packet sizes can be observed, and that could be used to reconstruct ("decrypt") encrypted data. This may sound very academic, but [researchers have shown](https://www.cs.jhu.edu/~fabian/papers/oakland08.pdf), that in specific circumstances phrases in a voice call could be recognised despite the encryption. (In short, researchers have shown that the lengths of encrypted VoIP packets can be used to identify the pre-recorded phrases spoken within a call.) So if you plan to do something really stupid (meaning: illegal) with your RasPBX, you should stop thinking about it right now.
 
-However, closing VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal. 
+However, enclosing the VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal. 
 
-Anyway, let's take a look into how connect RasPBX into the OpenVPN network. As I mentioned, I already have my OpenVPN server, so I will not cover that part, only how to install and configure OpenVPN client.
+Anyway, let's take a look into how connect RasPBX into the OpenVPN network. As I mentioned, I already have my OpenVPN server, so I will not cover that part, only how to install and configure the OpenVPN client.
 
-Which is in fact very easy. Just install *openvpn* package by `apt install openvpn`, and then copy the content of your OpenVPN configuration into the config file:
+Which is in fact very easy. Just install the *openvpn* package with `apt install openvpn`, and then copy the content of your OpenVPN configuration into the config file:
 
     nano /etc/openvpn/myVPN_TCP.conf
 
-(paste your config into that file, save and close it), and then you can run OpenVPN client with command: `sudo systemctl start openvpn@myVPN_TCP.service`.
+(paste your config into that file, save and close it), and then you can run the OpenVPN client with the command: `sudo systemctl start openvpn@myVPN_TCP.service`.
 
-When OpenVPN connection is established, you can check if it is working by entering: `sudo systemctl status openvpn@myVPN_TCP.service`. And of course, we would like that OpenVPN connection will be automatically established after reboot of your RasPBX device, so we must say: `sudo systemctl enable openvpn@myVPN_TCP.service`.
+When an OpenVPN connection is established, you can check if it is working by entering: `sudo systemctl status openvpn@myVPN_TCP.service`. And of course, we would like that the OpenVPN connection will be automatically established after a reboot of your RasPBX device, so we must say: `sudo systemctl enable openvpn@myVPN_TCP.service`.
 
 You may wonder why *myVPN_TCP*? It is just a name of my VPN connection, you can name it whatever you want.
 
 ### Set up NTP
 
-Next important thing is time. Correct time is important for VPN to work, but also for other services. Asterisk also only starts after time has been set correctly. RaspberryPi unfortunately do not have internal persistent hardware clock, however you can buy one as an hardware add-on. In any case, it is good to have correct (synchronized) time. Therefore on system boot, current time is obtained through NTP servers.
+The next important thing is time. Correct time is important for the VPN to work, but also for other services. Asterisk also only starts after the time has been set correctly. RaspberryPis unfortunately do not have an internal persistent hardware clock, however you can buy one as an hardware add-on. In any case, it is good to have the correct (synchronized) time. Therefore on system boot, the current time is obtained through NTP servers.
 
-However, if internet connection is not continuously present or not present at all, this could lead to problems with time synchronisation. If internet connection is restored later, system can experience a large time jump. If Asterisk is started with wrong time first and time is properly set later, audio on calls can be seriously distorted. Also, in setups without internet connection Asterisk will not start by default.
+However, if an internet connection is not continuously present or not present at all, this could lead to problems with time synchronisation. If an internet connection is restored later, the system can experience a large time jump. If Asterisk is started with the wrong time first and the time is properly set later, audio on calls can be seriously distorted. Also, in setups without an internet connection, Asterisk will not start by default.
 
-And we do not want that, don't we?
+And we don't want that, do we?
 
-To overcome this problem, we need to install a package `fake-hwclock`, which saves the time on shutdown and loads it again on reboot. Additionally, we will install and set up continuous time synchronisation.
+To overcome this problem, we need to install the package `fake-hwclock`, which saves the time on shutdown and loads it again on reboot. Additionally, we will install and set up continuous time synchronisation.
 
-So first we say: `apt install fake-hwclock`. And then: `apt install ntp`. Then it is suggested to edit NTP config file with `nano /etc/ntp.conf`, and at the end of the file we should add:
+So first we say: `apt install fake-hwclock`. And then: `apt install ntp`. Then it is suggested to edit the NTP config file with `nano /etc/ntp.conf`, and at the end of the file we should add:
 
     server goodtime.ijs.si iburst
     server ntp1.arnes.si iburst
     server ntp2.arnes.si iburst
 
-Well, I suggest you add your ISP's or your local NTP servers, but since I am from Slovenia, I am using Slovenian famous NTP servers.
+Well, I suggest you add your ISP's or your local NTP servers, but since I am from Slovenia, I am using famous Slovenian NTP servers.
 
-Then we can restart the NTP service: `service ntp restart`. Then we can check if time synchronisation is working by issuing `ntpq -c lpeer` and `ntpq -p | egrep "^\*|jitter"` commands (the latter will show us time deviation). Finally we would like that NTP is automatically started at reboot by issuing a command `service ntp enable`. And we can check the correct date and time by typing command `date`.
+Then we can restart the NTP service: `service ntp restart`. Then we can check if the time synchronisation is working by issuing `ntpq -c lpeer` and `ntpq -p | egrep "^\*|jitter"` commands (the latter will show us the time deviation). Finally we would like that NTP is automatically started at reboot by issuing a command `service ntp enable`. And we can check the correct date and time by typing command `date`.
 
-## Security of your system
+## The security of your system
 
-We have done a lot of things, but before we start installing the telephony part, we must take care of security of our RasPBX system. There are many important things, also in the telephony part, but for now, we will just take care of some basic stuff around SSH security and firewall. Please note that it is important to at least basically understand security considerations and mechanisms, if not, you can easily make a mistake or even lock yourself out of your system.
+We have done a lot of things, but before we start installing the telephony part, we must take care of security for our RasPBX system. There are many important things, also in the telephony part, but for now, we will just take care of some basic stuff around SSH security and firewall. Please note that it is important to at least basically understand security considerations and mechanisms, if not, you can easily make a mistake or even lock yourself out of your system.
  
 ### Secure SSH
 
 Regarding SSH security, there are several good practices, but we will implement the following:
 - disable empty passwords;
 - disable .rhosts files (verification);
-- specify supported HostKey algorithms, available KEX (Key Exchange) algorithms, ciphers allowed and available MAC (message authentication code) algorithms;
-- set up login with SSH key instead of a password.
+- specify supported HostKey algorithms, available KEX (Key Exchange) algorithms, allowed ciphers and available MAC (message authentication code) algorithms;
+- set up login with a SSH key instead of a password.
 
 **Disabling empty passwords**: to explicitly disallow remote login from accounts with empty passwords, open the SSHd config file: `nano /etc/ssh/sshd_config` and add/enable the following line:
 
