@@ -341,3 +341,137 @@ Ko končate, preizkusite konfiguracijo SSH z ukazom: `sshd -t` ali celo zaženit
 Če je vse v redu, morate znova zagnati SSH z ukazom: `systemctl restart ssh`.
 
 Zdaj lahko preverite, ali vse deluje kot je treba. Najprej se odjavite, nato pa se poskusite znova prijaviti. Če ste uspeli priti v sistem je vse v redu. Če pa ne ... no, potem ste v manjših težavah. A vendar ni to nič, česar pravi heker ne bi mogel rešiti. Preprosto priključite monitor in tipkovnico na vašo RasPBX napravo in popravite, kar ste naredili narobe.
+
+### Onemogočanje (*root*) uporabnika
+
+Dobra varnostna praksa je tudi onemogočanje korenskega (*root*) uporabnika in še posebej onemogočanje SSH za korenskega (*root*) uporabnika.
+
+Za to moramo ustvariti novega uporabnika, recimo *matej*. Vpišemo ukaz: `adduser matej` in odgovorimo na nekaj vprašanj:
+
+    Adding user 'matej' ...
+    Adding new group 'matej' (1001) ...
+    Adding new user 'matej' (1001) with group 'matej' ...
+    Creating home directory '/home/matej' ...
+    Copying files from '/etc/skel' ...
+    New password: 
+    Retype new password: 
+    passwd: password updated successfully
+    Changing the user information for matej
+    Enter the new value, or press ENTER for the default
+        Full Name []: Matej Kovacic
+        Room Number []: 
+        Work Phone []: 
+        Home Phone []: 
+        Other []: 
+    Is the information correct? [Y/n] 
+
+Nato dodamo tega uporabnika v skupino *sudo*: `usermod -aG sudo matej`. *Sudo* je program, ki uporabnikom Linuxa omogoča izvajanje programov z varnostnimi privilegiji drugega uporabnika, privzeto gre za uporabnika s skrbniškimi privilegiji (*root* ali *admin*, če želite).
+
+Zdaj se poskušamo prijaviti v sistem kot *matej*: `su - matej`. Seveda lahko preverimo, katero je dejansko uporabniško ime trenutnega uporabnika, tako da vpišemo ukaz `whoami`. Videli bomo, da je naše uporabniško ime `matej` (kar je pričakovano).
+
+Če pa rečemo: `sudo whoami`, nas bo sistem najprej vprašal za naše geslo, nato pa bomo videli bomo, da nas bo prepoznal kot uporabnika `root`.
+
+Zdaj moramo seveda prekopirati naše ključe SSH h uporabniku *matej*. Najprej pridobimo skrbniške privilegije s `sudo su` in nato odpremo konfiguracijsko datoteko SSH: `nano /etc/ssh/sshd_config` in spremenimo naslednje vrednosti, kot je opisano:
+
+    ChallengeResponseAuthentication yes
+    PasswordAuthentication yes
+    UsePAM yes
+
+Nato znova zaženemo SSH: `systemctl restart ssh` in iz **našega računalnika** kopiramo naš javni ključ SSH h uporabniku *matej* **na RasPBX** (**ne** na *root*!): `ssh-copy -id matej@192.168.1.150`.
+
+Preverimo, ali se lahko uspešno povežemo na RasPBX preko SSH, nato pa gremo nazaj na konfiguracijo OpenSSH (`nano /etc/ssh/sshd_config`) in nastavitve spremenimo nazaj:
+
+    ChallengeResponseAuthentication no
+    PasswordAuthentication no
+    UsePAM no
+
+Preden konfiguracijsko datoteko zapremo, bomo onemogočili še prijavo za root uporabnika. To lahko storimo tako, da spremenimo spremenljivko "PermitRootLogin" v vrednost "n0":
+
+     PermitRootLogin no
+
+Shranimo datoteko, znova zaženimo SSH (`systemctl restart ssh`) in to je to.
+
+### Namestitev sistema za preprečevanje vdorov
+
+Sedaj sledi namestitev `fail2ban`, ki je v osnovi programsko ogrodje za preprečevanje vdorov, ki ščiti računalniške strežnike pred napadi s tim. grobo silo. Poenostavljeno povedano – če se nekdo poskuša večkrat prijaviti v vaš sistem z ugibanjem pravilnega gesla, bo `fail2ban` to zaznal in za nekaj časa blokiral njegov IP naslov.
+
+Dejanska aplikacija se nahaja v `/usr/bin/install-fail2ban` in tam lahko vidimo, da če se IP ne uspe prijaviti v naš sistem 3-krat zapored (`maxretry = 3`), je dostop za ta IP naslov blokiran za pol ure ("bantime = 1800"). Če bo kakšen neumen heker poskušal uganiti pravilno geslo, bo lahko izvedel samo tri ugibanja, nato pa bo za 30 minut zaklenjen iz našega sistema, preden bo lahko spet poskusil trikrat. Kar pomeni, da bo lahko izvedel največ 144 ugibanj na dan. to pa je zanj že kar omejujoče.
+
+Zatorej nasvet: uporabite dolga in zapletena gesla. In redno preverjajte varnostne dnevniške zapise. Dnevniški Asterisk se nahajajo v datoteki `/var/log/asterisk/security_log`. Za preverjanje lahko uporabite `cat`, `grep` in druga odlična orodja, ki jih premore Linux.
+
+Seveda se vsi ti nasveti slišijo zelo lepo, toda v realnosti *nihče*, dejansko prav **nihče** dnevniških zapisov dejansko ne preverja. Čeprav bi jih morali. Zato je nujno, da nastavite, da `fail2ban` pomembna obvestila pošilja na vaš e-poštni naslov. Navodilo "redno preverjajte dnevniške zapise" bo tako pomenilo "*preberite (in razumite) vašo e-pošto*". Kar je veliko bolj preprosteje.
+
+Torej, namestimo orodje `fail2ban`. Zadeva je preprosta. Samo vnesite ukaz `install-fail2ban` in odgovorite na vprašanja. Ker bi želeli, da vam sistem pošilja obvestila na vaš e-poštni naslov, ga le vnesite, ko vas vpraša po njem. Ko vas namestitvena aplikacija na koncu vpraša, ali naj namestitveni prepiše datoteko `/etc/fail2ban/filter.d/asterisk.conf`, lahko mirno rečete **y** (da).
+
+Obstaja še nekaj drugih stvari, ki jih morate storiti za zaščito vašega sistema Asterisk, vendar se bomo k temu vrnili malo kasneje. Najpomembneje pa je vedeti, da ta opisana konfiguracija `fail2ban` deluje **samo**, če imate nastavitev, da gostom SIP ne dovolite, da se povežejo z vašim sistemom Asterisk! To bomo konfigurirali pozneje.
+
+#### Kako odblokirati IP naslov
+
+Torej, nastavili ste `fail2ban`, vse deluje v redu, vendar ste naredili napako in vnesli napačno geslo v enega od vaših VoIP odjemalcev. VoIP odjemalec se poskuša prijaviti v vaš sistem in po treh neuspešnih poskusih prejmete e-pošto, ki vas obvešča, da je bil ta IP ravnokar blokiran: "*The IP 10.10.8.9 has just been banned by Fail2Ban after 3 attempts against Asterisk.*".
+
+Prva stvar, ki jo lahko storite, je, da počakate pol ure. Vedno je čas za dobro kavo, zato si jo le skuhajte jo popijte *počasi ter z užitkom*.
+
+Če pa se vam malo mudi, lahko blokirani IP *odblokirate*. Najprej lahko preverite stanje `fail2ban` tako, da vnesete `fail2ban-client status`:
+
+    Status
+    |- Number of jail:	2
+    `- Jail list:	asterisk, sshd
+
+Vidimo lahko, da imamo dve ječi v katere `fail2ban` zaklepa poredne uporabnike. Enase imenuje *asterisk* in druga *sshd*. Torej preverimo ječo *asterisk*. Ukaz `fail2ban-client status asterisk` vam bo pokazal, kateri IP je zaprt v tem zaporu:
+
+    Status for the jail: asterisk
+    |- Filter
+    |  |- Currently failed:	0
+    |  |- Total failed:	3
+    |  `- File list:	/var/log/asterisk/security_log
+    `- Actions
+       |- Currently banned:	1
+       |- Total banned:	1
+       `- Banned IP list:	10.10.8.9
+
+Zdaj lahko ta naslov IP ročno odblokirate: `fail2ban-client set asterisk unbanip 10.10.8.9`. No, hudobne in nagajive IP naslove, ki *še niso v ječi*, pa lahko tja zaprete z ukazom: `fail2ban-client set asterisk banip 10.10.8.9`.
+
+### Namestitev požarnega zidu
+
+Zadnji korak pri zagotavljanju osnovne varnosti pa bo namestitev požarnega zidu. Namestili bomo `ufw`, kar je okrajšava za *nezapleten požarni zid*. Ključna beseda tukaj je "*nezapleteno*". Če niste seznanjeni z upravljanjem omrežij v Linux, se vam bo aplikacija `ufw` zdela precej zapletena. Vendar pa je izraz *nezapleten* potrebno razumeti relativno - oglejte si recimo kakšno drugo orodje za požarni zid v okolju Linux, na primer `iptables`, in hitro boste videli, da je `ufw` v resnici - nezapleten.
+
+Torej, namestimo `ufw` in sicer tako, da vnesemo ukaz: `apt install ufw`.
+
+Zdaj je čas, da določimo nekaj pravil. Najprej bomo zavrnili vse dohodne povezave in dovolili vse odhodne povezave:
+
+    ufw default deny incoming
+    ufw default allow outgoing
+
+Samo malo, kaj pa je sedaj to?? Kako bomo potem lahko sploh uporabljali sistem, če dohodne omrežne povezave niso dovoljene???
+
+Brez panike! To je le splošno pravilo, kasneje pa bomo definirali posebna pravila, ki uporabnikom omogočajo povezavo z našo RasPBX centralo. Pravzaprav to naredimo kar takoj. Moja pravila so torej naslednja:
+- dovoli vse povezave iz omrežja VPN (tako da se bodo VoIP odjemalci lahko povezali z mojim sistemom samo iz VPN);
+- iz drugih omrežij (vključno z mojim lokalnim omrežjem) dovoli samo SSH povezave s sistemom (to mi bo omogočilo osnovno upravljanje sistema iz lokalnega omrežja, če VPN izpade);
+- spletni vmesnik je na voljo samo iz VPN-ja z določenega naslova IP (nepooblaščeni uporabniki VPN-ja se ne bodo mogli prijaviti v spletni vmesnik in upravljati sistema).
+
+A najprej si oglejmo nastavitve mojega omrežja.
+
+Moje lokalno omrežje je v območju 192.168.1.0/24, kar pomeni, da lahko uporabljam naslove IP od 192.168.1.1 do 192.168.1.254 (192.168.1.0 je ID omrežja in 192.168.1.255 je tim. oddajni naslov). Moja RasPBX naprava ima lokalni IP 192.168.1.150.
+
+Uporabljam pa tudi VPN (v območju 10.10.8.0/24), moja naprava RasPBX pa ima naslov IP v VPN omrežju 10.10.8.150. V mojem omrežju VPN je več drugih naprav in želim, da bo spletno upravljanje RasPBX dostopno iz IP naslova 10.10.8.10.
+
+Če sedaj to prevedemo v jezik, ki ga razume požarni zid, bodo nastavitve naslednje:
+- najprej bomo **dovolili povezave SSH od koder koli** (SSH deluje na TCP vratih 22): `ufw allow 22/tcp`;
+- potem bomo **dovolili spletno upravljanje iz mojega računalnika, vendar le, če je povezan z VPN** (moj VPN IP je 10.10.8.10): `ufw allow from 10.10.8.10 to any port 80 proto tcp`;
+- potem bomo **blokirali povezave s spletnim vmesnikom za vse ostale**: `ufw deny to any port 80 proto tcp`;
+- na koncu pa bomo **dovolili vse (druge) povezave iz omrežja VPN**: `ufw allow from 10.10.8.0/24 to any`.
+
+Ko vnesemo vse te ukaze, lahko požarni zid ufw aktiviramo tako, da vnesemo `ufw enable`. Prav tako lahko izpišemo pravila požarnega zidu: `ufw status numbered`. Pravila, ki jih ne želimo več, pa izbrišemo z `ufw delete [številka pravila]`. Primer za mojo napravo:
+
+         To                         Action      From
+         --                         ------      ----
+    [ 1] 22/tcp                     ALLOW IN    Anywhere                  
+    [ 2] 80/tcp                     ALLOW IN    10.10.8.10                 
+    [ 3] 80/tcp                     DENY IN     Anywhere                  
+    [ 4] Anywhere                   ALLOW IN    10.10.8.0/24              
+    [ 5] 22/tcp (v6)                ALLOW IN    Anywhere (v6)             
+    [ 6] 80/tcp (v6)                DENY IN     Anywhere (v6)  
+
+Uporabna ukaza sta tudi `ufw disable` in `ufw reset`, za več pa si oglejte dokumentacijo UFW.
+
+Zdaj smo končali. Za konec seveda preverite, ali vse deluje tako kot mora. Se pravi, popolnoma se odjavite in se skušajte na RasPBX ponovno prijaviti iz svojega lokalnega omrežja (`ssh root@192.168.1.150`) in prek VPN-ja (`ssh root@10.10.8.150`). Če vse deluje, je vaš sistem že kar dobro zavarovan in čas je za naslednji korak. A pred tem si privoščite skodelico kave – pošteno ste si jo prislužili.
