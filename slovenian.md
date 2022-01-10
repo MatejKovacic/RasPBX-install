@@ -23,23 +23,23 @@ Poglejmo si torej kako vse to dejansko naredimo. Natančneje, pogledali si bomo,
 Ampak najprej nekaj osnov . RaspberryPi, RasPBX, Asterisk, FreePBX, USB ključ, trunk povezava, interne telefonske številke... o čem točno je govora???
 
 ## Osnovni koncepti
-Najprej zelo kratka razlaga osnovnih pojmov. RaspberryPi je majhen računalnik, ki je bil prvotno razvit za promocijo poučevanja računalništva v šolah. Vendar se je projekt razvil in danes je na voljo več modelov RaspberryPi z mnogimi moduli in dodatki. Najpomembneje pa je, da so računalniki RaspberryPi relativno poceni (stanejo med 40 in 100 EUR, odvisno od modela in dodatne opreme, ki jo želite kupiti) in so predvsem odlično orodje za učenje novih stvari. Vse to so razlogi, da bi vsak pravi heker - in tukaj uporabljamo izraz heker na pozitiven način, torej pod heker mislimo strokovnjaka za programiranje in reševanje težav z računalnikom - moral imeti vsaj eno (še raje pa več) teh naprav v svojem arzenalu.
+Najprej zelo kratka razlaga osnovnih pojmov. **RaspberryPi** je majhen računalnik, ki je bil prvotno razvit za promocijo poučevanja računalništva v šolah. Vendar se je projekt razvil in danes je na voljo več modelov RaspberryPi z mnogimi moduli in dodatki. Najpomembneje pa je, da so računalniki RaspberryPi relativno poceni (stanejo med 40 in 100 EUR, odvisno od modela in dodatne opreme, ki jo želite kupiti) in so predvsem odlično orodje za učenje novih stvari. Vse to so razlogi, da bi vsak pravi heker - in tukaj uporabljamo izraz heker na pozitiven način, torej pod heker mislimo strokovnjaka za programiranje in reševanje težav z računalnikom - moral imeti vsaj eno (še raje pa več) teh naprav v svojem arzenalu.
 
 Za zagon RasPBX potrebujete RaspberryPi 3 ali RaspberryPi 4, poleg tega pa potrebujete dovolj močan napajalnik (3A), smiselno pa je kupiti tudi ohišje za vaš RaspberryPi. Če napajalnik ni dovolj močan, RaspberryPi ne bo zmogel zagotoviti dovolj električne energije za GSM ključek, kar se bo manifestiralo v pogostih ponovnih zagonih tega mini računalnika. V tem primeru boste morali kupiti USB razdelilec z zunanjim napajanjem.
 
-RasPBX je operacijski sistem za vaš RaspberryPi, ki temelji na Debian Linuxu, in ima integrirano programsko opremo Asterisk in FreePBX, tako da njuno ročno nameščanje ni potrebno. Operacijski sistem [RasPBX si lahko prenesete](http://www.raspberry-asterisk.org/downloads/) iz uradne spletne strani projekta. Za naš projekt smo uporabili različico 10-10-2020 (raspbx-10-10-2020.zip), ki vključuje Asterisk 16.13.0 in FreePBX 15.0.16.75. Za tiste, ki ste ste opazili besedo Linux - da, RasPBX je odprtokoden in popolnoma brezplačen operacijski sistem. Potrebno je samo, da si ga prenesete iz uradne spletne strani in že ste pripravljeni na delo.
+**RasPBX** je operacijski sistem za vaš RaspberryPi, ki temelji na Debian Linuxu, in ima integrirano programsko opremo Asterisk in FreePBX, tako da njuno ročno nameščanje ni potrebno. Operacijski sistem [RasPBX si lahko prenesete](http://www.raspberry-asterisk.org/downloads/) iz uradne spletne strani projekta. Za naš projekt smo uporabili različico 10-10-2020 (raspbx-10-10-2020.zip), ki vključuje Asterisk 16.13.0 in FreePBX 15.0.16.75. Za tiste, ki ste ste opazili besedo Linux - da, RasPBX je odprtokoden in popolnoma brezplačen operacijski sistem. Potrebno je samo, da si ga prenesete iz uradne spletne strani in že ste pripravljeni na delo.
 
-Asterisk je programska izvedba telefonske centralne centrale (PBX). V bistvu gre za programsko opremo za prenos govora (in tudi videa) preko IP ter vzpostavljanje in nadzor telefonskih klicev med telekomunikacijskimi končnimi točkami (ki so lahko navadni, fizični telefoni ali tako imenovani programski telefoni – VoIP aplikacije na računalniku ali na mobilnem telefonu). Pravzaprav je Asterisk še veliko več od tega, a pomembno je vedeti, da je ta programska oprema odprtokodna in brezplačna (čeprav je na voljo tudi več plačljivih modulov, ki nam poenostavijo upravljanje telefonskega omrežja) in da to programsko opremo uporabljajo številna telekomunikacijska podjetja po svetu za zelo komercialne namene. Torej ne gre za nekakšen igračkast projekt. Gre za resen projekt, z veliko funkcionalnostmi, kar za vas pomeni ure in ure zabavnega učenja in ustvarjanja. Mimogrede, sem omenil, da je tudi Asterisk odprtokoden in brezplačen?
+**Asterisk** je programska izvedba telefonske centralne centrale (PBX). V bistvu gre za programsko opremo za prenos govora (in tudi videa) preko IP ter vzpostavljanje in nadzor telefonskih klicev med telekomunikacijskimi končnimi točkami (ki so lahko navadni, fizični telefoni ali tako imenovani programski telefoni – VoIP aplikacije na računalniku ali na mobilnem telefonu). Pravzaprav je Asterisk še veliko več od tega, a pomembno je vedeti, da je ta programska oprema odprtokodna in brezplačna (čeprav je na voljo tudi več plačljivih modulov, ki nam poenostavijo upravljanje telefonskega omrežja) in da to programsko opremo uporabljajo številna telekomunikacijska podjetja po svetu za zelo komercialne namene. Torej ne gre za nekakšen igračkast projekt. Gre za resen projekt, z veliko funkcionalnostmi, kar za vas pomeni ure in ure zabavnega učenja in ustvarjanja. Mimogrede, sem omenil, da je tudi Asterisk odprtokoden in brezplačen?
 
-FreePBX je spletni odprtokodni grafični uporabniški vmesnik (GUI), ki upravlja Asterisk. In da, tudi ta aplikacija je odprtokodna in brezplačna.
+**FreePBX** je spletni odprtokodni grafični uporabniški vmesnik (GUI), ki upravlja Asterisk. In da, tudi ta aplikacija je odprtokodna in brezplačna.
 
-GSM USB ključek v RasPBX je posebna USB naprava, pravzaprav USB modem, v katerega lahko vstavite SIM kartico in nato ta modem povežete z računalnikom (v našem primeru RaspberryPi) preko USB vmesnika. Na voljo je več USB modemov, vendar vsi ne delujejo z RasPBX. Združljivi USB modemi morajo biti odklenjeni in morajo imeti omogočeno tim. glasovno zmogljivost. Kompatibilni modem lahko izberete [iz seznama uradno podprtih] (https://github.com/bg111/asterisk-chan-dongle/wiki/Requirements-and-Limitations). Stanejo okoli 20 EUR, lahko kupite tudi rabljenega, če pa ni odklenjen, boste morali uporabiti [DC Unlocker](https://www.dc-unlocker.com/downloads/DC_unlocker_software), kar pa vas bo stalo nekaj dodatnega denarja. (Mimogrede, DC Unlocker deluje samo v sistemu Windows). Sam sem uporabil Huawei E1752C, vi pa seveda lahko izberete kateregakoli drugega izmed podprtih modelov. Mimogrede, namesto USB ključa lahko nastavite RasPBX tako, da se v mobilno omrežje poveže z mobilnim telefonom prek povezave Bluetooth, klici pa gredo nato prek te povezave, vendar sam tega nisem preskusil.
+**GSM USB ključek** v RasPBX je posebna USB naprava, pravzaprav USB modem, v katerega lahko vstavite SIM kartico in nato ta modem povežete z računalnikom (v našem primeru RaspberryPi) preko USB vmesnika. Na voljo je več USB modemov, vendar vsi ne delujejo z RasPBX. Združljivi USB modemi morajo biti odklenjeni in morajo imeti omogočeno tim. glasovno zmogljivost. Kompatibilni modem lahko izberete [iz seznama uradno podprtih] (https://github.com/bg111/asterisk-chan-dongle/wiki/Requirements-and-Limitations). Stanejo okoli 20 EUR, lahko kupite tudi rabljenega, če pa ni odklenjen, boste morali uporabiti [DC Unlocker](https://www.dc-unlocker.com/downloads/DC_unlocker_software), kar pa vas bo stalo nekaj dodatnega denarja. (Mimogrede, DC Unlocker deluje samo v sistemu Windows). Sam sem uporabil **Huawei E1752C**, vi pa seveda lahko izberete kateregakoli drugega izmed podprtih modelov. Mimogrede, namesto USB ključa lahko nastavite RasPBX tako, da se v mobilno omrežje poveže z mobilnim telefonom prek povezave Bluetooth, klici pa gredo nato prek te povezave, vendar sam tega nisem preskusil.
 
 Seveda boste potrebovali tudi kartico SIM in preden jo vstavite v USB modem, najprej na njej onemogočite PIN kodo. To lahko storite s svojim telefonom. Če slučajno ne veste kako, uporabite iskalnik. :)
 
-V telekomunikacijah se izraz trunk uporablja za povezavo dveh sistemov. Preprosto povedano, trunk je povezava vašega telefonskega sistema (PBX) z drugim telefonskim sistemom. Preko te povezave nato lahko usmerjate odhodne in dohodne klice.
+V telekomunikacijah se izraz **trunk** uporablja za povezavo dveh sistemov. Preprosto povedano, *trunk* je povezava vašega telefonskega sistema (PBX) z drugim telefonskim sistemom. Preko te povezave nato lahko usmerjate odhodne in dohodne klice.
 
-Interna telefonska številka (v angleščini se uporablja izraz endpoint), je telefonska številka znotraj vaše telefonske centrale, ki jo uporabljajo programski telefoni (odjemalci VoIP) in fizični telefoni. Interno lahko uporabite katero koli številčenje, sam sem se odločil za štirimestne interne številke  (1000, 2000, 3000, itd.).
+**Interna telefonska številka** (v angleščini se uporablja izraz *endpoint*), je telefonska številka znotraj vaše telefonske centrale, ki jo uporabljajo programski telefoni (odjemalci VoIP) in fizični telefoni. Interno lahko uporabite katero koli številčenje, sam sem se odločil za štirimestne interne številke  (*1000*, *2000*, *3000*, itd.).
 
 Dovolj govorjenja, čas je, da se lotimo izvedbe projekta!
 
@@ -53,16 +53,16 @@ Kot smo že omenili, bomo potrebovali:
 
 Pogledali si bomo tudi kako svojo telefonsko centralo postavimo znotraj omrežja VPN. O tem kako postaviti svoje lastno omrežje na OpenVPN tehnologiji ter kako implementirati ustrezne varnostne izboljšave (zlasti na področju kriptografije), tokrat ne bo govora, predpostavka pa je da VPN omrežje že imamo oziroma, da telefonsko centralo postavljamo v lokalnem omrežju.
 
-Pa začnimo.
+*Pa začnimo.*
 
 ## Namestitev operacijskega sistema
 Najprej si bomo ogledali namestitev osnovnega sistema. Ker je le-ta Linux, seveda pomaga, če poznate vsaj nekaj osnov dela v Linuxu. Če pa se z Linuxom še niste srečali, pa brez panike – ostanite odprtega duha in sledite navodilom za namestitev. Predpostavljam sicer, da veste, kako uporabljati terminal in kako se prijaviti v oddaljeni sistem Linux s pomočjo SSH. Namig: v operacijskem sistemu Windows lahko uporabite PuTTY ali vgrajenega odjemalca SSH iz ukaznega poziva Windows.
 
-Nastavitev nekaterih stvari (kot so povezave SSH) se v Linux in Windows sistemih nekoliko razlikujejo. Vendar se s tem ne rabite preveč obremenjevati - vedno namreč lahko uporabite svoj najljubši spletni iskalnik in se naučite nekaj novega. (Ali morda lahko začnete uporabljati Linux?)
+**Nastavitev nekaterih stvari (kot so povezave SSH) se v Linux in Windows sistemih nekoliko razlikujejo. Vendar se s tem ne rabite preveč obremenjevati - vedno namreč lahko uporabite svoj najljubši spletni iskalnik in se naučite nekaj novega. (Ali morda lahko začnete uporabljati Linux?)**
 
 ### Zapis RasPBX operacijskega sistema na kartico SD
 
-Ko prenesete datoteko RasPBX raspbx-10-10-2020.zip, jo odpakirajte in zapišite datoteko .IMG na kartico SD. Za to v Ubuntu Linux lahko uporabite orodje Disks, če pa uporabljate druge operacijske sisteme, pa z uporabo spletnega iskalnika poiščite, katera orodja lahko uporabite za to.
+Ko prenesete datoteko RasPBX *raspbx-10-10-2020.zip*, jo odpakirajte in zapišite datoteko .IMG na kartico SD. Za to v Ubuntu Linux lahko uporabite orodje **Diski**, če pa uporabljate druge operacijske sisteme, pa z uporabo spletnega iskalnika poiščite, katera orodja lahko uporabite za to.
 
 <img src="001_SD_card.png" alt="Pripomoček za diske" width="300"/>
 
@@ -70,9 +70,9 @@ Nato v RaspberryPi vstavite kartico SD. SIM kartico vstavite v GSM USB ključek 
 
 ### Prijava v RasPBX
 
-Po zagonu naprave RaspberryPi moramo ugotoviti njen IP naslov. Za to obstaja več načinov, pravi heker pa bo seveda uporabil orodje nmap.
+Po zagonu naprave RaspberryPi moramo ugotoviti njen IP naslov. Za to obstaja več načinov, pravi heker pa bo seveda uporabil orodje **nmap**.
 
-V terminal torej vpišemo nmap 192.168.1.0/24 (vpišemo omrežni naslov omrežja, v katerega je povezan naš RaspberryPi, v mojem primeru je bilo to 192.168.1.0/24) in poiščemo napravo, ki je v omrežju videti takole:
+V terminal torej vpišemo `nmap 192.168.1.0/24` (vpišemo omrežni naslov omrežja, v katerega je povezan naš RaspberryPi, v mojem primeru je bilo to `192.168.1.0/24`) in poiščemo napravo, ki je v omrežju videti takole:
 
     Nmap scan report for 192.168.1.150
     Host is up (0.0091s latency).
@@ -85,7 +85,7 @@ V terminal torej vpišemo nmap 192.168.1.0/24 (vpišemo omrežni naslov omrežja
     445/tcp  open  microsoft-ds
     8088/tcp open  radan-http
 
-Zdaj se lahko z RasPBX napravo povežemo prek SSH. Uporabniško ime je root in privzeto geslo je raspberry: ssh root@192.168.1.150. Potrditi bomo morali še identiteto ključa SSH RaspberryPi:
+Zdaj se lahko z RasPBX napravo povežemo prek SSH. Uporabniško ime je **root** in privzeto geslo je **raspberry**: `ssh root@192.168.1.150`. Potrditi bomo morali še identiteto ključa SSH RaspberryPi:
 
     The authenticity of host '192.168.1.150 (192.168.1.150)' can't be established.
     ECDSA key fingerprint is SHA256:vtE5/xxxxxxxxxxxxxxxxxxACyoanxxxxxxxxxxxmDQ.
@@ -121,25 +121,25 @@ Zdaj se lahko z RasPBX napravo povežemo prek SSH. Uporabniško ime je root in p
 
 ### Kaj postoriti po prvi prijavi?
 
-Najprej spremenite geslo z ukazom passwd.
+Najprej spremenite geslo z ukazom `passwd`.
 
-Nato ustvarite nove gostiteljske ključe SSH (da bodo unikatni za vašo napravo): regen-hostkeys.
+Nato ustvarite nove gostiteljske ključe SSH (da bodo unikatni za vašo napravo): `regen-hostkeys.`
 
-Nato konfigurirajte svoj časovni pas: configure-timezone. Ker živim v Sloveniji, Evropa, sem ga seveda nastavil na 'Evropa/Ljubljana'.
+Nato konfigurirajte svoj časovni pas: `configure-timezone`. Ker živim v Sloveniji, Evropa, sem ga seveda nastavil na 'Evropa/Ljubljana'.
 
 <img src="002_configure_locales.png" alt="Ponovna konfiguracija jezikovnih nastavitev" width="300"/>
 
-Nato morate znova konfigurirati področne nastavitve: dpkg-reconfigure locales. V našem primeru bomo dodali podporo za slovenske lokalne nastavitve (sl_SI.UTF-8 UTF-8), za privzete pa izberemo en_GB.UTF-8.
+Nato morate znova konfigurirati področne nastavitve: `dpkg-reconfigure locales`. V našem primeru bomo dodali podporo za slovenske lokalne nastavitve (`sl_SI.UTF-8 UTF-8`), za privzete pa izberemo `en_GB.UTF-8`.
 
-Sledijo varnostne posodobitve. Za to lahko uporabimo ukaz raspbx-upgrade, vendar nam bo zagon tega ukaza vrnil napako. Sporočilo o napaki pravi, da je med preverjanjem podpisa prišlo do napake, in sicer zaradi pretečenega ključa GPG, uporabljenega za digitalno podpisovanje nekaterih paketov RaspPBX:
+Sledijo varnostne posodobitve. Za to lahko uporabimo ukaz `raspbx-upgrade`, vendar nam bo zagon tega ukaza vrnil napako. Sporočilo o napaki pravi, da je med preverjanjem podpisa prišlo do napake, in sicer zaradi pretečenega ključa GPG, uporabljenega za digitalno podpisovanje nekaterih paketov RaspPBX:
 
     The following signatures were invalid: EXPKEYSIG B188E2B695BD4743 DEB.SURY.ORG Automatic Signing Key <deb@sury.org>
     Reading package lists... Done
     E: Repository 'http://raspbian.raspberrypi.org/raspbian buster InRelease' changed its 'Suite' value from 'stable' to 'oldstable'
 
-Zato moramo prenesti in namestiti nov podpisni ključ z ukazom: wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg.
+Zato moramo prenesti in namestiti nov podpisni ključ z ukazom: `wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg`.
 
-Zdaj lahko posodabljamo skladišča programskih paketov z ukazom apt update. Videli bomo še nekaj opozoril, ki pa bodo izginila, ko bomo namestili vse nadgradnje sistema:
+Zdaj lahko posodabljamo skladišča programskih paketov z ukazom `apt update`. Videli bomo še nekaj opozoril, ki pa bodo izginila, ko bomo namestili vse nadgradnje sistema:
 
     E: Repository 'https://packages.sury.org/php buster InRelease' changed its 'Suite' value from '' to 'buster'
     N: This must be accepted explicitly before updates for this repository can be applied. See apt-secure(8) manpage for details.
@@ -154,11 +154,11 @@ Tukaj odgovorimo z Da (vnesimo y in pritisnemo Enter).
 
 Tudi tukaj odgovorimo z Da (vnesimo y in pritisnemo Enter).
 
-Nato lahko vso programsko opremo nadgradimo z ukazom apt upgrade in na koncu odstranimo neuporabljene programske pakete z apt autoremove.
+Nato lahko vso programsko opremo nadgradimo z ukazom `apt upgrade` in na koncu odstranimo neuporabljene programske pakete z `apt autoremove`.
 
-Od zdaj lahko varno uporabljamo raspbx-upgrade, ki je v bistvu le skripta, ki izvaja ukaze za posodobitev in nadgradnjo v enem samem koraku.
+Od zdaj lahko varno uporabljamo `raspbx-upgrade`, ki je v bistvu le skripta, ki izvaja ukaze za posodobitev in nadgradnjo v enem samem koraku.
 
-Končno lahko zaženemo raspi-config, da razširimo datotečni sistem na celotno kartico SD. Žal nam bo raspi-config postavil kakšno neumno vprašanje, na primer, da ne more identificirati privzetega uporabnika, vendar v tem primeru samo pritisnemo Enter in to je to. Nato izberemo možnost Advanced Options in končno Expand Filesystem.
+Končno lahko zaženemo `raspi-config`, da razširimo datotečni sistem na celotno kartico SD. Žal nam bo `raspi-config` postavil kakšno neumno vprašanje, na primer, da ne more identificirati privzetega uporabnika, vendar v tem primeru samo pritisnemo Enter in to je to. Nato izberemo možnost `Advanced Options` in končno `Expand Filesystem`.
 
 Ko bo vse to narejeno, nas bo sistem pozval, da ga ponovno zaženemo, kar seveda z veseljem storimo.
 
