@@ -33,7 +33,7 @@ Za zagon RasPBX potrebujete RaspberryPi 3 ali RaspberryPi 4, poleg tega pa potre
 
 **FreePBX** je spletni odprtokodni grafični uporabniški vmesnik (GUI), ki upravlja Asterisk. In da, tudi ta aplikacija je odprtokodna in brezplačna.
 
-**GSM USB ključek** v RasPBX je posebna USB naprava, pravzaprav USB modem, v katerega lahko vstavite SIM kartico in nato ta modem povežete z računalnikom (v našem primeru RaspberryPi) preko USB vmesnika. Na voljo je več USB modemov, vendar vsi ne delujejo z RasPBX. Združljivi USB modemi morajo biti odklenjeni in morajo imeti omogočeno tim. glasovno zmogljivost. Kompatibilni modem lahko izberete [iz seznama uradno podprtih] (https://github.com/bg111/asterisk-chan-dongle/wiki/Requirements-and-Limitations). Stanejo okoli 20 EUR, lahko kupite tudi rabljenega, če pa ni odklenjen, boste morali uporabiti [DC Unlocker](https://www.dc-unlocker.com/downloads/DC_unlocker_software), kar pa vas bo stalo nekaj dodatnega denarja. (Mimogrede, DC Unlocker deluje samo v sistemu Windows). Sam sem uporabil **Huawei E1752C**, vi pa seveda lahko izberete kateregakoli drugega izmed podprtih modelov. Mimogrede, namesto USB ključa lahko nastavite RasPBX tako, da se v mobilno omrežje poveže z mobilnim telefonom prek povezave Bluetooth, klici pa gredo nato prek te povezave, vendar sam tega nisem preskusil.
+**GSM USB ključek** v RasPBX je posebna USB naprava, pravzaprav USB modem, v katerega lahko vstavite SIM kartico in nato ta modem povežete z računalnikom (v našem primeru RaspberryPi) preko USB vmesnika. Na voljo je več USB modemov, vendar vsi ne delujejo z RasPBX. Združljivi USB modemi morajo biti odklenjeni in morajo imeti omogočeno tim. glasovno zmogljivost. Kompatibilni modem lahko izberete [iz seznama uradno podprtih](https://github.com/bg111/asterisk-chan-dongle/wiki/Requirements-and-Limitations). Stanejo okoli 20 EUR, lahko kupite tudi rabljenega, če pa ni odklenjen, boste morali uporabiti [DC Unlocker](https://www.dc-unlocker.com/downloads/DC_unlocker_software), kar pa vas bo stalo nekaj dodatnega denarja. (Mimogrede, DC Unlocker deluje samo v sistemu Windows). Sam sem uporabil **Huawei E1752C**, vi pa seveda lahko izberete kateregakoli drugega izmed podprtih modelov. Mimogrede, namesto USB ključa lahko nastavite RasPBX tako, da se v mobilno omrežje poveže z mobilnim telefonom prek povezave Bluetooth, klici pa gredo nato prek te povezave, vendar sam tega nisem preskusil.
 
 Seveda boste potrebovali tudi kartico SIM in preden jo vstavite v USB modem, najprej na njej onemogočite PIN kodo. To lahko storite s svojim telefonom. Če slučajno ne veste kako, uporabite iskalnik. :)
 
@@ -45,10 +45,10 @@ Dovolj govorjenja, čas je, da se lotimo izvedbe projekta!
 
 ## Kaj bomo potrebovali
 Kot smo že omenili, bomo potrebovali:
-- RaspberryPi 3 ali RaspberryPi 4 (preizkusil sem oba, vendar je RPi4 veliko zmogljivejši in zmore obdelati do 200 sočasnih telefonskih klicev (dejansko, [brez heca] (https://www.youtube.com/watch? v=dVGf3HrKZl4)). Predlagam, da kupite RPi4 s 4 ali 8 GB RAM-a);
+- RaspberryPi 3 ali RaspberryPi 4 (preizkusil sem oba, vendar je RPi4 veliko zmogljivejši in zmore obdelati do 200 sočasnih telefonskih klicev (dejansko, [brez heca](https://www.youtube.com/watch?v=dVGf3HrKZl4)). Predlagam, da kupite RPi4 s 4 ali 8 GB RAM-a);
 - napajalnik za RaspberryPi (3A ali več), ohišje za RaspberryPi in SD kartico (8 GB je minimalno, predlagam pa nakup nekoliko bolj kvalitetne 32 GB kartice);
 - združljiv GSM USB ključek (npr. Huawei E1752C);
-- RasPBX, ki ga lahko brezplačno [prenesete z uradne spletne strani projekta] (http://www.raspberry-asterisk.org/downloads/) (uporabil sem različico 10-10-2020);
+- RasPBX, ki ga lahko brezplačno [prenesete z uradne spletne strani projekta](http://www.raspberry-asterisk.org/downloads/) (uporabil sem različico 10-10-2020);
 - internetno povezavo.
 
 Pogledali si bomo tudi kako svojo telefonsko centralo postavimo znotraj omrežja VPN. O tem kako postaviti svoje lastno omrežje na OpenVPN tehnologiji ter kako implementirati ustrezne varnostne izboljšave (zlasti na področju kriptografije), tokrat ne bo govora, predpostavka pa je da VPN omrežje že imamo oziroma, da telefonsko centralo postavljamo v lokalnem omrežju.
