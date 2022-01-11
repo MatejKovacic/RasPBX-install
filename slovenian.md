@@ -1,7 +1,7 @@
 # Namestitev RasPBX
 *Namestitev RasPBX za začetnike*
 
-Pred nekaj leti sem naletel na zanimiv projekt nekoga, ki je [ustvaril GSM povezavo med dvema RasPBX strežnikoma](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx -hosts.html), da je lahko brezplačno klical iz Brazilije v Nemčijo in obratno. Žal takrat za take projekte nisem imel dovolj časa, a povezava na spletno stran je ostala med zaznamki in čakala... do zdaj.
+Pred nekaj leti sem naletel na zanimiv projekt nekoga, ki je [ustvaril GSM povezavo med dvema RasPBX strežnikoma](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html), da je lahko brezplačno klical iz Brazilije v Nemčijo in obratno. Žal takrat za take projekte nisem imel dovolj časa, a povezava na spletno stran je ostala med zaznamki in čakala... do zdaj.
 
 V današnjem prispevku si bomo ogledali kako namestimo telefonski strežnik [*Asterisk*](https://www.asterisk.org/) na mini računalnik [*RaspberryPi*](https://www.raspberrypi.org/) ter kako vse skupaj nastavimo, da omogoča klicanje iz računalnika ali pametnega telefona na običajne telefonske številke. Povedano drugače – ogledali si bomo, kako si postaviti lastno telefonsko centralo, ki jo lahko pospravimo v žep. No, pravzaprav ne povsem dobesedno, saj mora biti RaspberryPi povezan v omrežje, potrebujemo pa tudi napajanje. Sprehajanje s telefonsko centralo v žepu, povezano s kabli v omrežje in na napajalnik pa je precej... nepraktično, ampak saj razumemo poanto, kajne?
 
@@ -116,7 +116,7 @@ Zdaj se lahko z RasPBX napravo povežemo prek SSH. Uporabniško ime je **root** 
     install-dongle      Install GSM/3G calling capability with chan_dongle
     raspbx-backup       Backup your complete system to an image file
 
-<img src="005_login.png" alt="Login to the system with SSH" width="300"/>
+<img src="005_login.png" alt="Prijava v sistem preko SSH" width="300"/>
 
 
 ### Kaj postoriti po prvi prijavi?
@@ -178,11 +178,11 @@ Najprej bomo na RasPBX napravi vzpostavili sistem elektronske pošte, ki sistems
 
 Sistem nas sedaj vodi skozi različne nastavitve. Na prvi konfiguracijski strani moramo izbrati "*mail sent by smarthost; received via SMTP or fetchmail*".
 
-<img src="003_mail_server1.png" alt="Konfiguracija pošte" width="300"/>
+<img src="003_mail_server1.png" alt="Konfiguracija e-pošte" width="300"/>
 
 Na naslednjih straneh lahko obdržimo privzete vrednosti s pritiskom na tipko Enter. To počnemo, dokler ne pridemo do strani, ki se začne z "*Please enter the IP address or the host name of a mail server...*". Tukaj moramo vnesti ime gostitelja SMTP našega ponudnika e-pošte. Ker uporabljam tudi svoj lastni poštni strežnik, sem vnesel nastavitve svojega poštnega strežnika, lahko pa uporabite tudi GMail ali katerega drugega poštnega ponudnika (po možnosti takega, ki ni v lasti velikih zlobnih tehnoloških podjetij).
 
-<img src="004_mail_server2.png" alt="Konfiguracija pošte" width="300"/>
+<img src="004_mail_server2.png" alt="Konfiguracija e-pošte" width="300"/>
 
 Pri tem pa je potreben majhen trik: vnesti je potrebno FQDN ime in vrata vašega poštnega strežnika, to dvoje pa mora biti razmejeno z dvojnim dvopičjem. Na primer: `mail.example.com::587` - upoštevajte dvojno dvopičje (`::`) med FQDN in vrati. Oh, in za *nehekerje*, ki ne vedo, kaj pomeni FQDN - to pomeni *fully qualified domain name*, gre za ime domene, ki določa natančno lokacijo vašega poštnega strežnika v drevesni strukturi domenskega sistema.
 
@@ -475,3 +475,242 @@ Ko vnesemo vse te ukaze, lahko požarni zid ufw aktiviramo tako, da vnesemo `ufw
 Uporabna ukaza sta tudi `ufw disable` in `ufw reset`, za več pa si oglejte dokumentacijo UFW.
 
 Zdaj smo končali. Za konec seveda preverite, ali vse deluje tako kot mora. Se pravi, popolnoma se odjavite in se skušajte na RasPBX ponovno prijaviti iz svojega lokalnega omrežja (`ssh root@192.168.1.150`) in prek VPN-ja (`ssh root@10.10.8.150`). Če vse deluje, je vaš sistem že kar dobro zavarovan in čas je za naslednji korak. A pred tem si privoščite skodelico kave – pošteno ste si jo prislužili.
+
+## Namestitev USB modema
+
+In sedaj končno prihaja prava stvar. Razlog, zakaj ste se vztrajali pri prebiranju dosedanjih nebuloz. Izpolnitev vaših želja. Končno si bomo pogledali kako na sistem namestimo USB modem (v angleščini se uporablja izraz *USB dongle*, gre pa za USB GSM modem) in kako lahko z njegovo pomočjo kličemo ven.
+
+Na hitro še preverite ali imate SIM kartico z deaktivirano PIN številko, ali imat epri sebi enega izmed podprtih USB modemov z najnovejšo strojno programsko opremo in omogočeno glasovno zmogljivostjo. Potem pa lahko končno zaženete ta želeni ukaz: `install-dongle`.
+
+Najprej morate vnesti telefonsko številko vaše SIM kartice (tiste, ki je vstavljena v USB ključ). Predpostavimo, da je ta +38641234567 (svoje telefonske številke vam seveda ne mislim izdati). Vnesemo torej »+38641234567«.
+
+Kot ste opazili, morate telefonsko številko vnesti v skladu z mednarodnim standardom E.164 za zapis telefonske številke. V mojem primeru je 386 koda države za Slovenijo, 41 je območna koda in 234567 je telefonska številka. Več o [telefonskih številkah v Sloveniji si lahko preberete na Wikipediji](https://en.wikipedia.org/wiki/Telephone_numbers_in_Slovenia).
+
+Nato morate vnesti e-poštni naslov za pošiljanje dohodnih SMS sporočil (tukaj sem, jasno, vpisal svoj e-poštni naslov), telefonsko številko, na katero naj bodo posredovana dohodna SMS sporočila (to sem pustil prazno, ker ne želim uporabljati posredovanja SMS-ov), na koncu pa me je aplikacija vprašala, ali želim na RasPBX napravo namestiti spletno stran za pošiljanje SMS-ov s preko USB modema. Seveda želim, kako neumno vprašanje, zato sem hitro rekel `y` (*Da*) in nato vnesel še geslo za SMS stran, ki se glasi `mojesupervarnogeslo`. Ne, hecam se, svojih gesel seveda ne bom delil z vami.
+
+<img src="006_sms1.png" alt="Spletni vmesnik za pošiljanje SMS sporočil" width="300"/>
+
+Mimogrede, še krajša opazka glede spletnega vmesnika za pošiljanje SMS sporočil. Če imate vsaj malo občutka za spletno oblikovanje, je ta vmesnik prava žalitev za vaše oči. Vseeno pa to ni problem, saj lahko izgled vmesnika spremenite sami. Datoteke HTML se nahajajo v `/var/www/html/sms` in jih lahko prosto urejate. Če boste pripravili kakšen zanimiv dizajn vmesnika za pošiljanje SMS poročil, vam bom zelo hvaležen, če ga boste delili z mano.
+
+<img src="007_sms2.png" alt="Spletni dizajn v vsem svojem sijaju" width="300"/>
+
+Zdaj lahko USB modem vstavite v vaš RaspberryPi. Če je bil slučajno že prej priključen (niste mogli počakati, ha!), pa ga izvlecite ven ter ga ponovno priključite. Nekateri starejši GSM modemi sicer zahtevajo ponovni zagon celotnega računalnika RaspberryPi in v tem primeru boste v ukazno vrstico morali vnesti ukaz `reboot`.
+
+### Konfiguracija USB modema
+
+Ko se s SSH znova povežete na RasPBX, lahko preverite, ali v sistemu vidite USB GSM ključek. Vnesite ukaz `ls -l /dev/ttyUSB0*` in dobili boste približno takle izpis:
+
+    crw-rw-rw- 1 root dialout 188, 0 okt 29 15:27 /dev/ttyUSB0
+
+Now show dongle devices through Asterisk management console: `asterisk -rx 'dongle show devices'`. You will see something like this:
+Zdaj si lahko v upravljalni konzoli Asterisk ogledate še ali je ključek prepoznal tudi Asterisk sistem: `asterisk -rx 'dongle show devices'`. Videli boste nekaj takega:
+
+    ID           Group State      RSSI Mode Submode Provider Name  Model      Firmware          IMEI             IMSI             Number        
+    dongle0      0     Free       21   3    3       BOB            E1752      11.126.03.01.314  xxxxxxxxxxxxxxx  2934xxxxxxxxxxx  Unknown       
+
+Vidite lahko, da imate vstavljen en GSM USB modem (imenovan *dongle0*), izpiše pa se tudi več zanimivih informacij o tem ključu, kot na primer IMEI, IMSI vaše kartice SIM itd. *State: Free* pomeni, da je ključ USB pripravljen za sprejemanje klicev. In če se sprašujete, ali *dongle0* pomeni, da bi lahko obstajal tudi *dongle1* itd., je odgovor pritrdilen, na RaspberryPi lahko povežete več ključev (vendar upoštevajte, da boste potem potrebovali več električne energije za napajanje).
+
+Zdaj lahko pogledate še več informacij o vašem ključku (*dongle0*). Vnesite ukaz `asterisk -rx 'dongle show device state dongle0'` in dobili boste veliko zanimivih informacij:
+
+    -------------- Status -------------
+      Device                  : dongle0
+      State                   : Free
+      Audio                   : /dev/ttyUSB1
+      Data                    : /dev/ttyUSB2
+      Voice                   : Yes
+      SMS                     : Yes
+      Manufacturer            : huawei
+      Model                   : E1752
+      Firmware                : 11.126.03.01.314
+      IMEI                    : xxxxxxxxxxxxxxx
+      IMSI                    : 2934xxxxxxxxxxx
+      GSM Registration Status : Registered, home network
+      RSSI                    : 21, -71 dBm
+      Mode                    : GSM/GPRS
+      Submode                 : EDGE
+      Provider Name           : BOB
+      Location area code      : xxx
+      Cell ID                 : xxx
+      Subscriber Number       : Unknown
+      SMS Service Center      : +38640441000
+      Use UCS-2 encoding      : Yes
+      USSD use 7 bit encoding : Yes
+      USSD use UCS-2 decoding : No
+      Tasks in queue          : 0
+      Commands in queue       : 0
+      Call Waiting            : Disabled
+      Current device state    : start
+      Desired device state    : start
+      When change state       : now
+      Calls/Channels          : 0
+        Active                : 0
+        Held                  : 0
+        Dialing               : 0
+        Alerting              : 0
+        Incoming              : 0
+        Waiting               : 0
+        Releasing             : 0
+        Initializing          : 0
+
+Ker seveda želim ohraniti svojo zasebnost, so podatki o mojem IMEI, IMSI, LAC kodi in ID bazne postaje zabrisani.
+
+Sedaj lahko končno konfiguriramo naš ključ za klice in SMS sporočila. Odprite konfiguracijsko datoteko: `nano /etc/asterisk/dongle.conf` in poiščite `[dongle0]`. Videli boste vrstice *audio* in *data*, nato pa dodajte svoje vrstice *exten*, *imei* in *imsi*, kot je prikazano v naslednjem primeru:
+
+    [dongle0]
+    audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
+    data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
+    exten=+38641234567;
+    imei=xxxxxxxxxxxxxxx;
+    imsi=2934xxxxxxxxxxx;
+
+Shranite in zaprite datoteko ter se prijavite neposredno v upravljalno konzolo Asterisk: `asterisk -rvvv`. Nato vnesite ukaz `dongle reload now`:
+
+    raspbx*CLI> dongle reload now
+    [2021-10-29 17:23:11] NOTICE[1421]: chan_dongle.c:429 do_monitor_phone: [dongle0] stopping by restart request
+        -- [dongle0] Dongle has disconnected
+        -- [dongle0] Trying to connect on /dev/ttyUSB2...
+        -- [dongle0] Dongle has connected, initializing...
+        -- [dongle0] Dongle initialized and ready
+
+### Svoboda kliče
+
+Kot lahko vidite, je USB ključek zdaj pripravljen. Najprej preverimo, ali lahko pošljemo SMS sporočilo. V upravljalni konzoli Asterisk vnesite `dongle sms dongle0 +38640XXXXXX Test!`. To bo na moj osebni mobilni telefon (*+38640XXXXXX*) poslalo SMS sporočilo z besedilom "*Test!*.
+
+Odhodni klic pa lahko sprožimo z ukazom `channel originate dongle/dongle0/+38640XXXXXX application MusicOnHold`. V upravljalni konzoli Asterisk se bo izpisalo nekaj takega:
+
+    -- Called dongle0/+38640XXXXXX
+    -- Dongle/dongle0-0100000000 is making progress
+    -- Dongle/dongle0-0100000000 answered
+    -- Started music on hold, class 'default', on channel 'Dongle/dongle0-0100000000'
+    -- Stopped music on hold on Dongle/dongle0-0100000000
+
+Klicani telefon bo začel zvoniti in če dvignete, boste slišali glasbo.
+
+Zdaj lahko zaprete upravljalno konzolo Asterisk tako, da vnesete `exit` in poskusite poslati SMS še prek spletne strani. V brskalniku odprite spletno stran `/sms` na vaši napravi RasPBX (v mojem primeru `http://10.10.8.150/sms/`) in pošljite SMS sporočilo. Če se spomnite, smo postavili požarni zid, tako da je spletna stran za pošiljanje SMS sporočil na voljo samo iz dovoljenih naslovov IP.
+
+In da ne pozabimo. Če pošljete SMS nazaj na vaš GSM USB ključek, ga bo RasPBX takoj poslal na vaš e-poštni naslov. To pa ni kar tako, kajne?
+
+Žal pa **prejemanje MMS sporočil ne deluje** (pošiljanje pa tudi ne). Ko vam bo nekdo poslal MMS sporočilo, ne boste prejeli niti številke pošiljatelja, pač pa le sporočilo, da ste prejeli SMS s številke `MMSC` s prazno vsebino. Če ima kdo od bralcev idejo, kako rešiti ta problem, ste seveda toplo dobrodošli, da to idejo ali celo konkretno rešitev delite z nami.
+
+Kakorkoli že, e-poštna sporočila v katerih dobivate prejete SMS-e izgledajo obupno slabo. To lahko popravite tako, da spremenite kodo v konfiguracijski datoteki. To storite takole: `nano /etc/asterisk/extensions_custom.conf` in dodate nekaj takega:
+
+    [from-trunk-dongle]
+    exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
+    exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
+    exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
+    exten => sms,n,System(sendmail -t < /tmp/sms.txt)
+    exten => sms,n,Hangup()
+    exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
+    exten => _.,n,Goto(from-trunk,${EXTEN},1)
+
+Pazite le, da vnesete pravilen e-poštni naslov.
+
+### Namestitev spletnega vmesnika za USSD
+
+*Unstructured Supplementary Service Data* (USSD), včasih imenovani tudi *quick codes* ali *feature codes*, je komunikacijski protokol, ki ga mobilni telefoni GSM uporabljajo za komunikacijo z računalniki operaterja mobilnega omrežja. USSD se lahko uporablja za brskanje po WAP, predplačniško storitev povratnega klica, storitve mobilnega plačevanja, različne lokacijske storitve ali kot del konfiguracije telefona v omrežju. Sporočila USSD so dolga do 182 alfanumeričnih znakov, vendar za razliko od sporočil SMS sporočila USSD med samo sejo ustvarijo povezavo v realnem času. Povezava ostane odprta, kar omogoča dvosmerno izmenjavo podatkov.
+
+Sam sicer USSD storitev ne uporabljam, če pa te storitve potrebujete, samo vnesite ukaz `apt install ussd-webpage`, nato pa z brskalnikom odprite `/ussd` podstran na vaši RasPBX napravi (v mojem primeru `http://10.10. 8.150/ussd/`).
+
+### Namestitev dodatnega kodeka
+
+Čisto za konec boste morda boste želeli namestiti še dodatni glasovni kodek G.729, ki je licenciran in ga je zato treba ročno namestiti v vaš sistem. G.729 uporablja kompresijo, zato porablja manj pasovne širine za ceno enake kakovosti zvoka. Ponuja zelo dober kompromis med pasovno širino in kakovostjo in zanj velja, da je za večino klicev zelo dobra izbira. Standardni klici s kodekom npr. G.711 zahtevajo 64 kbit/s na klic, kodek G.729 pa stisne glas na 8 kbit/s (pri čemer se kvaliteta ne poslabša zelo bistveno), kar vam omogoča do osemkrat večjo zmogljivost na isti povezavi. To je idealno za uporabo, če je vaša pasovna širina omejena. Kodek lahko namestite tako, da vnesete `apt install asterisk16-codecg729`.
+
+In to je zaenkrat to. Konzolo lahko zaenkrat pustite ob strani, nadaljnja konfiguracija bo potekala preko spletnega vmesnika.
+
+## FreePBX konfiguracija
+
+Zdaj pa se začne prava zabava. Odprite spletni brskalnik in vnesite naslov IP vaše RasPBX. V mojem primeru `http://10.10.8.150`.
+
+Ko se poskušamo prvič prijaviti v spletni vmesnik FreePBX, se izvedejo začetne nastavitve sistema. Najprej moramo nastaviti privzeti jezik. Toplo vam priporočam, da izberete angleščino, saj sta tako dokumentacija, kot pomoč na forumih večinoma v angleščini. Prav tako boste morali nastaviti svoj časovni pas ter seveda uporabniško ime in geslo. In ne pozabite na e-naslov za e-pošto z obvestili. Prav tako vam močno priporočam, da omogočite samodejne posodobitve.
+
+<img src="009_freepbx-dashboard.png" alt="Nadzorna plošča FreePBX" width="300"/>
+
+Po uspešni prijavi na nadzorno ploščo moramo klikniti na "Apply config" s čimer aktiviramo spremembe, ki smo jih naredili. Zdaj je naš sistem pripravljen za nadaljnje delo.
+
+### Nastavitev trunk povezave
+
+Kot smo pojasnili, se trunk povezave uporabljajo za povezavo dveh telefonskih sistemov (izmenjavo prometa med njima). Z našo trunk povezavo bomo naš sistem RasPBX preko USB modema povezali z mobilnim operaterjem. Iz te povezave bomo kasneje usmerjali odhodne in dohodne klice med našim telefonskim sistemom in javnim telefonskim omrežjem.
+
+Najprej moramo seveda ustvariti novo trunk povezavo za naš GSM ključek. V spletnem vmesniku FreePBX izberite `Connectivity` → `Trunks` → `Add Custom Trunk` in nastavite naslednje vrednosti:
+- `General` - `Trunk Name`: vnesite ime trunk povezave, sam sem uporabil `gsm_dongle0`.
+- `General` - `Outbound CallerID`: vnesite telefonsko številko vaše SIM kartice, ki je vstavljena v USB modem. Številka naj bo v E.164 zapisu. Sam sem vnesel `+38640XXXXXX` (no, v resnici nisem vnesel X-ov, ker pač ne želim razkriti svoje telefonske številko, ampak saj razumete bistvo, kajne?).
+- `Dialed Number Manipulation Rules`: tukaj izberite polje `match pattern` in vnesite `XXXXXXXXX` (ja, tukaj je pa treba vnesti X-e).
+- `Custom Settings` - `Custom Dial String`: `dongle/dongle0/$OUTNUM$`.
+
+<img src="010_trunk1.png" alt="Trunk povezava - splošne nastavitve" width="300"/>
+
+<img src="011_trunk2.png" alt="Trunk povezava - Dialed Number Manipulation Rules" width="300"/>
+
+<img src="012_trunk3.png" alt="Trunk povezava - Custom Settings" width="300"/>
+
+Kliknite na *Submit changes* (gumb spodaj desno) in nato *Apply config* (zgoraj desno).
+
+Preden nadaljujemo, pa je potrebna kratka razlaga glede pravil za tim. manipulacijo klicanih številk (`Dialed Number Manipulation Rules`). V mojem primeru sem vnesel `XXXXXXXXX`. Kaj pomenijo ti znaki?
+
+Med nastavitvami trunk povezave lahko nastavite pravila za manipulacijo klicane številke, torej pravila, ki določijo kaj se s številko zgodi, ko jo pošljete iz trunk povezave v drugo telefonsko omrežje. S temi pravili lahko klicani številki, preden jo posredujete trunk povezavi, dodate predpone itd. Če na primer uporabnik pokliče številko *123456*, lahko pred to številko dodate *041*, tako da bo klicana številka v resnici *041123456*. Če pa ne velja nobeno pravilo, se številka ne spremeni. V našem primeru za klicane številke sicer ne bomo uporabljali nobenih posebnih pravil, vendar pa zahtevamo, da so klicane številke dolge 9 števk, zato smo uporabili vzorec `XXXXXXXXX`.
+
+Če pa bi želeli pred številko dodati predpono, pa izberete `Dialed Number Manipulation Rules` in v polje `prepend`, vnesete številko, ki bo dodana pred vsako klicano številko na tej trunk povezavi. Če na primer vnesete `#31#`, bo to na dani trunk povezavi skrilo ID klicatelja (omenjena koda se v Evropi uporablja za skrivanje klicne identitete).
+
+Ampak kaj pa pomenijo ti X-i? To so vzorci, ki se uporabljajo za "razlago" oblike števila:
+- **X** se ujema s katero koli številko od 0-9.
+- **Z** se ujema s katero koli številko od 1 do 9.
+- **N** se ujema s katero koli številko od 2 do 9.
+- **[1237-9]** se ujema s katero koli številko v oklepaju (v našem primeru se ujema s številkami: 1,2,3,7,8,9).
+- **.** pika se ujema z eno ali več klicanimi številkami.
+
+Torej pravilo "XXXXXXXXX" preprosto pomeni, da lahko preko dane trunk povezave pokličete katero koli 9-mestno dolgo številko od 000000000 do 999999999.
+
+Zdaj ste verjetno pomislili, da lahko s temi pravili nastavimo omejitev katere številke lahko kličejo uporabniki našega telefonskega sistema.
+
+Imate prav. To je mogoče narediti, vendar bomo to naredili v nastavitvah odhodnih povezav. In ravno to je tema našega naslednjega podpoglavja.
+
+### Nastavljanje izhodnih povezav
+
+Tim. izhodne povezave (*outbound routes*) se uporabljajo za to, da vaš RasPBX sistem ve, katere številke lahko kličejo vaši uporabniki (oz. vaše interne telefonske številke) in na katero trunk povezavo naj se posredujejo posamezni odhodni klici. Tukaj lahko nastavite številke, ki jih uporabniki ne morejo klicati, npr. številke za klic v sili (tega v tem vodiču sicer ne bomo obravnavali) in pot za običajne klice. Nastavimo pa lahko tudi posebno poti za mednarodne klice ali klice v različna omrežja (nekateri operaterji na primer ponujajo neomejene brezplačne klice znotraj svojega omrežja) – vsaka od teh poti lahko poteka po svoji trunk povezavi.
+
+Poglejmo si torej kako nastaviti izhodno povezavo, preko katere boste lahko s pomočjo GSM modema klicali ven iz vašega RasPBX sistema. V FreePBX klinite `Connectivity` → `Outbound routes` in nato gumb `Add Outbound Route`. Sedaj nastavite svojo izhodno povezavo:
+- `Route Name`: vnesite ime izhodne povezave, sam sem uporabil `gsm_out`.
+- `Trunk Sequence for Matched Route`: iz menija izberite `gsm_dongle0` (to je ime trunk povezave, ki smo jo nastavili v prejšnjem koraku).
+- `Dial Patterns`: tukaj izberite polje `match pattern` in vnesite `0[12345678]XXXXXXX`.
+
+Ta vzorec bo uporabnika omejil, da bo lahko klical samo 9-mestne številke, ki se začnejo z 0 in jim sledi druga števka, ki pa je lahko katera koli, razen 0 ali 9. Vseh ostalih sedem števk je lahko kar koli od 0 do 9.
+
+Kaj pomeni to pravilo? Na kratko: ne dovolimo mednarodnih klicev ter dovolimo samo klicanje v lokalna omrežja od 01 do 08 Omrežje 090 ni dovoljeno, saj so številke 090 v Sloveniji tim. komercialne številke, kamor lahko pokličete razne vedeževalke, vroče linije in podobne neumnosti ter zapravite kup denarja. Česar pa verjetno nočete, kajne?
+
+<img src="013_outbound_routes1.png" alt="Izhodne povezave – nastavitve povezave" width="300"/>
+
+<img src="014_outbound_routes2.png" alt="Izhodne povezave – klicni vzorci" width="300"/>
+
+Kliknite gumb *Submit* in nato *Apply config*.
+
+<img src="015_outbound_routes3.png" alt="Seznam izhodnih povezav" width="300"/>
+
+#### Nastavitev klicnih predpon za odhodne klice
+
+Če želite, da mora uporabnik za klicanje ven (torej, za uporabo vaše izhodne povezave) vnesti določeno številko, na primer `0`, pojdite na nastavitve vaše izhodne povezave in izberite `Dial Patterns`. Nato pojdite na polje `prefix` in vnesite `0`.
+
+S tem boste nastavili, da ko bo neka vaša interni uporabnik želel poklicati zunanjo številko, npr. `031987654`, bo moral najprej pritisniti `0` in šele nato vnesti številko ki jo kliče (v našem primeru `031987654`). Brez tega klic na zunanje številke ne bo mogoč.
+
+### Nastavitev internih telefonskih številk
+
+Zdaj lahko končno nastavimo naše interne telefonske številke. V telefonski terminologiji se za to uporablja angleški izraz *extension*, kar bi lahko zelo grobo prevedli kot *razširitev*. Gre za lokalne telefonske številke znotraj našega telefonskega sistema. V FreePBX kliknite `Applications` → `Extensions`. Kliknite na gumb `Add Extension` in dodajte novo številko tipa `SIP [chan_pjsip] extension`.
+
+Nato nastavite:
+- `User extension`: lahko je poljubna številka, sam sem se odločil za 4-mestne številke in v mojem primeru sem vnesel `1000`.
+- `Display name`: prikazno ime je seveda ime uporabnika ali naprave. Sam sem vpisal `Matej - racunalnik`, saj to številko nameravam uporabljati na svojem računalniku.
+- `Secret`: tukaj se nahaja geslo za vašo interno telefonsko številko (oziroma vaš SIP račun). to geslo je samodejno ustvarjeno, lahko pa ga poljubno spremenite. Na primer, v ... no, tega vam seveda ne izdam, saj morajo gesla ostati tajna, kajne?
+<img src="016_extensions1.png" alt="Interne telefonske številke – splošne nastavitve" width="300"/>
+
+Na tem mestu pa lahko postorite še nekaj zanimivih stvari. Pod izbiro `Voicemail` lahko omogočite zvočno pošto. Poglejmo si nekaj uporabnih nastavitev:
+- Nastavitev gesla `Voicemail Password` (uporabite samo številke).
+- `Disable (*) in Voicemail Menu`: nastavite na **ne** (**no**), kar vam bo omogočilo, da s pomočjo telefona lahko uporabljate zvočne menije.
+- `Require From Same Extension`: nastavite na **da** (**yes**), s čimer določite, da uporabnik do svoje zvočne pošte lahko dostopa samo preko svoje interne telefonske številke.
+- Nastavite e-naslov uporabnika (`e-mail address`), `pager address` je namenjen pošiljanju res zelo kratkih e-sporočil.
+- `Email Attachment`: če nastavite na **da** (**yes**), bodo zvočna sporočila uporabnika poslana na njegov e-naslov kot priložena zvočna datoteka.
+- `Delete Voicemail`: če nastavite na **da** (**yes**), bodo zvočna sporočila iz sistema izbrisana takoj, ko bodo uporabniku poslana po e-pošti.
+
+<img src="017_extension2.png" alt="Zvočna pošta" width="300"/>
+
+Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*. Seveda v sistem lahko dodate več telefonskih številk, lahko tudi za vse svoje prijatelje in znance. Vendar pa se zavedajte, da bodo pri trenutnih nastavitvah vse te interne številke lahko uporabljale vašo trunk povezavo za izhodne klice, kar lahko vodi do nepredvidenih stroškov. A brez skrbi, v nadaljevanju si bomo pogledali kako tem dodatnim številkam omejiti klicanje ven.
+
+<img src="023_extensions_list.png" alt="Seznam internih telefonskih številk" width="300"/>
