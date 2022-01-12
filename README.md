@@ -1,6 +1,56 @@
 # Installation of RasPBX
 *RasPBX installation for beginners*
 
+- [Installation of RasPBX](#installation-of-raspbx)
+  * [Basic concepts](#basic-concepts)
+  * [What you will need](#what-you-will-need)
+  * [Installation of the operating system](#installation-of-the-operating-system)
+    + [Write the RasPBX image to a SD card](#write-the-raspbx-image-to-a-sd-card)
+    + [Log in to the RasPBX device](#log-in-to-the-raspbx-device)
+    + [First things to do after login](#first-things-to-do-after-login)
+  * [PBX installation and configuration](#pbx-installation-and-configuration)
+    + [Setting up the e-mail system](#setting-up-the-e-mail-system)
+    + [Set up VPN client](#set-up-vpn-client)
+    + [Set up NTP](#set-up-ntp)
+  * [The security of your system](#the-security-of-your-system)
+    + [Secure SSH](#secure-ssh)
+      - [Login with SSH key](#login-with-ssh-key)
+    + [Disable *root* user](#disable--root--user)
+    + [Install intrusion prevention](#install-intrusion-prevention)
+      - [How to unban IP address](#how-to-unban-ip-address)
+    + [Install firewall](#install-firewall)
+  * [Installation of USB dongle](#installation-of-usb-dongle)
+    + [Dongle configuration](#dongle-configuration)
+    + [Freedom is calling](#freedom-is-calling)
+    + [Install USSD webpage](#install-ussd-webpage)
+    + [Install additional codec](#install-additional-codec)
+  * [FreePBX configuration](#freepbx-configuration)
+    + [Set up the trunk](#set-up-the-trunk)
+    + [Set up outbound routes](#set-up-outbound-routes)
+      - [Setting up dial prefix for outgoing calls](#setting-up-dial-prefix-for-outgoing-calls)
+    + [Set up extensions](#set-up-extensions)
+    + [Set up inbound routes](#set-up-inbound-routes)
+    + [Additional SIP settings](#additional-sip-settings)
+    + [Enabling TCP instead of UDP](#enabling-tcp-instead-of-udp)
+  * [Setting up SIP clients](#setting-up-sip-clients)
+    + [Your voicemail configuration](#your-voicemail-configuration)
+    + [Voicemail Admin e-mail configuration](#voicemail-admin-e-mail-configuration)
+  * [Some other things to do](#some-other-things-to-do)
+    + [Block extension to call outside](#block-extension-to-call-outside)
+    + [Restrict extension to calling a specific number only](#restrict-extension-to-calling-a-specific-number-only)
+  * [Updating the system](#updating-the-system)
+  * [Backups](#backups)
+  * [Some other cool things to do](#some-other-cool-things-to-do)
+    + [Testing](#testing)
+    + [Connecting the physical phone](#connecting-the-physical-phone)
+      - [Configuring and connecting VoIP phone to your local network](#configuring-and-connecting-voip-phone-to-your-local-network)
+      - [Connecting VoIP phone to the VPN](#connecting-voip-phone-to-the-vpn)
+        * [RaspberryPi as a router for the wired network](#raspberrypi-as-a-router-for-the-wired-network)
+        * [Access to VoIP phone from the VPN network](#access-to-voip-phone-from-the-vpn-network)
+        * [Change *unchangeable* default password](#change--unchangeable--default-password)
+    + [Volume in voicemail messages](#volume-in-voicemail-messages)
+  * [And what can *you* do?](#and-what-can--you--do-)
+
 A few years ago I came across a very interesting project from some guy, who [created a GSM bridge between two RasPBX hosts](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html) and who wanted to make free long distance calls from Brazil to Germany with the help of his RaspberryPi. That sounded just cool, but other projects were waiting for me at that time and I didn't have time for that. Until now.
 
 So, what do we intend to do? I am going to show you, how you can install the [*Asterisk*](https://www.asterisk.org/) telephony server on a small single board computer [*RaspberryPi*](https://www.raspberrypi.org/) in order to be able to make calls from your computer or smartphone to ordinary phone numbers. So basically, you will literally end up with your own PBX in your pocket. Actually no, because RaspberryPi needs to be connected to a power supply and network, and you would look weird with cables going into your pocket, but you get the idea.
@@ -818,7 +868,7 @@ So we will have the following algorithm:
 So, we will set up the first outgoing connection, saying, that extension `3000` can call outside number `031987654`. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Now you should configure your outbound route:
 - `Route Name`: `3000_to_my_mobile` (meaning this extension can call my personal mobile only).
 - `Trunk Sequence for Matched Route`: from the drop down menu select `gsm_dongle0`.
-- `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
+- `Dial Patterns`: here go to the field `match pattern` and enter `031987654` (outside number that is allowed to be called).
 
 Now we add another rule. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Define some things:
 - `Route Name`: `3000_no_out`.
