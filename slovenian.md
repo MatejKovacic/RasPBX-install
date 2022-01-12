@@ -695,7 +695,7 @@ S tem boste nastavili, da ko bo neka vaša interni uporabnik želel poklicati zu
 
 Zdaj lahko končno nastavimo naše interne telefonske številke. V telefonski terminologiji se za to uporablja angleški izraz *extension*, kar bi lahko zelo grobo prevedli kot *razširitev*. Gre za lokalne telefonske številke znotraj našega telefonskega sistema. V FreePBX kliknite `Applications` → `Extensions`. Kliknite na gumb `Add Extension` in dodajte novo številko tipa `SIP [chan_pjsip] extension`.
 
-Nato nastavite:
+Nato sledijo nastavite:
 - `User extension`: lahko je poljubna številka, sam sem se odločil za 4-mestne številke in v mojem primeru sem vnesel `1000`.
 - `Display name`: prikazno ime je seveda ime uporabnika ali naprave. Sam sem vpisal `Matej - racunalnik`, saj to številko nameravam uporabljati na svojem računalniku.
 - `Secret`: tukaj se nahaja geslo za vašo interno telefonsko številko (oziroma vaš SIP račun). to geslo je samodejno ustvarjeno, lahko pa ga poljubno spremenite. Na primer, v ... no, tega vam seveda ne izdam, saj morajo gesla ostati tajna, kajne?
@@ -714,3 +714,70 @@ Na tem mestu pa lahko postorite še nekaj zanimivih stvari. Pod izbiro `Voicemai
 Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*. Seveda v sistem lahko dodate več telefonskih številk, lahko tudi za vse svoje prijatelje in znance. Vendar pa se zavedajte, da bodo pri trenutnih nastavitvah vse te interne številke lahko uporabljale vašo trunk povezavo za izhodne klice, kar lahko vodi do nepredvidenih stroškov. A brez skrbi, v nadaljevanju si bomo pogledali kako tem dodatnim številkam omejiti klicanje ven.
 
 <img src="023_extensions_list.png" alt="Seznam internih telefonskih številk" width="300"/>
+
+### Nastavljanje dohodnih povezav
+
+Končno lahko nastavimo še, kam (na katere interne telefonske številke) bodo usmerjeni dohodni klici. V FreePBX kliknite `Connectivity` → `Inbound routes`. Kliknite gumb 'Inbound Route' in nastavite:
+- `Description`: vnesite ime vaše dohodne povezave, sam sem uporabil `gsm_in`.
+- `Set destination` - `Select Extensions` in izberite interno telefonsko številko, kamor bodo posredovani dohodni klici. Sam sem izbral `1000 - "Matej - racunalnik"`.
+
+Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*. In to je to. Pravzaprav ne še čisto zares, je pa sedaj čas za nekaj preskusov.
+
+<img src="018_inbound_routes1.png" alt="Dohodne povezave" width="300"/>
+
+<img src="019_inbound_routes2.png" alt="Seznam dohodnih povezav" width="300"/>
+
+Če sedaj pokličemo naš RasPBX sistem (torej telefonsko številko SIM kartice, ki je vstavljena v USB modem) z mobilnega ali navadnega telefona, bomo slišali glasovno sporočilo, da lokalna številka 1000 ni na voljo. To pomeni, da naš sistem deluje, ker pa še nismo nastavili nobenega SIP odjemalca oziroma ker na sistem nismo povezali še nobenega telefona, klica ne moremo sprejeti.
+
+### Dodatne SIP nastavitve
+
+Zdaj lahko nastavimo še nekaj dodatnih stvari, vključno z nekaterimi **dobrimi varnostnimi praksami**. V FreePBX kliknite `Settings` → `Asterisk SIP settings` in pojdite na `General SIP Settings`. Tukaj morate nastaviti:
+- `Allow SIP Guests`: nastavite na **ne** (**no**), saj je to dobra varnostna praksa.
+- omogočite dodatni kodek `g729`, ki smo ga namestili v terminalu.
+- lahko omogočite tudi video podporo, če želite (vendar bo to delovalo samo za interne klice).
+
+Zdaj izberite `SIP Legacy Settings [chan_sip]` (`Settings` → `Asterisk SIP settings` ter pojdite na `SIP Legacy Settings [chan_sip]`. Izberite `Other SIP Settings` in vnesite `alwaysauthreject`=`yes` (to je tudi dobra varnostna praksa).
+
+<img src="020_sip_settings1.png" alt="Splošne SIP  nastavitve" width="300"/>
+
+Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*.
+
+### Omogočanje TCP namesto UDP
+
+Pri uporabi internetne telefonije včasih pride do težav zaradi nastavitev omrežne opreme. Nekatere funkcije domačih omrežnih usmerjevalnikov namreč lahko nenamerno motijo promet VoIP. Ena od funkcij, ki povzročajo težave, je SIP ALG. ALG ali Application Layer Gateway je zasnovan za omogočanje posredovanja določenih vrst prometa čez NAT in požarni zid vašega usmerjevalnika. SIP ALG je posebej zasnovan za prenos prometa SIP skozi NAT/požarni zid vašega usmerjevalnika, tako da SIP promet lahko doseže telefone za NAT-om. Problem pa nastopi takrat, ko so paketi SIP že optimizirani za prehod skozi NAT/požarne zidove brez dodatne pomoči. SIP ALG takrat povzroča težave. Razlog je v tem, da SIP ALG prepiše TCP naslove paketov SIP, to pa potem ovira proces dostave. Posledica tega je, da naprava, ki jo kličete misli, da vaš telefon ni za NAT-om, čeprav v resnici je. Če ALG nastavitev moti SIP promet, se to manifestira kot nezmožnost sprejemanja dohodnih klicev, VoIP telefoni pa se odjavljajo iz omrežja.
+
+Podobne težave sem imel tudi sam. Težave so se kazale v nezmožnosti sprejemanja dohodnih klicev, odhodni klici pa so bili samodejno prekinjeni po 30 sekundah. Ker onemogočanje SIP ALG nastavitve na mojem usmerjevalniku ni preprečilo težav s kakovostjo klicev, sem se odločil za nekoliko bolj drastične ukrepe. Večje težave namreč včasih *lahko* rešimo z večjim kladivom.
+
+Taka rešitev je bila v mojem primeru onemogočanje UDP protokola. Namesto UDP sem za SIP promet uporabil TCP protokol. Za tiste, ki ne veste o čem je govora - TCP in UDP sta internetna protokola. Sporočila preko protokola TCP se zaradi vzpostavljene povezave med odjemalcem in servisom prenašajo zanesljivo v obe smeri, so brez napak, podvojevanja in v pravem vrstnem redu. UDP pa je nepovezovalni protokol za prenašanje paketov, kar pomeni, da odjemalec in strežnik ne vzpostavita povezave, ampak strežnik pošilja pakete odjemalcu in ne preverja, če je odjemalec pakete dobil. Tak način prenosa podatkov je sicer manj zanesljiv, a po drugi strani hitrejši, zato se pogosto uporablja pri VoIP komunikacijah.
+
+V FreePBX torej kliknete `Settings` → `Asterisk SIP settings` in izberete `SIP Settings [chan_pjsip]`. Tukaj nato onemogočite UDP in omogočite TCP.
+
+<img src="021_sip_settings2.png" alt="Onemogočanje UDP in omogočanje TCP" width="300"/>
+
+Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*.
+
+## Nastavljanje SIP odjemalcev
+
+Končno se lahko lotimo nastavitev naših SIP odjemalcev (tim. *sofphones*). Sam uporabljam več operacijskih sistemov, in sicer: Ubuntu Linux, Windows in MacOS na računalniku ter Android in iPhone na telefonih. Seveda sem skušal najti *najboljšega odjemalca* za vsakega od teh sistemov, po možnosti takega, ki je odprtokoden, vendar sem hitro ugotovil, da obstaja veliko izdelkov, a vsak od njih ima kup svojih težav. Končno sem končal na aplikaciji Zoiper, ki sicer ni odprtokoden, vendar pa brezplačna različica deluje zelo dobro. Ker pri brezplačni različici pogrešam predvsem funkcijo ZRTP šifriranja, pa vse bralce naprošam, če mi predlagajo katere SIP odjemalce za različne operacijske sisteme bi se splačalo uporabiti oz. preskusiti.
+
+Kot že omenjeno, obstaja več odjemalcev SIP, v bistvu pa morate pri vsakem nastaviti uporabniški ID ali uporabniško ime (to je vaša interna telefonska številka, na primer `1000`), domeno (to je IP naslov vaše RasPBX naprave; prav tako je smiselno, da dodate številko vrat, ki je v našem primeru 5060, tako da vnesete `10.10.8.150:5060`) in geslo vaše interne telefonske številke. Običajno boste morali izbrati tudi transportni protokol, ki je v našem primeru `TCP`.
+
+<img src="022_zoiper_client.png" alt="Zoiper odjemalec na Linuxu" width="300"/>
+
+Ko je vaš SIP odjemalec uspešno poveže na telefonsko centralo (če ste vnesli napačno geslo, vas bo `fail2ban` blokiral za pol ure oziroma boste morali odblokirati blokiran IP naslov), lahko izvedete prvi testni klic... in nato seveda poskusite sprejeti testni klic od zunaj. Poskusite pa lahko tudi interne klice med vašimi internimi telefonskimi številkami.
+
+### Nastavitve glasovne pošte
+
+Zdaj lahko nastavite še svojo glasovno pošto (če ste jo pred tem omogočili v FreePBX). S SIP odjemalcem pokličite `*97` vnesite svoje geslo za glasovno pošto in že lahko slišite glasovni meni. Sedaj pritisnite "0" in "1", da posnamete svoje *sporočilo o tem, da niste dosegljivi*. Ko končate, pritisnite `#` in nato `1`, da sprejmete in shranite sporočilo. Posnamete lahko tudi *sporočilo, da ste zasedeni* itd.
+
+Nato svojega SIP odjemalca odjavite iz sistema (da ne bo dosegljiv) in ga poskusite poklicati. Če ste vse nastavili pravilno, boste slišali *sporočilo o tem, da niste dosegljivi*, sistem pa vam bo nato omogočil, da pustite glasovno sporočilo. To sporočilo bo posneto in poslano na vaš e-poštni naslov, kjer si ga lahko predvajate. To pa je kul rešitev, kaj?
+
+<img src="027_voicemail_admin.png" alt="Nastavljanje e-poštnih obvestil zvočne pošte" width="300"/>
+
+Naj na koncu omenimo še eno malenkost. Če greste v FreePBX v `Settings` → `Voicemail Admin` → `Settings` → `Email Config`, lahko spremenite vsebino e-pošte z obvestilom, ki se pošlje uporabniku, ko prejme glasovno pošto. Sam sem odstranil sklic na `http://AMPWEBADDRESS/ucp`, saj modul *User Control Panel*, preko katerega lahko zunanji uporabniki dostopajo do svoje glasovne pošte in nekaterih nastavitev, privzeto ni nameščen. Poleg tega omogočanje dostopa zunanjim uporabnikom predstavlja tudi varnostno tveganje, sam osebno pa tudi menim, da je za uporabnike bolj enostavno, da glasovna sporočila prejmejo kot prilogo e-pošte.
+
+### Nastavitve e-pošte skrbnika glasovne pošte
+
+E-pošto za skrbnika glasovne pošte najdete pod `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Tukaj lahko urejate polje `from`, `subject` in `body` e-poštnega obvestila o novem sporočilu glasovne pošte. Preverite tudi polje `Server e-mail` in vnesite svoj elektronski naslov za obvestila (v mojem primeru `obvestilo@xxxxx.si`.
+
+Še kratka opomba - če imate težave z dostavo e-pošte, preverite dnevniške zapise poštnega strežnika `exim4` na vašem RasPBX. Na RasPBX se povežite preko SSH in si oglejte vsebino datoteke z dnevniškimi zapisi z ukazom: `cat /var/log/exim4/mainlog`.
