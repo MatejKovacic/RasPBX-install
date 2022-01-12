@@ -781,3 +781,57 @@ Naj na koncu omenimo še eno malenkost. Če greste v FreePBX v `Settings` → `V
 E-pošto za skrbnika glasovne pošte najdete pod `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Tukaj lahko urejate polje `from`, `subject` in `body` e-poštnega obvestila o novem sporočilu glasovne pošte. Preverite tudi polje `Server e-mail` in vnesite svoj elektronski naslov za obvestila (v mojem primeru `obvestilo@xxxxx.si`.
 
 Še kratka opomba - če imate težave z dostavo e-pošte, preverite dnevniške zapise poštnega strežnika `exim4` na vašem RasPBX. Na RasPBX se povežite preko SSH in si oglejte vsebino datoteke z dnevniškimi zapisi z ukazom: `cat /var/log/exim4/mainlog`.
+
+## Še nekaj drugih malenkosti
+
+### Blokada odhodnih klicev
+
+Pozorni bralci se spomnite obljube, da si bomo pogledali, kako lahko blokiramo določeno interno številko, da ne more klicati ven. Čas je za izpolnitev obljube.
+
+Blokado odhodnih klicev lahko naredimo na več načinov, v našem primeru pa bomo to naredili tako, da bomo za konkretno interno telefonsko številko ustvarili posebno izhodno povezavo. V FreePBX kliknemo `Connectivity` → `Outbound routes` in nato na gumb `Add Outbound Route`. Zdaj nastavimo naslednje:
+- `Route Name`: to povezavo bomo poimenovali `4000_no_out`, saj je povezava namenjena blokadi izhodnih klicev interne številke `4000`.
+- `Dial Patterns`: iizberemo polje `match pattern` in vnesemo `0[12345678]XXXXXXX`.
+- `Dial Patterns`: izberemo polje `CallerID` in vnesemo interno telefonsko številko, za katero želimo blokirati odhodne klice, v našem primeru je to `4000`.
+- **Ne nastavimo** `Trunk Sequence for Matched Routes`.
+
+<img src="024_4000_no_out1.png" alt="Blokada odhodnih klicev" width="300"/>
+
+<img src="025_4000_no_out2.png" alt="Blokada odhodnih klicev" width="300"/>
+
+Ob kliku na gumb *Submit*, vas bo sistem vrnil na seznam izhodnih povezav. Z miško primite povezavo, ki ste jo ravnokar ustvarili (nahaja se na dnu seznama) in jo *potegnite na vrh seznama*. Nato kliknite *Apply config*.
+
+<img src="026_outbound_routes.png" alt="Seznam izhodnih povezav" width="300"/>
+
+### Omejevanje interne številko na klicanje samo določene zunanje številke
+
+Kaj pa, če želimo, da bo določena interna številka, recimo "3000", lahko klicala samo določeno zunanjo številko (na primer "031987654"). Ali je to mogoče storiti?
+
+Seveda se da, je pa nekoliko zapleteno. Nastaviti je potrebno izhodni povezavi, pri čemer pa je potrebno upoštevati, da se izhodne povezave procesirajo od zgoraj navzdol. To pomeni, da se najprej preveri prvo pravilo, nato drugo itd.
+
+Torej bomo imeli naslednji algoritem:
+- Prvo pravilo: če interna telefonska številka `3000` kliče zunanjo številko `031987654`, je klic dovoljen.
+- Če interna telefonska številka 3000 pokliče katero koli drugo zunanjo številko, skočimo na drugo pravilo.
+- Drugo pravilo: če interna telefonska številka `3000` pokliče katero koli zunanjo številko (ne katero koli drugo, ampak katero koli!), klic ni dovoljen. In to je konec pravil za interno telefonsko številko "3000".
+
+Sedaj ustvarimo prvo pravilo (prvo izhodno povezavo), ki bo določilo, da interna telefonska številka 3000 lahko pokliče zunanjo številko 031987654. V FreePBX kliknemo `Connectivity` → `Outbound routes` in nato gumb `Add Outbound Route`. Sedaj definiramo izhodno povezavo:
+- `Route Name`: `3000_to_my_mobile` (ta interna številka bo lahko klicala samo mojo mobilno številko).
+- `Trunk Sequence for Matched Route`: iz menija izberemo `gsm_dongle0`.
+- `Dial Patterns`: v polje `match pattern` vnesemo`031987654` (zunanja številka, katere klicanje je dovoljeno).
+
+Zdaj dodamo še drugo pravilo (oz. drugo izhodno povezavo). V FreePBX kliknemo `Connectivity` → `Outbound routes` in nato gumb `Add Outbound Route`. Sedaj definiramo:
+- `Route Name`: `3000_no_out`.
+- `Dial Patterns`: v polje `match pattern` vnesemo `0[12345678]XXXXXXX`.
+- `Dial Patterns`: v polje `CallerID` vnesemo interno telefonsko številko, ki jo želimo blokirati, v našem primeru `3000`.
+- **Ne nastavimo** `Trunk Sequence for Matched Routes`.
+
+Na koncu pravila za izhodne povezave uredite tako, da bo prvo pravilo `3000_to_my_mobile`, drugo pa `3000_no_out`. Privzeta pot `gsm_out` pa ostane na dnu seznama. Nato kliknite *Apply config* in to je to.
+
+Vse to zveni precej preprosto, a je težava v tem, da če imate veliko pravil, celoten sistem hitro postane zelo nepregleden. Ena od rešitev je uporaba vzorcev klicanja v polju ID klicatelja. Ko nastavljate izhodne povezave, pojdite na `Dial Patterns` v polju `CallerID` in vnesite vzorec klicanja interne številke, ki jo želite blokirati, na primer `3XXX`. To pomeni, da bo izhodna pot veljala za vse razširitve od »3000« do »3999«. Potem imate lahko naslednjo shemo dodeljevanja številk:
+- 1XXX številke so dodeljene vam in vašim prijateljem,
+- 3XXX številke so dodeljene ljudem, ki vas imajo radi (in vas torej lahko pokličejo), vendar jih vi ne marate (zato jim ne dovolite, da oni pokličejo koga drugega),
+- 4XXX razširitve so dodeljene osebam, ki jih sploh ne marate, zato sploh ne morejo klicati zunaj vašega sistema,
+- ljudem, ki pa jih prav resnično sovražite, pa seveda ne dodeljujte telefonskih številk v vašem RasPBX sistemu.
+
+No, to je bilo malo za šalo, ampak zdaj verjetno razumete kako uporabiti klicne vzorce (*dial patterns*), kajne?
+
+<img src="030_outbound_routes.png" alt="Izhodne povezave" width="300"/>
