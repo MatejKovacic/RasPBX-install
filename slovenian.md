@@ -835,3 +835,35 @@ Vse to zveni precej preprosto, a je težava v tem, da če imate veliko pravil, c
 No, to je bilo malo za šalo, ampak zdaj verjetno razumete kako uporabiti klicne vzorce (*dial patterns*), kajne?
 
 <img src="030_outbound_routes.png" alt="Izhodne povezave" width="300"/>
+
+## Posodabljanje sistema
+
+Vaš FreePBX je nastavljen tako, da se samodejno posodablja, vendar to ne velja za operacijski sistem RaspPBX. Tega morate še vedno posodabljati sami. Vseeno pa lahko ročno posodobite tudi FreePBX komponento.
+
+To storite tako, da v FreePBX kliknete `Admin` → `Module Admin` ter izberete `Check Online`. Sistem bo nato sam poiskal module, ki jih je potrebno posodobiti. Pri tem je priporočljivo, da postopek iskanja posodobitev ob začetni postavitvi sistema zaženete ročno nekajkrat, saj se učasih zgodi, da pri posodabljanju včasih pride do zastojev.
+
+<img src="028_freepbx_upgrade1.png" alt="Posodabljanje FreePBX" width="300"/>
+
+<img src="029_freepbx_upgrade2.png" alt="Posodabljanje FreePBX" width="300"/>
+
+Za posodobitev operacijskega sistema (RasPBX), pa se s SSH povežite na vaš RaspberryPi in zaženite ukaz `raspbx-upgrade`.
+
+## Varnostne kopije
+
+V FreePBX izberite `Settings` → `Filestore`. Izberite zavihek `Local` in kliknite `+Add Local Path`. Vnesite ime poti, opis in ime mape, kamor se bodo shranjevale varnostne kopije. Sam sem vnesel `/var/spool/asterisk/backup`. Ko končate, zgoraj desno kliknite *Submit*.
+
+Zdaj v FreePBX izberite `Admin` in nato `Backup & Restore`. Nato izberite `+Add Backup`. Pod `Add Backup` vnesite ime varnostnega arhiva in opis. Pod `Storage` nastavite še e-nasov za obvestila, iz spustnega menija pa izberite mesto za shranjevanje varnostnih kopij, ki ste ga ustvarili v prejšnjem koraku.
+
+Zgoraj desno kliknite *Submit*. Na glavni strani `Backup & Restore` modula lahko sedaj ustvarjanje varnostne kopije sprožite ročno. Ali pa nastavite samodejno varnostno kopiranje ob določenem času.
+
+<img src="031_backups.png" alt="Varnostne kopije" width="300"/>
+
+Varnostne kopije se sedaj nahajajo v mapi `/var/spool/asterisk/backup`. Če se na RasPBX sistem povežete preko SSH in vneste ukaz `ls -lha /var/spool/asterisk/backup`, lahko vidite datoteke z varnostnimi kopijami:
+
+    total 32M
+    drwxr-xr-x  3 asterisk asterisk 4,0K okt 29 22:21 .
+    drwxrwxr-x 13 asterisk asterisk 4,0K okt 29 22:03 ..
+    -rw-r--r--  1 asterisk asterisk  32M okt 29 22:21 20211029-222115-1635538875-15.0.17.55-77834617.tar.gz
+    drwxr-xr-x  2 asterisk asterisk 4,0K okt 29 22:21 Manual-backup
+
+Seveda je smiselno, da si te varnostne kopije shranite tudi na zunanjo lokacijo, ampak to itak že veste.
