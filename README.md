@@ -1118,7 +1118,7 @@ Now our VoIP phone has a direct access to our VPN network! We also want that the
     sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
     sudo iptables -A FORWARD -i eth1 -o tun0 -j ACCEPT
 
-<img src="035_VoIP_over_VPN.png" alt="The complete setup of VoIP prone over VPN" width="300"/>
+<img src="035_VoIP_over_VPN.png" alt="The complete setup of VoIP phone over VPN" width="300"/>
 
 After reboot, any device connected on USB to Ethernet adapter will be assigned an IP address from a range `192.168.100.50` - `192.168.100.240` and will have a direct access to our VPN network.
 
@@ -1180,7 +1180,7 @@ And finally, you can restart Nginx server: `sudo service nginx restart`. Now I w
 Finally, we will install firewall (`sudo apt install ufw`) and set it up:
 - Set default rule-set (`sudo ufw default deny incoming` and `sudo ufw default allow outgoing`).
 - Allow SSH connections from anywhere: `sudo ufw allow 22/tcp`.
-- Allow web management of VoIP phone from my computer, **but only if it is connected to VPN** (my VPN IP si `10.10.8.10`): `sudo ufw allow from 10.10.8.10 to any port 443 proto tcp`.
+- Allow web management of VoIP phone from my computer, **but only if it is connected to VPN** (my VPN IP is `10.10.8.10`): `sudo ufw allow from 10.10.8.10 to any port 443 proto tcp`.
 
 When this is done, we activate the firewall with `sudo ufw enable`. Please note that this is a firewall running on a RaspberryPi *vpnbridge* device, so it is limiting access to *vpnbridge* device. But indirectly this firewall is also limiting access to VoIP phone connected to our *vpnbridge*.
 
