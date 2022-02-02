@@ -46,10 +46,10 @@
     + [Connecting VoIP phone to the VPN](#connecting-voip-phone-to-the-vpn)
       - [RaspberryPi as a router for the wired network](#raspberrypi-as-a-router-for-the-wired-network)
       - [Access to VoIP phone from the VPN network](#access-to-voip-phone-from-the-vpn-network)
-      - [Change *unchangeable* default password](#change--unchangeable--default-password)
+      - [Change unchangeable default password](#change--unchangeable--default-password)
       - [Make your old VoIP phone wireless](#make-your-old-voip-phone-wireless)
   * [Volume in voicemail messages](#volume-in-voicemail-messages)
-- [And what can *you* do?](#and-what-can--you--do-)
+- [And what can you do?](#and-what-can--you--do-)
 
 A few years ago I came across a very interesting project from some guy, who [created a GSM bridge between two RasPBX hosts](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html) and who wanted to make free long distance calls from Brazil to Germany with the help of his RaspberryPi. That sounded just cool, but other projects were waiting for me at that time and I didn't have time for that. Until now.
 
