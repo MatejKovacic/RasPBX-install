@@ -48,6 +48,7 @@
         * [RaspberryPi as a router for the wired network](#raspberrypi-as-a-router-for-the-wired-network)
         * [Access to VoIP phone from the VPN network](#access-to-voip-phone-from-the-vpn-network)
         * [Change *unchangeable* default password](#change--unchangeable--default-password)
+        * [Make your old VoIP phone wireless](#make--your--old--voip--phone--wireless)
     + [Volume in voicemail messages](#volume-in-voicemail-messages)
   * [And what can *you* do?](#and-what-can--you--do-)
 
@@ -1218,6 +1219,40 @@ Restart Nginx with `sudo service nginx restart` and you are done! Now your old t
 Ah, if you forgot the passwords or want to change something, you can always edit the file `/etc/nginx/.htpasswd`. Or just remove it and create it from scratch.
 
 Anyway, if you are using VoIP phone over VPN network, you may experience larger network lag. I don't have such problems, but I have read that if your calls are cutting out, or the phone loses registration, you should enable or increase the frequency of SIP keep-alive settings. Go to `Advanced Settings` → `Line 1` and change `Registration Period` (under `Basic SIP Network Settings`) to a lower number.
+
+##### Make your old VoIP phone wireless
+
+Now, what if we want to make our old VoIP phone "wireless", i. e. that it will connect to network through WiFi and not through wired connection? 
+
+Usually, we would not want that, because WiFi networks are not reliable as wired ones. But in case you don't have the option to install the Ethernet cable, you can connect RaspberryPi to WiFi instead. However, to do this, we must first scan available WiFi networks.
+
+We can issue the command `sudo iwlist wlan0 scan`, but we will get a lot of data we do not need, so we can just filter the printout and show just names of the available WiFi networks: `sudo iwlist wlan0 scan | grep ESSID`. We will get sometning like this:
+
+    ESSID:"MyHome"
+    ESSID:"DIRECT-14-HP DeskJet Plus 4100"
+    ESSID:"Telelink"
+    ESSID:"AndroidAP5ED8"
+
+Now we can open `wpa_supplicant.conf` file: `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf` and at the end of it add SSID of the network and the password:
+
+    network={
+       ssid="MyHome"
+       psk="MySuperStrongPassword!"
+    }
+
+Save the file and after a minute or so, RaspberryPi will automatically connect to `MyHome` WiFi network.
+ 
+ifconfig wlan0
+wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
+        inet6 fe80::c582:9f73:aac0:5cc3  prefixlen 64  scopeid 0x20<link>
+        ether b8:27:eb:a0:1c:b0  txqueuelen 1000  (Ethernet)
+        RX packets 37  bytes 4284 (4.1 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 39  bytes 5962 (5.8 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+And the best thing here is, that VPN will also be established automatically, so you do not need to change any configuration.
 
 ### Volume in voicemail messages
 
