@@ -1,6 +1,56 @@
 # Namestitev RasPBX
 *Namestitev RasPBX za začetnike*
 
+- [Osnovni koncepti](#osnovni-koncepti)
+- [Kaj bomo potrebovali](#kaj-bomo-potrebovali)
+- [Namestitev operacijskega sistema](#namestitev-operacijskega-sistema)
+  * [Zapis RasPBX operacijskega sistema na kartico SD](#zapis-raspbx-operacijskega-sistema-na-kartico-sd)
+  * [Prijava v RasPBX](#prijava-v-raspbx)
+  * [Kaj postoriti po prvi prijavi?](#kaj-postoriti-po-prvi-prijavi-)
+- [Namestitev in konfiguracija PBX](#namestitev-in-konfiguracija-pbx)
+  * [Nastavitev e-poštnega sistema](#nastavitev-e-po-tnega-sistema)
+  * [Nastavite odjemalca VPN](#nastavite-odjemalca-vpn)
+  * [Nastavite NTP](#nastavite-ntp)
+- [Varnost sistema](#varnost-sistema)
+  * [Varen SSH](#varen-ssh)
+    + [Prijavite se s ključem SSH](#prijavite-se-s-klju-em-ssh)
+  * [Onemogočanje (*root*) uporabnika](#onemogo-anje---root---uporabnika)
+  * [Namestitev sistema za preprečevanje vdorov](#namestitev-sistema-za-prepre-evanje-vdorov)
+    + [Kako odblokirati IP naslov](#kako-odblokirati-ip-naslov)
+  * [Namestitev požarnega zidu](#namestitev-po-arnega-zidu)
+- [Namestitev USB modema](#namestitev-usb-modema)
+  * [Konfiguracija USB modema](#konfiguracija-usb-modema)
+  * [Svoboda kliče](#svoboda-kli-e)
+  * [Namestitev spletnega vmesnika za USSD](#namestitev-spletnega-vmesnika-za-ussd)
+  * [Namestitev dodatnega kodeka](#namestitev-dodatnega-kodeka)
+- [FreePBX konfiguracija](#freepbx-konfiguracija)
+  * [Nastavitev trunk povezave](#nastavitev-trunk-povezave)
+  * [Nastavljanje izhodnih povezav](#nastavljanje-izhodnih-povezav)
+    + [Nastavitev klicnih predpon za odhodne klice](#nastavitev-klicnih-predpon-za-odhodne-klice)
+  * [Nastavitev internih telefonskih številk](#nastavitev-internih-telefonskih--tevilk)
+  * [Nastavljanje dohodnih povezav](#nastavljanje-dohodnih-povezav)
+  * [Dodatne SIP nastavitve](#dodatne-sip-nastavitve)
+  * [Omogočanje TCP namesto UDP](#omogo-anje-tcp-namesto-udp)
+- [Nastavljanje SIP odjemalcev](#nastavljanje-sip-odjemalcev)
+  * [Nastavitve glasovne pošte](#nastavitve-glasovne-po-te)
+  * [Nastavitve e-pošte skrbnika glasovne pošte](#nastavitve-e-po-te-skrbnika-glasovne-po-te)
+- [Še nekaj drugih malenkosti](#-e-nekaj-drugih-malenkosti)
+  * [Blokada odhodnih klicev](#blokada-odhodnih-klicev)
+  * [Omejevanje interne številko na klicanje samo določene zunanje številke](#omejevanje-interne--tevilko-na-klicanje-samo-dolo-ene-zunanje--tevilke)
+- [Posodabljanje sistema](#posodabljanje-sistema)
+- [Varnostne kopije](#varnostne-kopije)
+- [Kaj še lahko naredimo s takim sistemom?](#kaj--e-lahko-naredimo-s-takim-sistemom-)
+  * [Testiranje](#testiranje)
+  * [Povezava fizičnega telefona](#povezava-fizi-nega-telefona)
+    + [Konfiguriranje in povezava VoIP telefona v lokalno omrežje](#konfiguriranje-in-povezava-voip-telefona-v-lokalno-omre-je)
+    + [Povezovanje VoIP telefona prekp VPN](#povezovanje-voip-telefona-prekp-vpn)
+      - [RaspberryPi kot usmerjevalnik za žično omrežje](#raspberrypi-kot-usmerjevalnik-za--i-no-omre-je)
+      - [Dostop do VoIP telefona iz omrežja VPN](#dostop-do-voip-telefona-iz-omre-ja-vpn)
+      - [Spreminjanje *nespremenljivega* privzetega gesla](#spreminjanje--nespremenljivega--privzetega-gesla)
+      - [Pa naredimo svoj stari VoIP telefon še brezžičen](#pa-naredimo-svoj-stari-voip-telefon--e-brez-i-en)
+  * [Glasnost sporočil glasovne pošte](#glasnost-sporo-il-glasovne-po-te)
+- [Kaj pa lahko naredite *vi*?](#kaj-pa-lahko-naredite--vi--)
+
 Pred nekaj leti sem naletel na zanimiv projekt nekoga, ki je [ustvaril GSM povezavo med dvema RasPBX strežnikoma](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html), da je lahko brezplačno klical iz Brazilije v Nemčijo in obratno. Žal takrat za take projekte nisem imel dovolj časa, a povezava na spletno stran je ostala med zaznamki in čakala... do zdaj.
 
 V današnjem prispevku si bomo ogledali kako namestimo telefonski strežnik [*Asterisk*](https://www.asterisk.org/) na mini računalnik [*RaspberryPi*](https://www.raspberrypi.org/) ter kako vse skupaj nastavimo, da omogoča klicanje iz računalnika ali pametnega telefona na običajne telefonske številke. Povedano drugače – ogledali si bomo, kako si postaviti lastno telefonsko centralo, ki jo lahko pospravimo v žep. No, pravzaprav ne povsem dobesedno, saj mora biti RaspberryPi povezan v omrežje, potrebujemo pa tudi napajanje. Sprehajanje s telefonsko centralo v žepu, povezano s kabli v omrežje in na napajalnik pa je precej... nepraktično, ampak saj razumemo poanto, kajne?
@@ -867,3 +917,364 @@ Varnostne kopije se sedaj nahajajo v mapi `/var/spool/asterisk/backup`. Če se n
     drwxr-xr-x  2 asterisk asterisk 4,0K okt 29 22:21 Manual-backup
 
 Seveda je smiselno, da si te varnostne kopije shranite tudi na zunanjo lokacijo, ampak to itak že veste.
+
+## Kaj še lahko naredimo s takim sistemom?
+
+### Testiranje
+
+Seveda je smiselno da tak sistem čim obsežneje pretestiramo, da vidimo kako se obnaša v praksi. Sam sem preko VPN preskusil tudi povezavo iz Chicaga, ZDA v Slovenijo in interni telefonski klici so delovali odlično (predvsem je izstopal zelo čist zvok). Iz Chicaga sem preskusil tudi odhodne klice preko GSM modema (`gsm_dongle0`) in klici so delovali, vendar kakovost zvoka ni bila zelo dobra. Res pa je, da je bil RasPBX z GSM modemom postavljen na lokaciji, kjer je sprejem mobilnega signala bolj slab, kar je tudi možen vzrok za slabo kakovost zvoka. Vsekakor bi bilo smiselno narediti še več testov in če bo kdo izmed vas bralcev postavil podoben sistem ter ga stestiral, vas vabim, da svoje izkušnje delite z mano.
+
+### Povezava fizičnega telefona
+
+Sedaj, ko imate svojo lastno telefonsko centralo, se verjetno sprašujete, ali bi bilo mogoče nanjo povezati tudi fizični telefon? Odgovor je seveda – da! Brez težav si kupite namizni VoIP telefon (podpirati mora seveda SIP protokol), ki ga nato preprosto povežete v vaše omrežje in na njem nastavite ustrezno interno telefonsko številko iz vašega RasPBX sistema. Na trgu je na voljo več SIP telefonov, pred nakupom pa [preverite seznam podprtih naprav] (https://wiki.freepbx.org/display/FPG/EPM-Supported+Devices).
+
+Sam sem se odločil sem se za nakup enega od [telefonov Aastra](https://wiki.freepbx.org/display/FOP/Aastra), in sicer [Aastra6730i](https://wiki.freepbx.org/display/FPG/Supported+ Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), ki je v celoti podprt s strani FreePBX.
+
+Telefon sem uspelo dobiti po precej ugodni ceni in tako je nekega sončnega jutra na moja vrata pozvonil poštar, nekaj minut kasneje pa sem imel na mizi odpakirano čisto novo Aastra6730i. Jupi!
+
+#### Konfiguriranje in povezava VoIP telefona v lokalno omrežje
+
+Telefon sem najprej povezal v svoje lokalno omrežje ter z orodjem `nmap` ugotovil, da ima telefon Aastra lokalni IP naslov `192.168.1.225` ter da ima odprta dvoje TCP vrat - `443/TCP`, kar običajno pomeni, da na napravi teče spletni strežnik HTTPS in "23/TCP", kar običajno pomeni, da je naprava dostopna prek protokola "telnet". Slednje ni slišati dobro, saj `telnet` ne ponuja šifriranih povezav in bi morala biti njegova uporaba opuščena. Pravzaprav je `telnet` protokol že leta 1995 (se pravi tako rekoč v prazgodovini) nadomestil protokol `ssh`. Kakorkoli, ko sem se v telefon skušal prijaviti z ukazom `telnet`, se je bila povezava sicer vzpostavila, vendar s telefona sploh nisem dobil nikakršnega odgovora. Kot kaže je torej upravljanje navsezadnje možno le preko spletnega vmesnika.
+
+Obstaja pa še en način, da ugotovimo IP naslov Aastre. In sicer tako, da ga preberemo iz samega telefona. Na telefonu preprosto pritisnemo tipko 'Možnosti' in s tipkami za pomikanje izberemo `3 - Phone status` nato pa `IP&MAC Addresses`.
+
+Naslednji korak je, da zaženemo spletni brskalnik in vnesemo IP telefona Aastra v vrstico URL: `https://192.168.1.225`. Po pričakovanjih bomo prejeli več opozoril glede slabe varnosti HTTPS, pretečenega digitalnega potrdila (digitalno potrdilo je bilo izdano septembra 2006 in je poteklo septembra 2009) itd. A to ni velika težava, saj smo konec koncev v lokalnem omrežju, kjer lahko svoj VoIP telefon zaščitimo z drugimi ukrepi.
+
+Za prijavo v telefon, je potrebno vnesti uporabniško ime in geslo. Skrbniško uporabniško ime je `admin` geslo pa `22222`. Tega privzetega gesla pa žal ni mogoče spremeniti. Ob tem sem sicer za nekaj sekund ostal široko odprtih ust... ampak OK, dajmo telefon najprej pripraviti za telefoniranje.
+
+Preko spletnega vmesnika gremo v `Basic Settings` → `Preferences` in pod `Ringtones` poiščemo `Tone Set` ter ga nastavimo na `Europe`. To ni zelo pomembna nastavitev, vendar so nastavitve zato, da se ustrezno spremenijo, kajne? Naslednja stvar je, da nastavimo `Date Format` pod `Time and Date Setting` in preverimo, da so časovni strežniki (`NTP time servers`) omogočeni (pri meni so bili).
+
+Potem pa so na vrsti nastavitve računa SIP! V FreePBX najprej ustvarimo novo interno telefonsko številko `SIP [chan_pjsip]` s številko `7000` in se lotimo zadeve.
+
+Preko spletnega vmesnika VoIP telefona gremo v `Advanced Settings` → `Global SIP` in pod `Advanced SIP Settings` spremenimo `Transport Protocol` v `TCP` ter potrdimo, da je `Local SIP UDP/TCP Port` nastavljen na `5060`. Spremenimo tudi `Codec Preference List` (na vrh sem nastavil `G.729`), nato pa kliknemo `Save Settings`.
+
+Nato gremo v `Advanced Settings` → `Line 1` in nastavimo naslednje:
+- `Screen Name`: `Matej` (to je seveda moje ime).
+- `Phone Number`: `7000`.
+- `Caller ID`: `7000`.
+- `Authentication Name`: `7000` (vse te tri številke so tim *extension number* oz. naša interna telefonska številka).
+- `Password`: tukaj sem seveda vpisal geslo svoje interne telefonske številke.
+- `Proxy Server`: `192.168.1.150`.
+- `Proxy Port`: `5060`.
+- `Outbound Proxy Server`: `192.168.1.150`.
+- `Outbound Proxy Port	`: `5060`.
+- `Registrar Server	`: `192.168.1.150`.
+- `Registrar Port`: `5060`.
+
+Druge nastavitve niso bile spremenjene. Kot lahko vidimo, sem pod *proxy server*, *outbound proxy server* in *registrar server* vnesel lokalni IP naslov mojega RasPBX strežnika (`192.168.1.150`) in vrata (`5060`).
+
+V nastavitvah - `Basic Settings` → `Preferences` sem pod `General` odstranil `Local Dial Plan` (nastavljen je bil na `x+#|xx+*`), saj bodo omejitve klicanja implementirane na FreePBX.
+
+Ko kliknemo `Save Settings`, je potrebno telefon ponovno zagnati , pravi hekerji pa to seveda najraje naredijo preko omrežja, na daljavo. Izberemo torej `Operation` → `Reset` in pod `Phone` kliknemo `Restart`. Dobra minuta in VoIP telefon je ponovno zagnan ter uspešno povezan z mojo RasPBX centralo!
+
+Ko se ponovno prijavite v telefon, to lahko vidite pod `Status` → `System Information`. `SIP Status`, ki dokazuje, da je vaš telefon povezan na RasPBX je izpisan na dnu strani.
+
+<img src="032_Aastra_phone.jpeg" alt="Aastra 6730i VoIP phone" width="300"/>
+
+Zdaj seveda lahko kličemo, sprejemamo klice itd. ... in vse je super in krasno, a najprej je treba poskrbeti za varnost.
+
+Prva stvar, ki se je bomo znebili je zastareli HTTPS protokol SSL 3.0 HTTPS. Gremo v `Advanced Settings` → `Network` in pod `HTTPS Settings` nastavimo `HTTPS Client Method` na `TLS 1.0`. To sicer ni idealno, saj se v letu 2021 vse HTTPS kriptografske protokole manj od TLS 1.2 šteje za ne dovolj varne, je pa veliko boljše od prazgodovinskega SSL 3.0. A po drugi strani to ni zelo pomembno, če hkrati ne moremo spremeniti privzetega skrbniškega gesla. A vseeno, pokažimo, da varnost jemljemo resno!
+
+Naslednja težava je, da je strojna programska oprema na telefonu nekoliko zastarel in ji posodobitev ne bi škodila. Na žalost strojne programske opreme za ta telefon na uradnem spletnem mestu Aastre ni mogoče najti, sem jo pa našel na [Softpediji](https://drivers.softpedia.com/get/VoIP-Voice-over-IP/Aastra/Aastra-6730i -SIP-Phone-Firmware-3312217.shtml). Vendar pa postopek posodobitve strojne programske opreme sploh ni enostaven. Najprej si moramo datoteko s končnico `.st` shraniti na naš strežnik, in sicer TFTP, FTP ali HTTP. Nato je potrebno v telefon vnesti IP naslov strežnika in ime datoteke z nadgradnjo, to datoteko ročno prenesti na telefon in posodobitev nato ročno zagnati. Priznam, tega se nisem lotil, med drugim tudi zato, ker iz priloženih navodil ni jasno kako, oziroma ali sploh se preverja integriteta posodobitvenega paketa s strojno programsko opremo. In če gre med nadgradnjo kaj narobe, se mimogrede zgodim da bomo telefon popolnoma okvarili. Tako okvarjen telefon pa uporaben kvečjemu kot – kos opeke. Teoretično bi lahko *oblokiranje* tako okvarjeneg atelefona naredili tako, da telefon opremo ter notranji pomnilnik preprogramiramo s pomočjo programatorja strojne opreme... Vendar za to potrebujemo posebno opremo, ustrezno znanje o strojni opremi telefona, itd. Vse to pa je nekaj, s čimer se običajni uporabniki navadno ne želijo ukvarjati. Tako bo strojna programska oprema na telefonu zaenkrat ostalo takšna, kakršna je.
+
+#### Povezovanje VoIP telefona prekp VPN
+
+Vse to se sliši v super, a težava je v tem, da če je vaš telefon z RasPBX centralo povezan preko vašega lokalnega omrežja, to predstavlja rahlo omejitev. Še posebej, če bi radi telefon uporabljali na kakšni oddaljeni lokaciji. Kot vemo, je po standardu največja dolžina ethernetnega kabla omejena na 100 metrov – in to ni ravno velika razdalja.
+
+A brez skrbi, to težavo je mogoče rešiti z VPN. In natanko to bomo tudi storili.
+
+Ideja je preprosta. Svoj VoIP telefon morate samo povezati v VPN omrežje, v telefonu nastaviti *proxy server*, *outbound proxy server* ter *registrar server* tako, da bodo kazali na IP nslov RasPBX centrale v VPN omrežju in vse skupaj bi moralo delovati brez težav.
+
+Nekateri telefoni VoIP že imajo vgrajeno podporo za OpenVPN, kar pa ni veljalo za mojo Aastro 6730i. In kaj, če bi nekega dne morda želeli telefon povezati v VPN z Wireguardom ali kakšno drugo vrsto omrežja VPN? Kako torej povezati svoj *stari* telefon s *sodobnim* omrežjem VPN?
+
+Odgovor je preprost. Z RaspberryPi.
+
+##### RaspberryPi kot usmerjevalnik za žično omrežje
+
+Ker se mi je v omari slučajno valjal neuporabljen RaspberryPi 3, sem se odločil, da ga uporabim za žični usmerjevalnik. Ideja je, da bo RaspberryPi povezan z žičnim omrežjem, na njem bo odjemalec VPN, VoIP telefon pa bo nato povezan na RaspberryPi z omrežnim kablom. Z drugimi besedami, RaspberryPi bo za VoIP telefon deloval kot nekakšen most do omrežja VPN.
+
+Ideja je na papirju videti v redu, vendar pa ima RaspberryPi samo eno Ethernet povezavo. Zato je potrebno kupiti žični USB vmesnik (USB na RJ45), ki stane nekaj Evrov. RaspberryPi ima tudi WiFi povezavo, zato bi teoretično RaspberryPi v omrežje povezali preko WiFi povezave, vendar brezžične povezave niso tako zanesljive kot žične, zato sem se odločil da uporabim USB vmesnik. Si bomo pa vseeno pogledali, kako povezavo vzpostavimo tudi preko brezžične povezave.
+
+Postopek poznamo, zato se samo na hitro sprehodimo čez namestitev RaspberryPi OS. RaspberryPi OS najprej prekopiramo na kartico SD z *RaspberryPi Imager* in preden kartico vstavimo v RaspberryPi, na njej na razdelku `/boot` najprej ustvarimo datoteko z imenom `ssh`. Zakaj? Ker to aktivira SSH strežnik na RaspberryPi - in te naprave seveda želimo upravljati na daljavo, prek omrežja. V Linuxu preprosto gremo v mapo `/boot` SD kartice in uporabimo ukaz `touch ssh`.
+
+<img src="036_RPi_imager.png" alt="RaspberryPi Imager" width="300"/>
+
+Nato se z ukazom `ssh pi@192.168.1.228` prijavimo v sveže nameščen RaspberryPi OS (tukaj seveda vpišete IP vaše naprave). Privzeto uporabniško ime je `pi`, privzeto geslo pa `raspberry`.
+
+Hiter sprehod skozi ukaze:
+- Z ukazom `passwd` spremenimo geslo.
+- Posodobimo sistem (`sudo apt update`, `sudo apt upgrade`) in odstranimo neuporabljene pakete (`sudo apt autoremove`).
+- Zaženimo `sudo raspi-config` in pod `System Options` nastavimo ime gostitelja (sam sem ga spremenil v `vpnbridge`), pod `Localisation Options` nastavimo svoj časovni pas, tipkovnico in WLAN državo. Nazadnje pod `Advanced Options` izberemo `Expand Filesystem`. Po tem je treba RaspberryPi ponovno zagnati.
+- Sledil je zagon `sudo dpkg-reconfigure locales`, saj uporabljam slovensko lokalizacijo.
+- Namestimo tudi paket `ntp` (`fake-hwclock` je bil že nameščen) in nastavimo strežnike NTP.
+- Na koncu pa namestimo programski paket `openvpn` in nastavimo odjemalca za VPN omrežje. In seveda, ne pozabimo poskrbeti za varnostne nastavitve o katerih smo že dovolj obširno govorili.
+
+Zdaj moramo nastaviti samo še vmesnik USB na Ethernet. V našem sistemu se imenuje `eth1` (to lahko preverimo z ukazom `ip a`, zato ustvarimo posebno konfiguracijsko datoteko: `sudo nano /etc/network/interfaces.d/eth1` in vanjo zapišemo naslednje:
+
+    auto eth1
+    iface eth1 inet static
+    address 192.168.100.1
+    netmask 255.255.255.0
+
+To bo operacijskemu sistemu povedalo, naj na omrežni vmesnik `eth1` (pretvornik USB na RJ45) nastavi statični naslov IP in ta IP naslov naj bo `192.168.100.1`. Za omrežje vezano na `eth1` vmesnik moramo namreč uporabiti druge omrežne nastavitve (drug nabor IP naslovov), kot se uporabljajo na omrežju vezanem na vmesnik `eth0`. Seveda pa glede na vaše omrežne nastavitve lahko uporabite drugačen IP naslov, pomembno je le, da razumete logiko delovanja omrežij in ne naredite kakšne napake.
+
+Zdaj moramo namestiti strežnik DHCP:
+`sudo apt install isc-dhcp-server`
+
+Nastavimo ga tako, da odpremo konfiguracijsko datoteko z ukazom: `sudo nano /etc/dhcp/dhcpd.conf`. V datoteki je treba nastaviti `domain-name` in `domain-name-servers`:
+
+Poiščimo in odkomentirajmo pe authoritative; vrstico, da bo videti takole:
+
+    authoritative;
+
+V konfiguracijsko datoteko dodamo še naslednje vrstive:
+
+    subnet 192.168.100.0 netmask 255.255.255.0 {
+        range 192.168.100.50 192.168.100.240;
+        option routers 192.168.100.1;
+        option subnet-mask 255.255.255.0;
+    }
+
+Datoteko sedaj lahko shranimo.
+
+Nato odpremo naslednjo konfiguracijsko datoteko: `sudo nano /etc/default/isc-dhcp-server` in nastavimo `INTERFACESv4` na `eth1`:
+
+    INTERFACESv4="eth1"
+
+Vse te nastavitve bodo strežniku DHCP povedale, naj posluša na omrežnem vmesniku `eth1`, in ko se nanj poveže nova omrežna naprava, naj ji preko DHCP protokola dodeli IP naslov v razponu od `192.168.100.50` do `192.168.100.240`.
+
+Zdaj lahko znova zaženemo napravo: `sudo reboot`.
+
+Ko se naprava znova zažene, se nanjo povežemo s pomočjo SSH. Naprava ima zdaj tri omrežne vmesnike (pravzaprav več, vendar je eden tim. lokalni gostitelj (*localhost*) in en vmesnik Wi-Fi):
+- `eth0`: preko katerega je RaspberryPi povezan z internetom;
+- `eth1`: nanj bomo povezali VoIP telefon;
+- `tun0`: preko njega je RaspberryPi povezan v omrežje VPN;
+
+Sedaj torej povežimo telefon na omrežni USB vmesnik.
+
+Čim to naredimo, bo strežnik DHCP, ki posluša na `eth1`, samodejno dodelil IP naslov VoIP telefonu. To lahko preverimo z ukazom: `sudo systemctl status isc-dhcp-server`
+
+    ● isc-dhcp-server.service - LSB: DHCP server
+       Loaded: loaded (/etc/init.d/isc-dhcp-server; generated)
+       Active: active (running) since Tue 2021-11-09 20:18:12 CET; 26min ago
+         Docs: man:systemd-sysv-generator(8)
+      Process: 537 ExecStart=/etc/init.d/isc-dhcp-server start (code=exited, status=0/SUCCESS)
+        Tasks: 1 (limit: 2059)
+       CGroup: /system.slice/isc-dhcp-server.service
+               └─585 /usr/sbin/dhcpd -4 -q -cf /etc/dhcp/dhcpd.conf eth1
+    
+    nov 09 20:42:08 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.50 to 00:e0:4c:86:a3:a2 (vpnbridge) via eth1
+    nov 09 20:42:27 vpnbridge dhcpd[585]: reuse_lease: lease age 35 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.50
+    nov 09 20:42:27 vpnbridge dhcpd[585]: DHCPREQUEST for 192.168.100.50 from 00:e0:4c:86:a3:a2 (vpnbridge) via eth1
+    nov 09 20:42:27 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.50 to 00:e0:4c:86:a3:a2 (vpnbridge) via eth1
+    nov 09 20:42:40 vpnbridge dhcpd[585]: reuse_lease: lease age 41 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.51
+    nov 09 20:42:40 vpnbridge dhcpd[585]: DHCPDISCOVER from 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+    nov 09 20:42:40 vpnbridge dhcpd[585]: DHCPOFFER on 192.168.100.51 to 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+    nov 09 20:42:45 vpnbridge dhcpd[585]: reuse_lease: lease age 46 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.51
+    nov 09 20:42:45 vpnbridge dhcpd[585]: DHCPREQUEST for 192.168.100.51 (192.168.100.1) from 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+    nov 09 20:42:45 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.51 to 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+
+Kot lahko vidimo iz vrstice `DHCPACK`, ima VoIP telefon Aastra z naslovom MAC `00:08:5d:30:a8:a7` in imenom gostitelja `6730i00085D30A8A7` dodeljen IP naslov `192.168.100.51`.
+
+To je torej IP naslov našega VoIP telefona. (Mimogrede, te informacije lahko dobimo tudi iz datoteke `/var/lib/dhcp/dhcpd.leases`).
+
+Ker so DHCP naslovi v osnovi dinamični, se lahko zgodi, da bo naslednjič DHCP strežnik naši napravi dodelil drug naslov IP. Smiselno je torej, da napravi glede na njen MAC naslov nastavimo statični IP. To ni težko, če vemo, kaj delamo.
+
+Prvi korak je torej, da ugotovimo MAC naslov našega VoIP telefona (to smo videli v zgornjem izpisu v vrstici `DHCPACK`). Nato je potrebno samo odpreti konfiguracijsko datoteko strežnika DHCP z ukazom `sudo nano /etc/dhcp/dhcpd.conf` in ji dodati naslednje nastavitve:
+
+    host aastraphone {
+      hardware ethernet 00:08:5d:30:a8:a7;
+      fixed-address 192.168.0.51;
+    }
+
+Nastavitve so precej enostavne in ne potrebujejo dodatne razlage.
+
+Na koncu znova zaženemo strežnik DHCP, da vidimo, ali vse deluje pravilno, in stvar je gotova: `sudo systemctl restart isc-dhcp-server.service`
+
+Zdaj je naš telefon povezan z *vpnbridge* napravo RaspberryPi in ima dodeljen statični IP naslov, vendar se ne poveže v omrežje. Le zakaj?
+
+Zato, ker je potrebno nastaviti še posredovanje omrežnega prometa. Najprej bomo torej omogočili posredovanje IPv4 prometa, tako da se lahko ves promet iz `eth1` posreduje v internet ali VPN. Vnesemo ukaz: `sudo sysctl -w net.ipv4.ip_forward=1` in to je to. Ker pa seveda želimo, da IP posredovanje ostane aktivno po ponovnem zagonu, Raspberrya moramo odpreti datoteko `sysctl.conf`: `sudo nano /etc/sysctl.conf` in nato odkomentirati vrstico, ki določa posredovanje IPv4 omrežnega prometa:
+
+    net.ipv4.ip_forward=1
+
+Nato samo ponovno naložimo sysctl spremembe: `sudo sysctl -p`, in to je to. Če je posredovanje IPv4 aktivno, lahko preverimo z vnosom ukaza: `cat /proc/sys/net/ipv4/ip_forward` - izpisalo se bo `1`, če je posredovanje IPv4 aktivno, in `0`, če ni.
+
+Na koncu pa je treba operacijskemu sistemu povedati, kateri omrežni promet naj se posreduje in kam točno. V našem primeru želimo, da bo promet iz VoIP telefona usmerjen neposredno v VPN, z drugimi besedami, želimo tole: `eth1` → `tun0`. Operacijskemu sistemu to povemo v njegovem jeziku takole:
+
+    sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+    sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+    sudo iptables -A FORWARD -i eth1 -o tun0 -j ACCEPT
+
+Zdaj ima naš VoIP telefon neposreden dostop do omrežja VPN! Seveda želimo, da pravila požarnega zidu po ponovnem zagonu sistema ostanejo aktivna, zato odpremo datoteko: `sudo nano /etc/openvpn/update-resolv-conf` in na konec dodamo naslednje vrstice:
+
+    # Posredovanje prometa iz eth1 na VPN!
+    sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+    sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+    sudo iptables -A FORWARD -i eth1 -o tun0 -j ACCEPT
+
+<img src="035_VoIP_over_VPN.png" alt="Povezava VoIP telefona preko VPN" width="300"/>
+
+Po ponovnem zagonu bo RaspberryPi napravam, ki bodo nanj omrežno povezane preko USB Ethernet adapterja, dodelil IP naslov iz območja med `192.168.100.50` in `192.168.100.240`, ta naprava pa bo imela neposreden dostop do omrežja VPN (mimogrede, s pomočjo omrežnega stikala lahko na USB Ethernet adapter priključimo več naprav).
+
+##### Dostop do VoIP telefona iz omrežja VPN
+
+Zdaj imajo naprave, povezane z RaspberryPi, dostop do omrežja VPN. Hkrati pa bi morda želeli tudi dostop do VoIP telefona **iz omrežja VPN**. Povedano drugače, preko VPN omrežja bi radi dostopali do spletnega vmesnika za upravljanje VoIP telefona.
+
+To bomo rešili s spletnim posredniškim strežnikom (angl. *proxy*). Najprej namestimo spletni strežnik `nginx`: `sudo apt install nginx`. Nato odprimo nastavitveno datoteko `sudo nano /etc/nginx/nginx.conf` in spremenimo (ali dodamo) vrstico:
+
+    worker_processes 1;
+
+Nato uredimo nastavitveno datoteko `sites-enabled`: `sudo nano /etc/nginx/sites-enabled/default`. Vsebuje naj naslednje nastavitve:
+
+    # Preusmeritev na Aastra telefon
+    server {
+	    listen 443 default_server;
+    
+	    root /var/www/html;
+        index index.html index.htm;
+        server_name _;
+
+        ssl on;
+        ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+        ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    
+        location / {
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-Proto https;
+            proxy_redirect off;
+            proxy_pass https://192.168.100.51;
+            proxy_http_version 1.1;
+        }
+    }
+
+Kaj točno določajo te nastavitve? Nekaj zelo uporabnih stvari.
+
+Najprej se bo na našem RaspberryPi zagnal spletni strežnik HTTPS. Ta spletni strežnik bo dostopen na VPN IP naslovu na našega RaspberryPi (v mojem primeru je to na `https://10.10.8.127`). Nadalje, v našem primeru za HTTPS uporabljamo samopodpisana (tim. "snakeoil") digitalna potrdila, seveda pa vam nihče ne brani, da si ustvarite svoja lastna potrdila in jih podpišete z Let's Encrypt ali kakšnim drugim ponudnikom digitalnega podpisovanja digitalnih potrdil. Seveda je to mogoče samo, če je vaš telefon dostopen neposredno prek interneta, česar pa vam ne priporočam! uporaba samopodpisanih digitalnih potrdil v nejavnem omrežju sicer ni sporna. Ko je HTTPS povezava med spletnim brskalnikom in spletnim strežnikom na RaspberryPi vzpostavljena, pa se ves spletni promet preusmeri na IP naslov VoIP telefona (`192.168.100.51`).
+
+Najbolj kul stvar pri vsem skupaj pa je tole: ko se sedaj povežete na RaspberryPi (`https://10.10.8.127/`), bo vaša HTTPS povezava vzpostavljena s sodobnimi šifrirnimi protokoli (TLS 1.2 ali več). Nginx pa bo nato do VoIP telefona vzpostavil drugo šifrirano povezavo, lahko tudi s slabšimi šifrirnimi protokoli kot na primer TLS 1.0 ali celo SSL 3.0. Povedano drugače, gre za **ponovno šifriranje** HTTPS povezave, ki vam omogoča, da do VoIP telefona dostopate s sodobnim HTTPS šifriranjem, pa čeprav VoIP telefon sodobnih šifrirnih protokolov ne podpira.
+
+Pravzaprav je potrebno nastaviti samo eno malenkost, in sicer določiti katere šifrirne protokole naj spletni strežnik uporabi ob vzpostavljanju HTTPS povezave. Odprimo datoteko `/etc/nginx/sites-enabled/default` in pred `location` dodajmo naslednje vrstice:
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+
+Zdaj bomo torej lahko z RaspberryPi (*vpnbridge*) vzpostavili visokokakovostno šifrirno povezavo (TLS 1.3 ali 1.2), Nginx pa bo nato vzpostavil manj varno povezavo z VoIP telefonom ter nam tako omogočil dostop do spletnega vmesnika VoIP telefona preko kvalitetne HTTPS povezave.
+
+A najprej je potrebno preizkusiti še če so Nginx nastavitve brez napak: `sudo nginx -t` - upajmo, da so in če je vse v redu, bi morali videti takle izpis:
+
+    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+    nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+Končno lahko Nginx spletni strežnik ponovno zaženemo: `sudo service nginx restart`. Zdaj lahko zaženemo spletni brskalnik ter se povežemo na Aastra VoIP telefon preko naprave **vpnbridge**: `https://10.10.8.127/`.
+
+<img src="033_Aastra_SIP_config.png" alt="Aastra 6730i SIP nastavitve" width="300"/>
+
+Na koncu bomo nastavili še požarni zid (`sudo apt install ufw`) ter določili naslednja pravila:
+- nabor privzetih pravil (`sudo ufw default deny incoming` in `sudo ufw default allow outgoing`);
+- dovolimo povezave SSH od kjerkoli: `sudo ufw allow 22/tcp`;
+- dovolimo dostop do spletnega vmesnika VoIP telefona iz mojega računalnika, **vendar le, če je povezan v VPN** (moj VPN IP je `10.10.8.10`): `sudo ufw allow from 10.10.8.10 to any port 443 proto tcp`.
+
+Ko je to storjeno, aktiviramo požarni zid z `sudo ufw enable`. Upoštevajte, da je to požarni zid, ki deluje na napravi RaspberryPi *vpnbridge*, zato seveda omejuje dostop do naprave *vpnbridge*. A posredno ta požarni zid omejuje tudi dostop do VoIP telefona, povezanega z našim *vpnbridgeom*.
+
+Kaj smo torej naredili?. VoIP telefon je dostopen iz VPN, čeprav ni dovolj zmogljiv, da bi lahko poganjal VPN odjemalca. Zaščiten je tudi s požarnim zidom in dobrim HTTPS šifriranjem (TLS 1.2 ali več), pa čeprav VoIP telefon nima možnosti zaganjanja požarnega zidu in podpore sodobnih HTTPS šifrirnih protokolov.
+
+##### Spreminjanje *nespremenljivega* privzetega gesla
+
+Zdaj se morda sprašujete, ali bi bilo mogoče spremeniti tudi *nespremenljivo* geslo za administracijo telefona Aastra? Da, z nekaj triki je mogoče tudi to. Ampak najprej poglejmo, kako se gesla znebiti.
+
+Najprej moramo zakodirati privzeto uporabniško ime in geslo telefona Aastra (z Base64 algoritmom). To lahko naredimo kar na RaspberryPi, in sicer tako, da zaženemo ukaz `echo -n "admin:22222" | base64`. Dobili bomo: `YWRtaW46MjIyMjI=`.
+
+Zdaj odpremo nastavitveno datoteko `sites-enabled`, tako da vnesemo ukaz `sudo nano /etc/nginx/sites-enabled/default`. Poiščemo razdelek `location` in za `proxy_pass` dodajmo naslednjo vrstico :
+
+    proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+
+Shranimo datoteko in ponovno zaženimo Nginx: `sudo service nginx restart`. Kaj se zgodi? Do spletnega vmesnika za upravljanje telefona Aastra bomo lahko dostopali neposredno, ne da bi bilo potrebno vnašati uporabniško ime in geslo.
+
+V naslednjem koraku pa moramo v Nginx posredniškemu strežniku narediti novo uporabniško ime in geslo. Recimo, da bo naše uporabniško ime `matej` in geslo `MySuperCoolPWD123!`.
+
+Vnesemo ukaz: `sudo sh -c "echo -n 'matej:' >> /etc/nginx/.htpasswd"`, s čimer zapišemo naše uporabniško ime v datoteko `.htpasswd`. Nato pa: `sudo sh -c "openssl passwd -apr1 >> /etc/nginx/.htpasswd"`. Zdaj vnesemo še naše strašno skrivnostno geslo, in stvar je gotova.
+
+Uporabniško ime in geslo za preverjanje pristnosti sta zdaj shranjena v `/etc/nginx/.htpasswd`, ki izgleda takole:
+
+    matej:$apr1$cUzlGR14$WRgaPJ.0GAJeRgLN81vot.
+
+Pa še ena zanimivost – v to datoteko lahko dodamo več uporabnikov (z različnimi gesli), potrebno je samo ponoviti ta dva ukaza!
+
+A le počasi, nismo še končali. Če želimo omogočiti preverjanje pristnosti z datoteko `.htpasswd`, moramo znova odpreti nastavitveno datoteko `sites-enabled` (`sudo nano /etc/nginx/sites-enabled/default`) in pod razdelek `server` dodati naslednji dve vrstici:
+
+    auth_basic "VoIP phone";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+
+Znova zaženemo Nginx s `sudo service nginx restart` in to je to! Zdaj je vaš stari VoIP telefon varno spravljen za požarnim zidom, podpira sodobne protokole HTTPS, lahko pa tudi spreminjate *nespremenljiva* gesla tudi za dostop do njegovega vmesnika za upravljanje! Kaj ni to totalno kul?
+
+Ah, če ste slučajno pozabili geslo ali če želite kaj spremeniti, pa lahko vedno uredite datoteko `/etc/nginx/.htpasswd`. Ali pa jo preprosto odstranite in uporabnika ter geslo zanj ustvarite od začetka.
+
+Mimogrede, če uporabljate VoIP telefon prek omrežja VPN, lahko prihaja do omrežnih zakasnitev. Sam takšnih takšnih težav nisem zaznal, sem pa zasledil, da če se klici prekinjajo ali telefon izgublja registracijo, lahko težavo rešite z omogočanjem ali povečanjem tim. SIP keep-alive nastavitve. V tem primeru v telefonu odprite `Advanced Settings` → `Line 1` in spremenite `Registration Period` (pod `Basic SIP Network Settings`) na nižjo številko.
+
+##### Pa naredimo svoj stari VoIP telefon še brezžičen
+
+Kaj pa, če želimo naš stari VoIP telefon narediti "brezžičen", torej, da se bo v omrežje povezoval prek WiFi in ne prek žične povezave?
+
+Običajno si tega sicer ne želimo, saj so omrežja WiFi bolj nezanesljiva kot žična. Če pa recimo nimate možnosti potegniti omrežnega kabla, pa lahko RaspberryPi povežete preko WiFi omrežja. Prva stvar je seveda, da poiščemo razpoložljiva WiFi omrežja.
+
+Vnesemo ukaz `sudo iwlist wlan0 scan`, ki pa bo izpisal veliko nepotrebnih podatkov, zato lahko izpis nekoliko filtriramo in prikažemo samo imena razpoložljivih WiFi omrežij: `sudo iwlist wlan0 scan | grep ESSID`. Izpisalo se bo nekaj takega:
+
+    ESSID:"MyHome"
+    ESSID:"DIRECT-14-HP DeskJet Plus 4100"
+    ESSID:"Telelink"
+    ESSID:"AndroidAP5ED8"
+
+Zdaj lahko odpremo datoteko `wpa_supplicant.conf` z ukazom: `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`. Na konec dodajmo SSID omrežja in geslo za dostop:
+
+    network={
+       ssid="MyHome"
+       psk="MySuperStrongPassword!"
+    }
+
+Datoteko shranimo in čez nekaj trenutkov se bo RaspberryPi samodejno povezal v naše WiFi omrežje (`MyHome`).
+ 
+ifconfig wlan0
+wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
+        inet6 fe80::c582:9f73:aac0:5cc3  prefixlen 64  scopeid 0x20<link>
+        ether b8:27:eb:a0:1c:b0  txqueuelen 1000  (Ethernet)
+        RX packets 37  bytes 4284 (4.1 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 39  bytes 5962 (5.8 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+Najboljše pri vsem pa je, da se bo VPN povezava vzpostavila samodejno in vam zato ni potrebno spreminjati nikakršnih nastavitev.
+
+### Glasnost sporočil glasovne pošte
+
+Pri uporabi glasovne pošte (govorimo o zvočnih sporočilih ob odsotnosti, ki nam jih sistem pošlje preko e-pošte) sem opazil, da imajo zvočni posnetki precej nizko glasnost. Rešitev je enostavna. V FreePBX pojdite na `Settings` → `Voicemail Admin` → `Settings` → `General` in poiščite polje `Volume Gain`. Ta parameter vam omogoča, da določite, za koliko želite povečati glasnost sporočil v glasovni pošti. Pozorni bralci boste opazili opombo, ki pravi, da mora biti na sistemu nameščen programski paket `sox`, vendar je na RasPBX že poskrbljeno za to.
+
+Sam sem to številko nastavil na `7` in glasovna sporočila so zdaj veliko glasnejša. Splošno pravilo je: večja številka, večja glasnost. Poskusite z različnimi številkami (na primer `2` ali `9`) in poiščite kaj je najbolj primerno za vaš sistem.
+
+## Kaj pa lahko naredite *vi*?
+
+Upam, da je bil članek zanimiv, in če se vam kje v omari valja kakšen odvečen RaspberryPi, lahko poskusite tudi sami postaviti RasPBX.
+
+<img src="037_everything_together.jpg" alt="Vse naprave na moji mizi" width="300"/>
+
+Obstaja pa tudi nekaj, kar lahko storite tudi **vi**.
+
+Če ste spletni oblikovalec, lahko sestavite kakšno lepo stran za pošiljanje SMS sporočil (in tudi USSD sporočil).
+
+Če ste razvijalec, lahko poskusite popraviti prejemanje MMS sporočil, ki sploh ne deluje.
+
+Vesel bom tudi vaših predlogov o tem, kateri SIP odjemalci dobro izgledajo ter so enostavni za uporabo (ter predvsem in brez zoprnih hroščev). Kot rečeno, najraje imam odprtokodne SIP odjemalce in tiste, ki podpirajo SRTP, ZRTP šifriranje ter imajo še druge varnostne funkcionalnosti. Te stvari mi lahko sporočite preko *Github issues*.
+
+Seveda je gotovo še veliko stvari, ki bi jih bilo mogoče narediti z RasPBX, in z veseljem bom slišal vaše ideje, zamisli, izkušnje in vprašanja. Tudi to mi lahko sporočite preko Githuba. Prav tako me lahko opozorite na napake v članku oziroma če sem vanj zapisal kakšno traparijo (skoraj gotovo sem jo).
+
+Za konec pa si lahko ogledate nekaj mojih predavanj in projektov, na primer:
+
+- [Video prikaz ponarejanja klicne identifikacije in prestrezanje VoIP komunikacijam](http://videolectures.net/single_kovacic_varnost_voip/).
+- [Hekanje GSM telefonije in nekaj malega o varnosti GSM telefonije](http://videolectures.net/single_kovacic_phonebusters/) ([PDF prosojnice](https://telefoncek.si/static/2014/01/The_Phonebusters_2014.pdf)).
+- [Vse o VPNjih](http://videolectures.net/water4cities_kovacic_virtual_private_networks/) ([PDF prosojnice](https://telefoncek.si/predavanja/VPN_2021.pdf)).
+- [Forenzična analiza omrežnega prometa mobilnega telefona](http://videolectures.net/water4cities_kovacic_network_forensic_analysis/) ([PDF prosojnice](https://telefoncek.si/predavanja/Network_forensic_analysis_of_a_mobile_phone_2021.pdf)).
+- ...in še [mnogo več ](https://telefoncek.si/predavanja/).
+
+*Ostanite z nami in veselo hekanje še naprej!*
