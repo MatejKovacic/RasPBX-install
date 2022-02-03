@@ -538,6 +538,10 @@ Kot ste opazili, morate telefonsko številko vnesti v skladu z mednarodnim stand
 
 Nato morate vnesti e-poštni naslov za pošiljanje dohodnih SMS sporočil (tukaj sem, jasno, vpisal svoj e-poštni naslov), telefonsko številko, na katero naj bodo posredovana dohodna SMS sporočila (to sem pustil prazno, ker ne želim uporabljati posredovanja SMS-ov), na koncu pa me je aplikacija vprašala, ali želim na RasPBX napravo namestiti spletno stran za pošiljanje SMS-ov s preko USB modema. Seveda želim, kako neumno vprašanje, zato sem hitro rekel `y` (*Da*) in nato vnesel še geslo za SMS stran, ki se glasi `mojesupervarnogeslo`. Ne, hecam se, svojih gesel seveda ne bom delil z vami.
 
+Če ste slučajno pozabili geslo za dostop do spletnega vmesnika za pošiljanje SMS sporočil, pa samo odprite ukazno vrstico in vpišite ukaz: `echo -n "myNEWpassword" | sha1sum`. Ukaz vam bo izračunal SHA1 kontrolno vsoto gesla, ki je v našem primeru naslednja: `72358c1e53720d0b9d6bcd377516fdcc96ecb931`. Zdaj odprite datoteko SMS spletnega vmesnika: `sudo nano /var/www/html/sms/index.php` in to kontrolno vsoto dodajte v spremenljivko `$password`:
+
+    $password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+
 <img src="006_sms1.png" alt="Spletni vmesnik za pošiljanje SMS sporočil" width="300"/>
 
 Mimogrede, še krajša opazka glede spletnega vmesnika za pošiljanje SMS sporočil. Če imate vsaj malo občutka za spletno oblikovanje, je ta vmesnik prava žalitev za vaše oči. Vseeno pa to ni problem, saj lahko izgled vmesnika spremenite sami. Datoteke HTML se nahajajo v `/var/www/html/sms` in jih lahko prosto urejate. Če boste pripravili kakšen zanimiv dizajn vmesnika za pošiljanje SMS poročil, vam bom zelo hvaležen, če ga boste delili z mano.
