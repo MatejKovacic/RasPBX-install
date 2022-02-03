@@ -538,6 +538,10 @@ As you noticed, you need to enter phone number in E.164 international standard f
 
 Then you need to enter e-mail address for sending incoming SMS messages (I entered my e-mail address), phone number to which incoming SMS messages should be forwarded (I left this empty, because I do not want to use SMS forwarding), and finally the script asked me if I want to install a webpage (on RasPBX) for sending SMS with my USB dongle. Of course I want, what a stupid question, so I said `y` (*Yes*) and then entered password for SMS page, which would be `mytotallysecurepassword`. Nah, I am joking, I am not sharing that with you.
 
+Anyway, if you forgot password for SMS page, just open a terminal and write: `echo -n "myNEWpassword" | sha1sum`. You will get SHA1 hash of a password (in our case it is: `72358c1e53720d0b9d6bcd377516fdcc96ecb931`). Now open the file for sending SMS through web page: `sudo nano /var/www/html/sms/index.php` and add this hash to a variable `$password`:
+
+    $password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+
 <img src="006_sms1.png" alt="SMS webpage" width="300"/>
 
 Regarding this webpage on RasPBX for sending SMS messages. If you are a web designer, it could look really insulting for your eyes. But this is not a problem, because you can change the outlook of SMS sending page. HTML files are located in `/var/www/html/sms` and you can edit them freely. If you managed to put together some likeble webpage, it would be much appreciated if you can share it with me.
