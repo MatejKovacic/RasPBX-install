@@ -1094,7 +1094,7 @@ After we checked `DHCPACK` and found out the MAC address of our VoIP phone. Then
 
     host aastraphone {
       hardware ethernet 00:08:5d:30:a8:a7;
-      fixed-address 192.168.0.51;
+      fixed-address 192.168.100.51;
     }
 
 The configuration is quite straightforward, so it does not need additional explanation.
