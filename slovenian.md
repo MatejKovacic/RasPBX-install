@@ -1088,7 +1088,7 @@ Prvi korak je torej, da ugotovimo MAC naslov našega VoIP telefona (to smo videl
 
     host aastraphone {
       hardware ethernet 00:08:5d:30:a8:a7;
-      fixed-address 192.168.0.51;
+      fixed-address 192.168.100.51;
     }
 
 Nastavitve so precej enostavne in ne potrebujejo dodatne razlage.
