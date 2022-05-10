@@ -1243,7 +1243,7 @@ Now we can open `wpa_supplicant.conf` file: `sudo nano /etc/wpa_supplicant/wpa_s
        psk="MySuperStrongPassword!"
     }
 
-Save the file and after a minute or so, RaspberryPi will automatically connect to `MyHome` WiFi network.
+Save the file and after a minute or so, RaspberryPi will automatically connect to `MyHome` WiFi network. You can check this with `iwconfig wlan0` or `iwgetid` commands. If device will not connect to the WiFi network automatically, you will have to reboot it.
  
 ifconfig wlan0
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
