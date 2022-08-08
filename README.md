@@ -20,7 +20,7 @@
   * [Install firewall](#install-firewall)
 - [Installation of USB dongle](#installation-of-usb-dongle)
   * [Dongle configuration](#dongle-configuration)
-  * [Freedom is calling... and sendig SMS messages](#freedom-is-calling)
+  * [Freedom is calling... and sending SMS messages](#freedom-is-calling)
   * [Install USSD webpage](#install-ussd-webpage)
   * [Install additional codec](#install-additional-codec)
 - [FreePBX configuration](#freepbx-configuration)
