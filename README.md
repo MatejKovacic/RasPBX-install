@@ -20,7 +20,7 @@
   * [Install firewall](#install-firewall)
 - [Installation of USB dongle](#installation-of-usb-dongle)
   * [Dongle configuration](#dongle-configuration)
-  * [Freedom is calling](#freedom-is-calling)
+  * [Freedom is calling... and sendig SMS messages](#freedom-is-calling)
   * [Install USSD webpage](#install-ussd-webpage)
   * [Install additional codec](#install-additional-codec)
 - [FreePBX configuration](#freepbx-configuration)
@@ -625,7 +625,7 @@ Save and close the file and login directly to Asterisk management console: `aste
         -- [dongle0] Dongle has connected, initializing...
         -- [dongle0] Dongle initialized and ready
 
-### Freedom is calling
+### Freedom is calling and sending SMS messages
 
 As you can see, USB dongle is now ready. So let's check if we can send SMS message. In Asterisk management console type `dongle sms dongle0 +38640XXXXXX Test!`. This will send a SMS message to my personal mobile (*+38640XXXXXX*), with text "*Test!*.
 
@@ -1016,32 +1016,32 @@ A quick walk through:
 - I also installed `ntp` package (`fake-hwclock` was already installed) and set up NTP servers.
 - Finally, I installed `openvpn` package and configured VPN client. Oh, and I took care of security settings.
 
-Now we need to configure USB to Ethernet adapter. In our system is named `eth1` (we can check this with `ip a` command, so we create a special configuration file: `sudo nano /etc/network/interfaces.d/eth1` and put the following configuration in it:
+Now we need to configure USB to Ethernet adapter. In our system is named `eth1` (we can check this with `ip a` command). Now, the tricky part. Debian based systems use a configuration file under `/etc/network/interfaces.d`. However, Raspbian moved away from that, so you need to edit `sudo nano /etc/dhcpcd.conf` - add these lines:
 
-    auto eth1
-    iface eth1 inet static
-    address 192.168.100.1
-    netmask 255.255.255.0
+```
+interface eth1
+static ip_address=192.168.100.1/24
+static routers=192.168.100.254
+static domain_name_servers=8.8.8.8 1.1.1.1
+```
+If you use "old" Debian style network interfaces configuration, everyting would kind of a work, but you will experience some really weird network behaviour.
 
-This will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else. 
+Anyway, this will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else. 
 
 Now we need to install DHCP server:
 `sudo apt install isc-dhcp-server`
 
-And configure it by opening the configuration file with: `sudo nano /etc/dhcp/dhcpd.conf`. In the file you should set the `domain-name` and `domain-name-servers` as follows:
-
-    option domain-name "vpnbridge.local";
-    option domain-name-servers 8.8.8.8, 8.8.4.4;
-
-Find and uncomment authoritative; line, so it will look like this:
+And configure it by opening the configuration file with: `sudo nano /etc/dhcp/dhcpd.conf`. In the file you should find and uncomment authoritative; line, so it will look like this:
 
     authoritative;
 
 Also, add the following lines to the configuration file:
 
     subnet 192.168.100.0 netmask 255.255.255.0 {
-        range 192.168.100.50 192.168.100.240;
+        range 192.168.100.60 192.168.100.100;
         option routers 192.168.100.1;
+        option domain-name-servers 8.8.8.8;
+        option domain-name "vpnbridge.local";
         option subnet-mask 255.255.255.0;
     }
 
@@ -1073,18 +1073,13 @@ When we do that, DHCP server listening on `eth1` will automatically assign a VoI
        CGroup: /system.slice/isc-dhcp-server.service
                └─585 /usr/sbin/dhcpd -4 -q -cf /etc/dhcp/dhcpd.conf eth1
     
-    nov 09 20:42:08 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.50 to 00:e0:4c:86:a3:a2 (vpnbridge) via eth1
-    nov 09 20:42:27 vpnbridge dhcpd[585]: reuse_lease: lease age 35 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.50
-    nov 09 20:42:27 vpnbridge dhcpd[585]: DHCPREQUEST for 192.168.100.50 from 00:e0:4c:86:a3:a2 (vpnbridge) via eth1
-    nov 09 20:42:27 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.50 to 00:e0:4c:86:a3:a2 (vpnbridge) via eth1
-    nov 09 20:42:40 vpnbridge dhcpd[585]: reuse_lease: lease age 41 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.51
     nov 09 20:42:40 vpnbridge dhcpd[585]: DHCPDISCOVER from 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
-    nov 09 20:42:40 vpnbridge dhcpd[585]: DHCPOFFER on 192.168.100.51 to 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
-    nov 09 20:42:45 vpnbridge dhcpd[585]: reuse_lease: lease age 46 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.51
-    nov 09 20:42:45 vpnbridge dhcpd[585]: DHCPREQUEST for 192.168.100.51 (192.168.100.1) from 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
-    nov 09 20:42:45 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.51 to 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+    nov 09 20:42:40 vpnbridge dhcpd[585]: DHCPOFFER on 192.168.100.60 to 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+    nov 09 20:42:45 vpnbridge dhcpd[585]: reuse_lease: lease age 46 (secs) under 25% threshold, reply with unaltered, existing lease for 192.168.100.60
+    nov 09 20:42:45 vpnbridge dhcpd[585]: DHCPREQUEST for 192.168.100.60 (192.168.100.1) from 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
+    nov 09 20:42:45 vpnbridge dhcpd[585]: DHCPACK on 192.168.100.60 to 00:08:5d:30:a8:a7 (6730i00085D30A8A7) via eth1
 
-As you can see from `DHCPACK` line, Aastra VoIP phone with MAC address `00:08:5d:30:a8:a7` and hostname `6730i00085D30A8A7` has IP address `192.168.100.51`.
+As you can see from `DHCPACK` line, Aastra VoIP phone with MAC address `00:08:5d:30:a8:a7` and hostname `6730i00085D30A8A7` has IP address `192.168.100.60`.
 
 So that is the IP address of our VoIP phone. (BTW, we can get these information also from file `/var/lib/dhcp/dhcpd.leases`).
 
@@ -1097,9 +1092,11 @@ After we checked `DHCPACK` and found out the MAC address of our VoIP phone. Then
       fixed-address 192.168.100.51;
     }
 
-The configuration is quite straightforward, so it does not need additional explanation.
+The configuration is quite straightforward, so it does not need additional explanation. Just keep in mind, that we set up static DHCP address for `192.168.100.51`, while range for dynamic DHCP addresses are defined from `192.168.100.60` to  `192.168.100.100`. So never mix up dynamic rang with static IP addresses. If you mix that up, you can get some warnings from your ISC DHCP server.
 
-finally we just restart DHCP server to see if everything is working well, and that is it: `sudo systemctl restart isc-dhcp-server.service`
+Oh, and don't forget so open firewall to that network, in order to pass DHCP traffic. Since this is a really specific network, we can open everthing: `sudo ufw allow from 192.168.100.0/24 to any`.
+
+Finally we just restart DHCP server to see if everything is working well, and that is it: `sudo systemctl restart isc-dhcp-server.service`
 
 Now our phone is connected to *vpnbridge* RaspberryPi device and has an IP address assigned, but it is not working. Why?
 
@@ -1262,6 +1259,10 @@ And the best thing here is, that VPN will also be established automatically, so 
 When using voicemail (these messages are sent to my e-mail), I noticed they voice files have quite low volume. However, this could be easily solved. Just go to `Settings` → `Voicemail Admin` → `Settings` → `General` and look for a field `Volume Gain`. This parameter allows you to specify how much gain to add to the message when sending a voicemail. There is also a note, that `sox` package must be installed on a system, but on RasPBX already is, so you do not need to worry about that.
 
 I set this number to `7`, and voice messages are much louder now. the rule is: higher the number, higher the volume. Try different numbers (for instance `2` and `9`) and find the right balance for you.
+
+### On VPN
+
+I am now living in a different country and I am using RasPBX sucessfully for a couple of weeks. VPN connection is working surprisingly well, however, I set up Wireguard VPN, because is is much faster with much less overhead. So far, no big issues regarding this.
 
 ## And what can *you* do?
 
