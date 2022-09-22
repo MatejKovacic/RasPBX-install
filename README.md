@@ -11,7 +11,7 @@ In this guide we are covering how to set up your very own PBX on a RaspberryPi, 
 
 Everything will be working through the VPN network and you will be able to have free phone calls among on your own infrastructure.
 
-And there is more. When you will be traveling abroad (in the countries with high roaming costs), you will be able to receive and place calls and SMS messages to your mobile phone with little or almost no costs. And hey, retention data will be showing your SIM card is still at your home country, while you will be able to receive calls on a completely.
+And there is more. When you will be traveling abroad (in the countries with high roaming costs), you will be able to receive and place calls and SMS messages to your mobile phone with little or almost no costs. And hey, retention data will be showing your SIM card is still at your home country, while you will be able to receive calls on a completely different location.
 
 How to do that? Well, check the following guides:
 
