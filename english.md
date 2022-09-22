@@ -101,7 +101,7 @@ As we already mentioned, you will need:
 - RasPBX, which you can freely [download from the official project's website](http://www.raspberry-asterisk.org/downloads/) (I am using version 10-10-2020);
 - internet connection.
 
-Additionally I am also using my own VPN network, and I will show you how to fence your PBX inside the VPN network. I am using OpenVPN, with several security enhancements, hardened cryptography settings, etc. But I am not going to talk about how to set up your own VPN network, I will just assume you already have one. If you don't, you can hire me to set up one for you.
+Additionally I am also using my own VPN network, and I will show you how to fence your PBX inside the VPN network. I am using Wireguard, with several security enhancements, hardened cryptography settings, etc. But I am not going to talk about how to set up your own VPN network, I will just assume you already have one. However, you can check my [guide how to set up Wireguard server](wireguard.md).
 
 *So let's start.*
 
@@ -281,17 +281,7 @@ However, using a VPN for encryption of VoIP data could be a little problematic. 
 
 However, enclosing the VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal. 
 
-Anyway, let's take a look into how connect RasPBX into the OpenVPN network. As I mentioned, I already have my OpenVPN server, so I will not cover that part, only how to install and configure the OpenVPN client.
-
-Which is in fact very easy. Just install the *openvpn* package with `apt install openvpn`, and then copy the content of your OpenVPN configuration into the config file:
-
-    nano /etc/openvpn/myVPN_TCP.conf
-
-(paste your config into that file, save and close it), and then you can run the OpenVPN client with the command: `sudo systemctl start openvpn@myVPN_TCP.service`.
-
-When an OpenVPN connection is established, you can check if it is working by entering: `sudo systemctl status openvpn@myVPN_TCP.service`. And of course, we would like that the OpenVPN connection will be automatically established after a reboot of your RasPBX device, so we must say: `sudo systemctl enable openvpn@myVPN_TCP.service`.
-
-You may wonder why *myVPN_TCP*? It is just a name of my VPN connection, you can name it whatever you want.
+Anyway, let's take a look into how connect RasPBX into the Wireguard network. As I mentioned, I already have my Wireguard server, so I will not cover that part. You can check out how to install Wireguard "server" and "client" on my [Wireguard guide](wireguard.md).
 
 ### Set up NTP
 
@@ -457,7 +447,7 @@ There are also some others things you need to do for securing your Asterisk syst
 
 #### How to unban IP address
 
-So, you set up `fail2ban`, everything is working fine, but you made a mistake and entered the wrong password to one of your VoIP clients. VoIP client is trying to login to your system, and after three unsuccessful attempts, you receive an e-mail informing you that "*The IP 10.10.8.9 has just been banned by Fail2Ban after 3 attempts against Asterisk.*".
+So, you set up `fail2ban`, everything is working fine, but you made a mistake and entered the wrong password to one of your VoIP clients. VoIP client is trying to login to your system, and after three unsuccessful attempts, you receive an e-mail informing you that "*The IP 10.10.6.9 has just been banned by Fail2Ban after 3 attempts against Asterisk.*".
 
 One simple thing you can do is to wait for half an hour. It is always time for a good coffee, so grab one and drink it *slowly*.
 
@@ -477,9 +467,9 @@ Here you can see, we have two jails, one is named *asterisk* and the other *sshd
     `- Actions
        |- Currently banned:	1
        |- Total banned:	1
-       `- Banned IP list:	10.10.8.9
+       `- Banned IP list:	10.10.6.9
 
-Now you can manually unban this IP address: `fail2ban-client set asterisk unbanip 10.10.8.9`. However, if user on this IP address is naughty (*and not banned yet*), you can also manually ban him with: `fail2ban-client set asterisk banip 10.10.8.9`.
+Now you can manually unban this IP address: `fail2ban-client set asterisk unbanip 10.10.6.9`. However, if user on this IP address is naughty (*and not banned yet*), you can also manually ban him with: `fail2ban-client set asterisk banip 10.10.6.9`.
 
 ### Install firewall
 
@@ -503,28 +493,28 @@ But first, let's take a look at my network setup.
 
 My local network is in range 192.168.1.0/24, which means I can use IP addresses from 192.168.1.1 to 192.168.1.254 (192.168.1.0 is the network ID, and 192.168.1.255 is the broadcast address for the network). My RasPBX device has local IP 192.168.1.150.
 
-But I am also using VPN (in range 10.10.8.0/24), and my RasPBX device has VPN IP address 10.10.8.150. In my VPN network there are several other devices, and I want that RasPBX web management will be accessible from 10.10.8.10.
+But I am also using VPN (in range 10.10.6.0/24), and my RasPBX device has VPN IP address 10.10.6.150. In my VPN network there are several other devices, and I want that RasPBX web management will be accessible from 10.10.6.10.
 
 Therefore we will set up the firewall the following way:
 - first we will **allow SSH connections from anywhere** (SSH is running on TCP port 22): `ufw allow 22/tcp`;
-- then we will **allow web management from my computer, but only if it is connected to VPN** (my VPN IP si 10.10.8.10): `ufw allow from 10.10.8.10 to any port 80 proto tcp`;
+- then we will **allow web management from my computer, but only if it is connected to VPN** (my VPN IP si 10.10.6.10): `ufw allow from 10.10.6.10 to any port 80 proto tcp`;
 - then we will **block connections to web interface for all others**: `ufw deny to any port 80 proto tcp`;
-- finally we will **allow all (other) connections from the VPN network**: `ufw allow from 10.10.8.0/24 to any`.
+- finally we will **allow all (other) connections from the VPN network**: `ufw allow from 10.10.6.0/24 to any`.
 
 When we enter all these commands, we can enable ufw by typing `ufw enable`. We can also list the firewall rules: `ufw status numbered` and then delete rules we do not want any more with `ufw delete [number]`. Here is example from my device:
 
          To                         Action      From
          --                         ------      ----
     [ 1] 22/tcp                     ALLOW IN    Anywhere                  
-    [ 2] 80/tcp                     ALLOW IN    10.10.8.10                 
+    [ 2] 80/tcp                     ALLOW IN    10.10.6.10                 
     [ 3] 80/tcp                     DENY IN     Anywhere                  
-    [ 4] Anywhere                   ALLOW IN    10.10.8.0/24              
+    [ 4] Anywhere                   ALLOW IN    10.10.6.0/24              
     [ 5] 22/tcp (v6)                ALLOW IN    Anywhere (v6)             
     [ 6] 80/tcp (v6)                DENY IN     Anywhere (v6)  
 
 Useful commands are also `ufw disable` and `ufw reset`, for more just check the UFW documentation.
 
-Now we are done. Just check if everything is working by completely logging out and logging in again, and if you are able to connect from your local network (`ssh root@192.168.1.150`) and through VPN (`ssh root@10.10.8.150`), grab a cup of coffee - you deserved it well.
+Now we are done. Just check if everything is working by completely logging out and logging in again, and if you are able to connect from your local network (`ssh root@192.168.1.150`) and through VPN (`ssh root@10.10.6.150`), grab a cup of coffee - you deserved it well.
 
 ## Installation of USB dongle
 
@@ -639,7 +629,7 @@ We can also check outgoing call by typing `channel originate dongle/dongle0/+386
 
 The called phone will start ringing and if you pick up, you will hear some music.
 
-Now you can close Asterisk management console by typing `exit`, and try to send SMS through webpage. In your browser you can open `/sms` webpage on your RasPBX device (in my case `http://10.10.8.150/sms/`) and send the SMS message. If you remember, we set up firewall, so webpage for SMS sending is available only from allowed IP addresses.
+Now you can close Asterisk management console by typing `exit`, and try to send SMS through webpage. In your browser you can open `/sms` webpage on your RasPBX device (in my case `http://10.10.6.150/sms/`) and send the SMS message. If you remember, we set up firewall, so webpage for SMS sending is available only from allowed IP addresses.
 
 Oh, almost forgot. If you send SMS back to your USB dongle, SMS is received and RasPBX instantly send it to your e-mail address. How cool is that, ha?
 
@@ -662,7 +652,7 @@ Just be careful to enter your correct e-mail address.
 
 *Unstructured Supplementary Service Data* (USSD), sometimes also called *quick codes* or *feature codes*, is a communications protocol used by GSM cellular telephones to communicate with the mobile network operator's computers. USSD can be used for WAP browsing, prepaid callback service, mobile-money services, location-based content services, menu-based information services or as part of configuring the phone on the network. USSD messages are up to 182 alphanumeric characters long, but unlike SMS messages, USSD messages create a real-time connection during a USSD session. The connection remains open, allowing a two-way exchange of a sequence of data.
 
-I am not using USSD, but if case you do, just type the command `apt install ussd-webpage`, and after that you can browse to `/ussd` webpage of your RasPBX (in my case `http://10.10.8.150/ussd/`).
+I am not using USSD, but if case you do, just type the command `apt install ussd-webpage`, and after that you can browse to `/ussd` webpage of your RasPBX (in my case `http://10.10.6.150/ussd/`).
 
 ### Install additional codec
 
@@ -672,7 +662,7 @@ And that is it. You can let the console some rest for now.
 
 ## FreePBX configuration
 
-Now the fun begins. Open your web browser and type the IP address of your RasPBX. In my case `http://10.10.8.150`.
+Now the fun begins. Open your web browser and type the IP address of your RasPBX. In my case `http://10.10.6.150`.
 
 <img src="images/008_freepbx_login.png" alt="Login to FreePBX" width="300"/>
 
@@ -816,7 +806,7 @@ In FreePBX click `Settings` → `Asterisk SIP settings` and go to `SIP Settings 
 
 Now we can setup our SIP clients (sofphones). I am using several operating systems, namely: Ubuntu Linux, Windows and MacOS on computer and one Android phone and an iPhone. So I was looking for the *best client* for each of those systems, preferably opensource, but quickly realized there are a lot of products, and each of them has its own set of problems. Finally I ended up on Zoiper, which is not opensource but free version works quite well. Although, I am missing ZRTP feature, so I am really open on your suggestions what should I use/try for different operating systems (you can use Github issues for that).
 
-As mentioned, there are several SIP clients, but basically, you neet to setup user ID or username (this is your extension number, for instance `1000`), domain (this is an IP address of your RasPBX device; it is also nice to add a port number, which is in our case 5060, so you would enter `10.10.8.150:5060`) and a password (which is a secret of your extension). Usually, you will need to select transport, which in our case is `TCP`.
+As mentioned, there are several SIP clients, but basically, you neet to setup user ID or username (this is your extension number, for instance `1000`), domain (this is an IP address of your RasPBX device; it is also nice to add a port number, which is in our case 5060, so you would enter `10.10.6.150:5060`) and a password (which is a secret of your extension). Usually, you will need to select transport, which in our case is `TCP`.
 
 <img src="images/022_zoiper_client.png" alt="Zoiper client on Linux" width="300"/>
 
@@ -992,7 +982,7 @@ However, this problem can and **will** be solved with VPN.
 
 The idea is simple. You just need to connect your VoIP phone to your VPN network, set *proxy server*, *outbound proxy server* and *registrar server* to your RasPBX VPN IP, and everything should just start working.
 
-Some VoIP phones have support for OpenVPN, but not my Aastra 6730i. Besides, you may want to connect the phone to Wireguard or some other type of VPN network. So how to connect your *old tech* phone to a modern VPN network?
+Some VoIP phones have support for VPN, but not my Aastra 6730i. Besides, you may want to connect the phone to Wireguard or some other type of VPN network. So how to connect your *old tech* phone to a modern VPN network?
 
 The answer is simple. With RaspberryPi.
 
@@ -1014,7 +1004,7 @@ A quick walk through:
 - Run `sudo raspi-config` and under `System Options` set hostname (I changed it to `vpnbridge`), under `Localisation Options` set your time zone, keyboard and WLAN country. Finally, under `Advanced Options` select `Expand Filesystem`. After that RaspberryPi needs to be rebooted.
 - Then I ran `sudo dpkg-reconfigure locales` because I am using Slovenian locales.
 - I also installed `ntp` package (`fake-hwclock` was already installed) and set up NTP servers.
-- Finally, I installed `openvpn` package and configured VPN client. Oh, and I took care of security settings.
+- Finally, I installed `wireguard` package and configured VPN client. Oh, and I took care of security settings.
 
 Now we need to configure USB to Ethernet adapter. In our system is named `eth1` (we can check this with `ip a` command). Now, the tricky part. Debian based systems use a configuration file under `/etc/network/interfaces.d`. However, Raspbian moved away from that, so you need to edit `sudo nano /etc/dhcpcd.conf` - add these lines:
 
@@ -1106,18 +1096,24 @@ Because we need to set up routing. First step is to enable IPv4 forwarding so th
 
 Then we can reload sysctl changes: `sudo sysctl -p` and that is it. We can check that IPv4 forwarding is active by entering a command: `cat /proc/sys/net/ipv4/ip_forward` - it will print out `1` if IPv4 forwarding is active, and `0` if it is not.
 
-Now we need to tell the operating system exactly which traffic should be forwarded and where exactly. We want that traffic from a VoIP phone will be routed directly to VPN, in other words, we want this: `eth1` → `tun0`. So we tell the machine to do this:
+Now we need to tell the operating system exactly which traffic should be forwarded and where exactly. We want that traffic from a VoIP phone will be routed directly to VPN, in other words, we want this: `eth1` → `wg0`. So we tell the machine to do this:
 
-    sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+    sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
     sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o tun0 -j ACCEPT
+    sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
 
-Now our VoIP phone has a direct access to our VPN network! We also want that these rules are persistent (remain active after reboot), so we open the file: `sudo nano /etc/openvpn/update-resolv-conf` and add these lines to the bottom of it:
+Now our VoIP phone has a direct access to our VPN network! We also want that these rules are persistent (remain active after reboot), so we create a small script: `sudo nano /etc/network/iptablesphone.sh` with these lines in it:
 
     # eth1 to VPN routing!
     sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
     sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
     sudo iptables -A FORWARD -i eth1 -o tun0 -j ACCEPT
+
+Then we open the file: `sudo nano /etc/network/interfaces` and add these line to the bottom of it:
+
+    up /etc/network/iptablesphone.sh
+
+This will run the firewall script when the network interfaces are set up.
 
 <img src="images/035_VoIP_over_VPN.png" alt="The complete setup of VoIP phone over VPN" width="300"/>
 
@@ -1157,9 +1153,9 @@ Then we edit `sites-enabled` config file: `sudo nano /etc/nginx/sites-enabled/de
 
 What will that do? A couple of very nice things, actually.
 
-First, it will start a HTTPS web server listening on our RaspberryPi. That web server will be accessible on Raspberry's VPN IP address (in my case on `https://10.10.8.127`). We are using self-signed "snakeoil" certificates, but you could set up your own certificates and sign them with Let's Encrypt, if you want your phone to be accessible directly through internet (however, I would not recommend you that!). Then all the web traffic is redirected to IP address of a VoIP phone (`192.168.100.51`).
+First, it will start a HTTPS web server listening on our RaspberryPi. That web server will be accessible on Raspberry's VPN IP address (in my case on `https://10.10.6.127`). We are using self-signed "snakeoil" certificates, but you could set up your own certificates and sign them with Let's Encrypt, if you want your phone to be accessible directly through internet (however, I would not recommend you that!). Then all the web traffic is redirected to IP address of a VoIP phone (`192.168.100.51`).
 
-And probably the most cool thing is, that when you will connect to `https://10.10.8.127/`, your HTTPS connection will be established with modern encryption protocols (TLS 1.2 or more). Nginx will then establish different encrypted connection with VoIP phone, with TLS 1.0 or even SSL 3.0, but this connection will be then **re-encrypted for you** by Nginx, so you will be able to access VoIP phone with modern HTTPS encryption methods.
+And probably the most cool thing is, that when you will connect to `https://10.10.6.127/`, your HTTPS connection will be established with modern encryption protocols (TLS 1.2 or more). Nginx will then establish different encrypted connection with VoIP phone, with TLS 1.0 or even SSL 3.0, but this connection will be then **re-encrypted for you** by Nginx, so you will be able to access VoIP phone with modern HTTPS encryption methods.
 
 Actually, in `/etc/nginx/sites-enabled/default` configuration file you can add these lines before the `location`:
 
@@ -1174,14 +1170,14 @@ But first we need to test the Nginx configuration: `sudo nginx -t` - hopefully y
     nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
     nginx: configuration file /etc/nginx/nginx.conf test is successful
 
-And finally, you can restart Nginx server: `sudo service nginx restart`. Now I was able to open my browser and connect to my Aastra VoIP phone through **vpnbridge** device: `https://10.10.8.127/`.
+And finally, you can restart Nginx server: `sudo service nginx restart`. Now I was able to open my browser and connect to my Aastra VoIP phone through **vpnbridge** device: `https://10.10.6.127/`.
 
 <img src="images/033_Aastra_SIP_config.png" alt="Aastra 6730i SIP settings" width="300"/>
 
 Finally, we will install firewall (`sudo apt install ufw`) and set it up:
 - Set default rule-set (`sudo ufw default deny incoming` and `sudo ufw default allow outgoing`).
 - Allow SSH connections from anywhere: `sudo ufw allow 22/tcp`.
-- Allow web management of VoIP phone from my computer, **but only if it is connected to VPN** (my VPN IP is `10.10.8.10`): `sudo ufw allow from 10.10.8.10 to any port 443 proto tcp`.
+- Allow web management of VoIP phone from my computer, **but only if it is connected to VPN** (my VPN IP is `10.10.6.10`): `sudo ufw allow from 10.10.6.10 to any port 443 proto tcp`.
 
 When this is done, we activate the firewall with `sudo ufw enable`. Please note that this is a firewall running on a RaspberryPi *vpnbridge* device, so it is limiting access to *vpnbridge* device. But indirectly this firewall is also limiting access to VoIP phone connected to our *vpnbridge*.
 

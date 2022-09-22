@@ -17,5 +17,6 @@ How to do that? Well, check the following guides:
 
 - [RasPBX guide - English version](english.md) 
 - [RasPBX guide - Slovenian version (slovenska različica)](slovenian.md)
+- [How to install Wireguard for RasPBX network](wireguard.md)
 
-I am preparing a complete guide how to set up WireGuard VPN, so stay tuned!
+I am preparing additional guides, so stay tuned!
