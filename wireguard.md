@@ -127,7 +127,7 @@ Create PSK keys: `wg genpsk > /etc/wireguard/clients/Matej.psk`
 (**client_Matej_private_key**)
 
 `cat /etc/wireguard/clients/Matej.key.pub`:
-tV4rTz42hbs+9hxCjZsQjHqfp9k8ex6uPi4x2PDCX3I= (**client_Matej_public_key**)
+`tV4rTz42hbs+9hxCjZsQjHqfp9k8ex6uPi4x2PDCX3I=` (**client_Matej_public_key**)
 
 `cat /etc/wireguard/clients/Matej.psk`:
 (**client_Matej_PSK**)
