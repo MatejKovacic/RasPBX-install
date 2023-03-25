@@ -18,10 +18,10 @@ This AT command will get relevant information from modem.
 
 Some useful AT commands you can use:
 ```
-AT command	Description
+AT command	                  Description
 AT+CCWA=0,0,1                 disable call-waiting
 AT+CFUN=1,1                   reboot modem
-AT^CARDLOCK="<code>"	      send unlock code
+AT^CARDLOCK="<code>"	        send unlock code
 AT^SYSCFG=13,0,3FFFFFFF,0,3   modem 2G only, automatic search any band, no roaming
 AT^SYSCFG=2,0,3FFFFFFF,2,4    Any
 AT^SYSCFG=13,1,3FFFFFFF,2,4   2G only
