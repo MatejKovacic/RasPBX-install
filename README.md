@@ -18,5 +18,6 @@ How to do that? Well, check the following guides:
 - [RasPBX guide - English version](english.md) 
 - [RasPBX guide - Slovenian version (slovenska različica)](slovenian.md)
 - [How to install Wireguard for RasPBX network](wireguard.md)
+- [Sending AT commands to modem and using 2G network only](modem-at-commands.md)
 
 I am preparing additional guides, so stay tuned!
