@@ -1,6 +1,6 @@
 <?php
 /*********************************************************************
- *  Chan_Dongle SMS Script v.0.01
+ *  Chan_Dongle SMS Script v.0.02
  *  for The Raspberry Asterisk
  *
  *   Author: Troy Nahrwold
