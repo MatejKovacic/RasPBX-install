@@ -536,7 +536,11 @@ Anyway, if you forgot password for SMS page, just open a terminal and write: `ec
 
 Regarding this webpage on RasPBX for sending SMS messages. If you are a web designer, it could look really insulting for your eyes. But this is not a problem, because you can change the outlook of SMS sending page. HTML files are located in `/var/www/html/sms` and you can edit them freely. If you managed to put together some likeble webpage, it would be much appreciated if you can share it with me.
 
-<img src="images/007_sms2.png" alt="Nice design of a SMS webpage" width="300"/>
+<img src="images/007_sms2.png" alt="Old design of a SMS webpage" width="300"/>
+
+Actually... I already did it. You can download my [SMS sending script](send-sms.php), rename it to `index.php` and copy it into `/var/www/html/sms` directory. But don't judge me for bad programming. And don't run HTML validator on this script.
+
+<img src="images/send_sms.png" alt="This is hopefully much beter design of a SMS webpage" width="300"/>
 
 Now you can insert your USB dongle into your RaspberryPi. If it was already connected before, unplug it and plug it in again. However, some older modems require a complete reboot of the RaspberryPi, so you can just do that by typing `reboot`.
 
