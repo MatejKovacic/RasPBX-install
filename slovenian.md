@@ -542,7 +542,11 @@ Nato morate vnesti e-poštni naslov za pošiljanje dohodnih SMS sporočil (tukaj
 
     $password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
 
-<img src="images/006_sms1.png" alt="Spletni vmesnik za pošiljanje SMS sporočil" width="300"/>
+<img src="images/006_sms1.png" alt="Stari spletni vmesnik za pošiljanje SMS sporočil" width="300"/>
+
+Ker je bil izgled starega spletnega vmesnika za pošiljanje SMS sporočil precej... zastarel, sem na hitro pripravil [malenkost lepši vmesnik z pošiljanje SMS sporočil](send-sms.php). Datoteko preimenujte v `index.php` in jo prekopirajte v mapo `/var/www/html/sms`. Ker je bila skripta precej na hitro popravljena, ne priporočam poganjanja HTML validatorja...
+
+<img src="images/send_sms.png" alt="Malce prenovljen spletni vmesnik za pošiljanje SMS sporočil" width="300"/>
 
 Mimogrede, še krajša opazka glede spletnega vmesnika za pošiljanje SMS sporočil. Če imate vsaj malo občutka za spletno oblikovanje, je ta vmesnik prava žalitev za vaše oči. Vseeno pa to ni problem, saj lahko izgled vmesnika spremenite sami. Datoteke HTML se nahajajo v `/var/www/html/sms` in jih lahko prosto urejate. Če boste pripravili kakšen zanimiv dizajn vmesnika za pošiljanje SMS poročil, vam bom zelo hvaležen, če ga boste delili z mano.
 
