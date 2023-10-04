@@ -5,7 +5,7 @@ A few years ago I came across a very interesting project from some guy, who [cre
 
 That sounds just cool, so I decided to write a pretty complete guide how to do that.
 
-<img src="images/034_target_setup.png" alt="What do we want to do" width="300"/>
+![What do we want to do](images/034_target_setup.png)
 
 In this guide we are covering how to set up your very own PBX on a RaspberryPi, how to set up a trunk to a mobile network and how to connect SIP clients to your PBX. SIP clients will be a computer (with SIP client), a mobile phone (with SIP client) and a physical VoIP desk phone.
 
