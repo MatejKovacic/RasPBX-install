@@ -786,6 +786,7 @@ Nato sledijo nastavite:
 - `User extension`: lahko je poljubna številka, sam sem se odločil za 4-mestne številke in v mojem primeru sem vnesel `1000`.
 - `Display name`: prikazno ime je seveda ime uporabnika ali naprave. Sam sem vpisal `Matej - racunalnik`, saj to številko nameravam uporabljati na svojem računalniku.
 - `Secret`: tukaj se nahaja geslo za vašo interno telefonsko številko (oziroma vaš SIP račun). to geslo je samodejno ustvarjeno, lahko pa ga poljubno spremenite. Na primer, v ... no, tega vam seveda ne izdam, saj morajo gesla ostati tajna, kajne?
+
 ![Interne telefonske številke – splošne nastavitve](images/016_extensions1.png)
 
 Na tem mestu pa lahko postorite še nekaj zanimivih stvari. Pod izbiro `Voicemail` lahko omogočite zvočno pošto. Poglejmo si nekaj uporabnih nastavitev:
@@ -971,7 +972,7 @@ Telefon sem uspelo dobiti po precej ugodni ceni in tako je nekega sončnega jutr
 
 #### Konfiguriranje in povezava VoIP telefona v lokalno omrežje
 
-Telefon sem najprej povezal v svoje lokalno omrežje ter z orodjem `nmap` ugotovil, da ima telefon Aastra lokalni IP naslov `192.168.1.225` ter da ima odprta dvoje TCP vrat - `443/TCP`, kar običajno pomeni, da na napravi teče spletni strežnik HTTPS in `23/TCP`, kar običajno pomeni, da je naprava dostopna prek protokola "telnet". Slednje ni slišati dobro, saj `telnet` ne ponuja šifriranih povezav in bi morala biti njegova uporaba opuščena. Pravzaprav je `telnet` protokol že leta 1995 (se pravi tako rekoč v prazgodovini) nadomestil protokol `ssh`. Kakorkoli, ko sem se v telefon skušal prijaviti z ukazom `telnet`, se je bila povezava sicer vzpostavila, vendar s telefona sploh nisem dobil nikakršnega odgovora. Kot kaže je torej upravljanje navsezadnje možno le preko spletnega vmesnika.
+Telefon sem najprej povezal v svoje lokalno omrežje ter z orodjem `nmap` ugotovil, da ima telefon Aastra lokalni IP naslov `192.168.1.225` ter da ima odprta dvoje TCP vrat - `443/TCP`, kar običajno pomeni, da na napravi teče spletni strežnik HTTPS in `23/TCP`, kar običajno pomeni, da je naprava dostopna prek protokola `telnet`. Slednje ni slišati dobro, saj `telnet` ne ponuja šifriranih povezav in bi morala biti njegova uporaba opuščena. Pravzaprav je `telnet` protokol že leta 1995 (se pravi tako rekoč v prazgodovini) nadomestil protokol `ssh`. Kakorkoli, ko sem se v telefon skušal prijaviti z ukazom `telnet`, se je bila povezava sicer vzpostavila, vendar s telefona sploh nisem dobil nikakršnega odgovora. Kot kaže je torej upravljanje navsezadnje možno le preko spletnega vmesnika.
 
 Obstaja pa še en način, da ugotovimo IP naslov Aastre. In sicer tako, da ga preberemo iz samega telefona. Na telefonu preprosto pritisnemo tipko 'Možnosti' in s tipkami za pomikanje izberemo `3 - Phone status` nato pa `IP&MAC Addresses`.
 
@@ -986,17 +987,20 @@ Potem pa so na vrsti nastavitve računa SIP! V FreePBX najprej ustvarimo novo in
 Preko spletnega vmesnika VoIP telefona gremo v `Advanced Settings` → `Global SIP` in pod `Advanced SIP Settings` spremenimo `Transport Protocol` v `TCP` ter potrdimo, da je `Local SIP UDP/TCP Port` nastavljen na `5060`. Spremenimo tudi `Codec Preference List` (na vrh sem nastavil `G.729`), nato pa kliknemo `Save Settings`.
 
 Nato gremo v `Advanced Settings` → `Line 1` in nastavimo naslednje:
-- `Screen Name`: `Matej` (to je seveda moje ime).
-- `Phone Number`: `7000`.
-- `Caller ID`: `7000`.
-- `Authentication Name`: `7000` (vse te tri številke so tim *extension number* oz. naša interna telefonska številka).
-- `Password`: tukaj sem seveda vpisal geslo svoje interne telefonske številke.
-- `Proxy Server`: `192.168.1.150`.
-- `Proxy Port`: `5060`.
-- `Outbound Proxy Server`: `192.168.1.150`.
-- `Outbound Proxy Port`: `5060`.
-- `Registrar Server`: `192.168.1.150`.
-- `Registrar Port`: `5060`.
+
+| Nastavitev | Vrednost |
+| :----- | :---- |
+|`Screen Name`|`Matej` (to je seveda moje ime)|
+|`Phone Number`|`7000`|
+|`Caller ID`|`7000`|
+|`Authentication Name`|`7000` (vse te tri številke so tim *extension number* oz. naša interna telefonska številka)|
+|`Password`|tukaj sem seveda vpisal geslo svoje interne telefonske številke|
+|`Proxy Server`|`192.168.1.150`|
+|`Proxy Port`|`5060`|
+|`Outbound Proxy Server`|`192.168.1.150`|
+|`Outbound Proxy Port`|`5060`|
+|`Registrar Server`|`192.168.1.150`|
+|`Registrar Port`|`5060`|
 
 Druge nastavitve niso bile spremenjene. Kot lahko vidimo, sem pod *proxy server*, *outbound proxy server* in *registrar server* vnesel lokalni IP naslov mojega RasPBX strežnika (`192.168.1.150`) in vrata (`5060`).
 
@@ -1083,9 +1087,12 @@ Vse te nastavitve bodo strežniku DHCP povedale, naj posluša na omrežnem vmesn
 Zdaj lahko znova zaženemo napravo: `sudo reboot`.
 
 Ko se naprava znova zažene, se nanjo povežemo s pomočjo SSH. Naprava ima zdaj tri omrežne vmesnike (pravzaprav več, vendar je eden tim. lokalni gostitelj (*localhost*) in en vmesnik Wi-Fi):
-- `eth0`: preko katerega je RaspberryPi povezan z internetom;
-- `eth1`: nanj bomo povezali VoIP telefon;
-- `wg0`: preko njega je RaspberryPi povezan v omrežje VPN;
+
+| Vmesnik | Opis |
+| ------- | ---- |
+| `eth0` | preko katerega je RaspberryPi povezan z internetom (WAN) |
+| `eth1` | nanj bomo povezali VoIP telefon (LAN) |
+| `wg0` | preko njega je RaspberryPi povezan v omrežje VPN |
 
 Sedaj torej povežimo telefon na omrežni USB vmesnik.
 

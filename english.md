@@ -976,17 +976,20 @@ Then it was the turn for the SIP account settings! In FreePBX I created new `SIP
 Through web interface of the VoIP phone I went to `Advanced Settings` → `Global SIP` and under `Advanced SIP Settings` changed `Transport Protocol` to `TCP` and confirmed that `Local SIP UDP/TCP Port` in `5060`. I also changed `Codec Preference List` (I set `G.729` to the top), and then clicked `Save Settings`.
 
 Then I went to `Advanced Settings` → `Line 1` and set the following:
-- `Screen Name`: `Matej` (that's my name, obviously).
-- `Phone Number`: `7000`.
-- `Caller ID`: `7000`.
-- `Authentication Name`: `7000` (all these three are the extension number).
-- `Password`: I just entered my extension's password.
-- `Proxy Server`: `192.168.1.150`.
-- `Proxy Port`: `5060`.
-- `Outbound Proxy Server`: `192.168.1.150`.
-- `Outbound Proxy Port`: `5060`.
-- `Registrar Server`: `192.168.1.150`.
-- `Registrar Port`: `5060`.
+
+| Option | Value |
+| :----- | :---- |
+|`Screen Name`|`Matej` (that's my name, obviously)|
+|`Phone Number`|`7000`|
+|`Caller ID`|`7000`|
+|`Authentication Name`|`7000` (all these three are the extension number)|
+|`Password`|I just entered my extension's password|
+|`Proxy Server`|`192.168.1.150`|
+|`Proxy Port`|`5060`|
+|`Outbound Proxy Server`|`192.168.1.150`|
+|`Outbound Proxy Port`|`5060`|
+|`Registrar Server`|`192.168.1.150`|
+|`Registrar Port`|`5060`|
 
 The other settings were not changed. As you can see, I entered local IP address of my RasPBX `192.168.1.150` and port `5060` under *proxy server*, *outbound proxy server* and *registrar server*.
 
@@ -1078,9 +1081,12 @@ All these settings will tell the DHCP server to listen to network interface `eth
 Now we can reboot the device: `sudo reboot`.
 
 After the device boots up again, we can SSH to it. Device now has three network interfaces (actually more, but one is local host and one Wi-Fi interface):
-- `eth0`: where RaspberryPi is connected to the internet.
-- `eth1`: we will connect VoIP phone here.
-- `wg0`: where RaspberryPi is connected to VPN network.
+
+| Interface | Description |
+| --------- | ----------- |
+| `eth0` | where RaspberryPi is connected to the internet (WAN) |
+| `eth1` | we will connect VoIP phone here (LAN) |
+| `wg0` | where RaspberryPi is connected to VPN network |
 
 So let's connect the phone to USB to ethernet adapter.
 
