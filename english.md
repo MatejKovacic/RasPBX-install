@@ -109,7 +109,8 @@ Additionally I am also using my own VPN network, and I will show you how to fenc
 
 First we will take a look into the installation of a basic system. Since it is Linux, it helps if you are familiar with Linux, but if you are not, just follow the installation instructions and you will be fine. However, I assume you already know how to use terminal and how to login to a remote Linux system using SSH. Hint: under Windows you can use PuTTY or the built-in SSH client from Windows command prompt.
 
-**Also, please note that I am using Ubuntu Linux as my main operating system, and setting up some things (like SSH connections) are a little bit different under Linux and Windows. But don't worry, you can always use your favourite search engine and learn something new. (Or maybe you can start using Linux?)**
+> [!NOTE]
+> Also, please note that I am using Ubuntu Linux as my main operating system, and setting up some things (like SSH connections) are a little bit different under Linux and Windows. But don't worry, you can always use your favourite search engine and learn something new. (Or maybe you can start using Linux?)
 
 ### Write the RasPBX image to a SD card
 
