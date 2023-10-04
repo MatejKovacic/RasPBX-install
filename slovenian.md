@@ -330,29 +330,41 @@ Kar zadeva varnost SSH, obstaja več dobrih praks, na našem sistemu pa bomo imp
 
 **Onemogočanje praznih gesel**: če želite izrecno onemogočiti oddaljeno prijavo iz računov s praznimi gesli, odprite konfiguracijsko datoteko SSHd: `nano /etc/ssh/sshd_config` in dodajte/omogočite naslednjo vrstico:
 
-    PermitEmptyPasswords no
+```ssh-config
+PermitEmptyPasswords no
+```
 
 Onemogočanje datotek .rhosts: če želite preprečiti branje uporabnikovih datotek `~/.rhosts` in `~/.shosts`, odprite konfiguracijsko datoteko SSHd: `nano /etc/ssh/sshd_config` in dodajte/omogočite naslednjo vrstico:
 
-    IgnoreRhosts yes
+```ssh-config
+IgnoreRhosts yes
+```
 
 V isti datoteki **nastavite podprte algoritme HostKey po želenem vrstnem redu**:
 
-    HostKey /etc/ssh/ssh_host_ed25519_key
-    HostKey /etc/ssh/ssh_host_rsa_key
-    HostKey /etc/ssh/ssh_host_ecdsa_key
+```ssh-config
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+```
 
 Nato **določite razpoložljive algoritme KEX (Key Exchange)**:
 
-    KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+```ssh-config
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+```
  
 Določite **dovoljene šifrirne algoritme**:
 
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+```ssh-config
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+```
  
 Določite **razpoložljive MAC (message authentication code) algoritme**:
 
-    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+```ssh-config
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+```
 
 #### Prijavite se s ključem SSH
 
@@ -383,9 +395,11 @@ Po tem se poskusite prijaviti v vašo RasPBX napravo z vašim SSH ključem – t
 
 In zdaj zadnji korak - popolnoma onemogočite preverjanje pristnosti z geslom **v sistemu RasPBX**, tako da se bodo lahko v vaš RasPBX prijavili samo uporabniki s ključi SSH. Torej, **na vašem RasPBX** zaženite ukaz: `nano /etc/ssh/sshd_config` in spremenite naslednje vrednosti, kot je opisano:
 
-    ChallengeResponseAuthentication no
-    PasswordAuthentication no
-    UsePAM no
+```ssh-config
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+```
 
 Ko končate, preizkusite konfiguracijo SSH z ukazom: `sshd -t` ali celo zaženite kakšen bolj razširjen test: `sshd -T`.
 
@@ -424,21 +438,27 @@ Zdaj se poskušamo prijaviti v sistem kot *matej*: `su - matej`. Seveda lahko pr
 
 Zdaj moramo seveda prekopirati naše ključe SSH h uporabniku *matej*. Najprej pridobimo skrbniške privilegije s `sudo su` in nato odpremo konfiguracijsko datoteko SSH: `nano /etc/ssh/sshd_config` in spremenimo naslednje vrednosti, kot je opisano:
 
-    ChallengeResponseAuthentication yes
-    PasswordAuthentication yes
-    UsePAM yes
+```ssh-config
+ChallengeResponseAuthentication yes
+PasswordAuthentication yes
+UsePAM yes
+```
 
 Nato znova zaženemo SSH: `systemctl restart ssh` in iz **našega računalnika** kopiramo naš javni ključ SSH h uporabniku *matej* **na RasPBX** (**ne** na *root*!): `ssh-copy -id matej@192.168.1.150`.
 
 Preverimo, ali se lahko uspešno povežemo na RasPBX preko SSH, nato pa gremo nazaj na konfiguracijo OpenSSH (`nano /etc/ssh/sshd_config`) in nastavitve spremenimo nazaj:
 
-    ChallengeResponseAuthentication no
-    PasswordAuthentication no
-    UsePAM no
+```ssh-config
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+```
 
 Preden konfiguracijsko datoteko zapremo, bomo onemogočili še prijavo za root uporabnika. To lahko storimo tako, da spremenimo spremenljivko "PermitRootLogin" v vrednost "n0":
 
-     PermitRootLogin no
+```ssh-config
+PermitRootLogin no
+```
 
 Shranimo datoteko, znova zaženimo SSH (`systemctl restart ssh`) in to je to.
 
@@ -490,8 +510,10 @@ Torej, namestimo `ufw` in sicer tako, da vnesemo ukaz: `apt install ufw`.
 
 Zdaj je čas, da določimo nekaj pravil. Najprej bomo zavrnili vse dohodne povezave in dovolili vse odhodne povezave:
 
-    ufw default deny incoming
-    ufw default allow outgoing
+```sh
+ufw default deny incoming
+ufw default allow outgoing
+```
 
 Samo malo, kaj pa je sedaj to?? Kako bomo potem lahko sploh uporabljali sistem, če dohodne omrežne povezave niso dovoljene???
 
@@ -541,7 +563,9 @@ Nato morate vnesti e-poštni naslov za pošiljanje dohodnih SMS sporočil (tukaj
 
 Če ste slučajno pozabili geslo za dostop do spletnega vmesnika za pošiljanje SMS sporočil, pa samo odprite ukazno vrstico in vpišite ukaz: `echo -n "myNEWpassword" | sha1sum`. Ukaz vam bo izračunal SHA1 kontrolno vsoto gesla, ki je v našem primeru naslednja: `72358c1e53720d0b9d6bcd377516fdcc96ecb931`. Zdaj odprite datoteko SMS spletnega vmesnika: `sudo nano /var/www/html/sms/index.php` in to kontrolno vsoto dodajte v spremenljivko `$password`:
 
-    $password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+```php
+$password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+```
 
 ![Spletni vmesnik za pošiljanje SMS sporočil](images/006_sms1.png)
 
@@ -615,12 +639,14 @@ Ker seveda želim ohraniti svojo zasebnost, so podatki o mojem IMEI, IMSI, LAC k
 
 Sedaj lahko končno konfiguriramo naš ključ za klice in SMS sporočila. Odprite konfiguracijsko datoteko: `nano /etc/asterisk/dongle.conf` in poiščite `[dongle0]`. Videli boste vrstice *audio* in *data*, nato pa dodajte svoje vrstice *exten*, *imei* in *imsi*, kot je prikazano v naslednjem primeru:
 
-    [dongle0]
-    audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
-    data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
-    exten=+38641234567;
-    imei=xxxxxxxxxxxxxxx;
-    imsi=2934xxxxxxxxxxx;
+```ini
+[dongle0]
+audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
+data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
+exten=+38641234567;
+imei=xxxxxxxxxxxxxxx;
+imsi=2934xxxxxxxxxxx;
+```    
 
 Shranite in zaprite datoteko ter se prijavite neposredno v upravljalno konzolo Asterisk: `asterisk -rvvv`. Nato vnesite ukaz `dongle reload now`:
 
@@ -653,14 +679,16 @@ In da ne pozabimo. Če pošljete SMS nazaj na vaš GSM USB ključek, ga bo RasPB
 
 Kakorkoli že, e-poštna sporočila v katerih dobivate prejete SMS-e izgledajo obupno slabo. To lahko popravite tako, da spremenite kodo v konfiguracijski datoteki. To storite takole: `nano /etc/asterisk/extensions_custom.conf` in dodate nekaj takega:
 
-    [from-trunk-dongle]
-    exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
-    exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
-    exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
-    exten => sms,n,System(sendmail -t < /tmp/sms.txt)
-    exten => sms,n,Hangup()
-    exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
-    exten => _.,n,Goto(from-trunk,${EXTEN},1)
+```ini
+[from-trunk-dongle]
+exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
+exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
+exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
+exten => sms,n,System(sendmail -t < /tmp/sms.txt)
+exten => sms,n,Hangup()
+exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
+exten => _.,n,Goto(from-trunk,${EXTEN},1)
+```
 
 Pazite le, da vnesete pravilen e-poštni naslov.
 
@@ -935,15 +963,15 @@ Seveda je smiselno da tak sistem čim obsežneje pretestiramo, da vidimo kako se
 
 ### Povezava fizičnega telefona
 
-Sedaj, ko imate svojo lastno telefonsko centralo, se verjetno sprašujete, ali bi bilo mogoče nanjo povezati tudi fizični telefon? Odgovor je seveda – da! Brez težav si kupite namizni VoIP telefon (podpirati mora seveda SIP protokol), ki ga nato preprosto povežete v vaše omrežje in na njem nastavite ustrezno interno telefonsko številko iz vašega RasPBX sistema. Na trgu je na voljo več SIP telefonov, pred nakupom pa [preverite seznam podprtih naprav] (https://wiki.freepbx.org/display/FPG/EPM-Supported+Devices).
+Sedaj, ko imate svojo lastno telefonsko centralo, se verjetno sprašujete, ali bi bilo mogoče nanjo povezati tudi fizični telefon? Odgovor je seveda – da! Brez težav si kupite namizni VoIP telefon (podpirati mora seveda SIP protokol), ki ga nato preprosto povežete v vaše omrežje in na njem nastavite ustrezno interno telefonsko številko iz vašega RasPBX sistema. Na trgu je na voljo več SIP telefonov, pred nakupom pa [preverite seznam podprtih naprav](https://wiki.freepbx.org/display/FPG/EPM-Supported+Devices).
 
-Sam sem se odločil sem se za nakup enega od [telefonov Aastra](https://wiki.freepbx.org/display/FOP/Aastra), in sicer [Aastra6730i](https://wiki.freepbx.org/display/FPG/Supported+ Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), ki je v celoti podprt s strani FreePBX.
+Sam sem se odločil sem se za nakup enega od [telefonov Aastra](https://wiki.freepbx.org/display/FOP/Aastra), in sicer [Aastra 6730i](https://wiki.freepbx.org/display/FPG/Supported+Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), ki je v celoti podprt s strani FreePBX.
 
-Telefon sem uspelo dobiti po precej ugodni ceni in tako je nekega sončnega jutra na moja vrata pozvonil poštar, nekaj minut kasneje pa sem imel na mizi odpakirano čisto novo Aastra6730i. Jupi!
+Telefon sem uspelo dobiti po precej ugodni ceni in tako je nekega sončnega jutra na moja vrata pozvonil poštar, nekaj minut kasneje pa sem imel na mizi odpakirano čisto novo *Aastra 6730i*. Jupi!
 
 #### Konfiguriranje in povezava VoIP telefona v lokalno omrežje
 
-Telefon sem najprej povezal v svoje lokalno omrežje ter z orodjem `nmap` ugotovil, da ima telefon Aastra lokalni IP naslov `192.168.1.225` ter da ima odprta dvoje TCP vrat - `443/TCP`, kar običajno pomeni, da na napravi teče spletni strežnik HTTPS in "23/TCP", kar običajno pomeni, da je naprava dostopna prek protokola "telnet". Slednje ni slišati dobro, saj `telnet` ne ponuja šifriranih povezav in bi morala biti njegova uporaba opuščena. Pravzaprav je `telnet` protokol že leta 1995 (se pravi tako rekoč v prazgodovini) nadomestil protokol `ssh`. Kakorkoli, ko sem se v telefon skušal prijaviti z ukazom `telnet`, se je bila povezava sicer vzpostavila, vendar s telefona sploh nisem dobil nikakršnega odgovora. Kot kaže je torej upravljanje navsezadnje možno le preko spletnega vmesnika.
+Telefon sem najprej povezal v svoje lokalno omrežje ter z orodjem `nmap` ugotovil, da ima telefon Aastra lokalni IP naslov `192.168.1.225` ter da ima odprta dvoje TCP vrat - `443/TCP`, kar običajno pomeni, da na napravi teče spletni strežnik HTTPS in `23/TCP`, kar običajno pomeni, da je naprava dostopna prek protokola "telnet". Slednje ni slišati dobro, saj `telnet` ne ponuja šifriranih povezav in bi morala biti njegova uporaba opuščena. Pravzaprav je `telnet` protokol že leta 1995 (se pravi tako rekoč v prazgodovini) nadomestil protokol `ssh`. Kakorkoli, ko sem se v telefon skušal prijaviti z ukazom `telnet`, se je bila povezava sicer vzpostavila, vendar s telefona sploh nisem dobil nikakršnega odgovora. Kot kaže je torej upravljanje navsezadnje možno le preko spletnega vmesnika.
 
 Obstaja pa še en način, da ugotovimo IP naslov Aastre. In sicer tako, da ga preberemo iz samega telefona. Na telefonu preprosto pritisnemo tipko 'Možnosti' in s tipkami za pomikanje izberemo `3 - Phone status` nato pa `IP&MAC Addresses`.
 
@@ -966,8 +994,8 @@ Nato gremo v `Advanced Settings` → `Line 1` in nastavimo naslednje:
 - `Proxy Server`: `192.168.1.150`.
 - `Proxy Port`: `5060`.
 - `Outbound Proxy Server`: `192.168.1.150`.
-- `Outbound Proxy Port	`: `5060`.
-- `Registrar Server	`: `192.168.1.150`.
+- `Outbound Proxy Port`: `5060`.
+- `Registrar Server`: `192.168.1.150`.
 - `Registrar Port`: `5060`.
 
 Druge nastavitve niso bile spremenjene. Kot lahko vidimo, sem pod *proxy server*, *outbound proxy server* in *registrar server* vnesel lokalni IP naslov mojega RasPBX strežnika (`192.168.1.150`) in vrata (`5060`).
@@ -1110,16 +1138,20 @@ Nato samo ponovno naložimo sysctl spremembe: `sudo sysctl -p`, in to je to. Če
 
 Na koncu pa je treba operacijskemu sistemu povedati, kateri omrežni promet naj se posreduje in kam točno. V našem primeru želimo, da bo promet iz VoIP telefona usmerjen neposredno v VPN, z drugimi besedami, želimo tole: `eth1` → `wg0`. Operacijskemu sistemu to povemo v njegovem jeziku takole:
 
-    sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
-    sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```sh
+sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
+sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```
 
 Zdaj ima naš VoIP telefon neposreden dostop do omrežja VPN! Seveda želimo, da pravila požarnega zidu po ponovnem zagonu sistema ostanejo aktivna, zato odpremo datoteko: `sudo nano /etc/openvpn/update-resolv-conf` in na konec dodamo naslednje vrstice:
 
-    # Posredovanje prometa iz eth1 na VPN!
-    sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
-    sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```sh
+# Posredovanje prometa iz eth1 na VPN!
+sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
+sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```    
 
 ![Povezava VoIP telefona preko VPN](images/035_VoIP_over_VPN.png)
 
@@ -1131,31 +1163,35 @@ Zdaj imajo naprave, povezane z RaspberryPi, dostop do omrežja VPN. Hkrati pa bi
 
 To bomo rešili s spletnim posredniškim strežnikom (angl. *proxy*). Najprej namestimo spletni strežnik `nginx`: `sudo apt install nginx`. Nato odprimo nastavitveno datoteko `sudo nano /etc/nginx/nginx.conf` in spremenimo (ali dodamo) vrstico:
 
-    worker_processes 1;
+```nginx
+worker_processes 1;
+```
 
 Nato uredimo nastavitveno datoteko `sites-enabled`: `sudo nano /etc/nginx/sites-enabled/default`. Vsebuje naj naslednje nastavitve:
 
-    # Preusmeritev na Aastra telefon
-    server {
-	    listen 443 default_server;
-    
-	    root /var/www/html;
-        index index.html index.htm;
-        server_name _;
+```nginx
+# Preusmeritev na Aastra telefon
+server {
+    listen 443 default_server;
 
-        ssl on;
-        ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
-        ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
-    
-        location / {
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_redirect off;
-            proxy_pass https://192.168.100.51;
-            proxy_http_version 1.1;
-        }
+    root /var/www/html;
+    index index.html index.htm;
+    server_name _;
+
+    ssl on;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_redirect off;
+        proxy_pass https://192.168.100.51;
+        proxy_http_version 1.1;
     }
+}
+```
 
 Kaj točno določajo te nastavitve? Nekaj zelo uporabnih stvari.
 
@@ -1165,9 +1201,11 @@ Najbolj kul stvar pri vsem skupaj pa je tole: ko se sedaj povežete na Raspberry
 
 Pravzaprav je potrebno nastaviti samo eno malenkost, in sicer določiti katere šifrirne protokole naj spletni strežnik uporabi ob vzpostavljanju HTTPS povezave. Odprimo datoteko `/etc/nginx/sites-enabled/default` in pred `location` dodajmo naslednje vrstice:
 
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+```nginx
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+```
 
 Zdaj bomo torej lahko z RaspberryPi (*vpnbridge*) vzpostavili visokokakovostno šifrirno povezavo (TLS 1.3 ali 1.2), Nginx pa bo nato vzpostavil manj varno povezavo z VoIP telefonom ter nam tako omogočil dostop do spletnega vmesnika VoIP telefona preko kvalitetne HTTPS povezave.
 
@@ -1197,7 +1235,9 @@ Najprej moramo zakodirati privzeto uporabniško ime in geslo telefona Aastra (z 
 
 Zdaj odpremo nastavitveno datoteko `sites-enabled`, tako da vnesemo ukaz `sudo nano /etc/nginx/sites-enabled/default`. Poiščemo razdelek `location` in za `proxy_pass` dodajmo naslednjo vrstico :
 
-    proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+```nginx
+proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+```
 
 Shranimo datoteko in ponovno zaženimo Nginx: `sudo service nginx restart`. Kaj se zgodi? Do spletnega vmesnika za upravljanje telefona Aastra bomo lahko dostopali neposredno, ne da bi bilo potrebno vnašati uporabniško ime in geslo.
 
@@ -1213,8 +1253,10 @@ Pa še ena zanimivost – v to datoteko lahko dodamo več uporabnikov (z različ
 
 A le počasi, nismo še končali. Če želimo omogočiti preverjanje pristnosti z datoteko `.htpasswd`, moramo znova odpreti nastavitveno datoteko `sites-enabled` (`sudo nano /etc/nginx/sites-enabled/default`) in pod razdelek `server` dodati naslednji dve vrstici:
 
-    auth_basic "VoIP phone";
-    auth_basic_user_file /etc/nginx/.htpasswd;
+```nginx
+auth_basic "VoIP phone";
+auth_basic_user_file /etc/nginx/.htpasswd;
+```
 
 Znova zaženemo Nginx s `sudo service nginx restart` in to je to! Zdaj je vaš stari VoIP telefon varno spravljen za požarnim zidom, podpira sodobne protokole HTTPS, lahko pa tudi spreminjate *nespremenljiva* gesla tudi za dostop do njegovega vmesnika za upravljanje! Kaj ni to totalno kul?
 
@@ -1243,7 +1285,8 @@ Zdaj lahko odpremo datoteko `wpa_supplicant.conf` z ukazom: `sudo nano /etc/wpa_
     }
 
 Datoteko shranimo in čez nekaj trenutkov se bo RaspberryPi samodejno povezal v naše WiFi omrežje (`MyHome`). To lahko preverimo z ukazoma `iwconfig wlan0` ali `iwgetid` commands. Če se RaspberryPi v WiFi omrežje ne bo povezal samodejno, pa bo potreben njegov ponoven zagon.
- 
+
+``` 
 ifconfig wlan0
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
@@ -1253,6 +1296,7 @@ wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         RX errors 0  dropped 0  overruns 0  frame 0
         TX packets 39  bytes 5962 (5.8 KiB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
 
 Najboljše pri vsem pa je, da se bo VPN povezava vzpostavila samodejno in vam zato ni potrebno spreminjati nikakršnih nastavitev.
 

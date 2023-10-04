@@ -318,29 +318,41 @@ Regarding SSH security, there are several good practices, but we will implement 
 
 **Disabling empty passwords**: to explicitly disallow remote login from accounts with empty passwords, open the SSHd config file: `nano /etc/ssh/sshd_config` and add/enable the following line:
 
-    PermitEmptyPasswords no
+```ssh-config
+PermitEmptyPasswords no
+```
 
 Disabling .rhosts files: to prevent reading the user’s `~/.rhosts` and `~/.shosts` files, open the SSHd config file: `nano /etc/ssh/sshd_config` and add/enable the following line:
 
-    IgnoreRhosts yes
+```ssh-config
+IgnoreRhosts yes
+```
 
 In the same file **set supported HostKey algorithms by order of preference**:
 
-    HostKey /etc/ssh/ssh_host_ed25519_key
-    HostKey /etc/ssh/ssh_host_rsa_key
-    HostKey /etc/ssh/ssh_host_ecdsa_key
+```ssh-config
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+```
 
 Then **specify the available KEX (Key Exchange) algorithms**:
 
-    KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+```ssh-config
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+```
  
 Specify the **allowed ciphers**:
 
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+```ssh-config
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+```
  
 Specify the **available MAC (message authentication code) algorithms**:
 
-    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+```ssh-config
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+```
 
 #### Login with SSH key
 
@@ -371,9 +383,11 @@ After that, try to login to your RasPBX with key only (to see if everything work
 
 And now the final step - disable password authentication **on a RasPBX system** completely, so only users with SSH keys will be able to login to you RasPBX. So, **on your RasPBX** run the command: `nano /etc/ssh/sshd_config`, and change the following values as described:
 
-    ChallengeResponseAuthentication no
-    PasswordAuthentication no
-    UsePAM no
+```ssh-config
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+```
 
 When you are finished, you should test SSH config with a command: `sshd -t`, or even run some more extended test: `sshd -T`.
 
@@ -412,21 +426,27 @@ But if we say: `sudo whoami`, we will be asked for our password and we will see 
 
 Now we need to copy our SSH keys to user *matej*. So we first need to became a root with `sudo su` and then open SSH configuration file: `nano /etc/ssh/sshd_config` and change the following values as described:
 
-    ChallengeResponseAuthentication yes
-    PasswordAuthentication yes
-    UsePAM yes
+```ssh-config
+ChallengeResponseAuthentication yes
+PasswordAuthentication yes
+UsePAM yes
+```
 
 Then we restart SSH: `systemctl restart ssh` and from **our computer** copy our public SSH key to user *matej* **on RasPBX** (**not** *root*!): `ssh-copy-id matej@192.168.1.150`.
 
 Check that we are able to SSH, go back to OpenSSH configuration (`nano /etc/ssh/sshd_config`) and change the settings back:
 
-    ChallengeResponseAuthentication no
-    PasswordAuthentication no
-    UsePAM no
+```ssh-config
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+```
 
 Now, before closing the file, we will also disable login for root user. We can do this by changing the `PermitRootLogin` variable to `no`:
 
-    PermitRootLogin no
+```ssh-config
+PermitRootLogin no
+```
 
 Save the file, restart SSH (`systemctl restart ssh`) and you are done.
 
@@ -480,8 +500,10 @@ So, let's install `ufw` by typing the command: `apt install ufw`.
 
 Now it is a time to set up some rules. First, we will deny all incoming connections, and allow all outgoing connections:
 
-    ufw default deny incoming
-    ufw default allow outgoing
+```sh
+ufw default deny incoming
+ufw default allow outgoing
+```
 
 Wait, what? How we will be able to call then, if incoming connections are not allowed???
 
@@ -531,7 +553,9 @@ Then you need to enter e-mail address for sending incoming SMS messages (I enter
 
 Anyway, if you forgot password for SMS page, just open a terminal and write: `echo -n "myNEWpassword" | sha1sum`. You will get SHA1 hash of a password (in our case it is: `72358c1e53720d0b9d6bcd377516fdcc96ecb931`). Now open the file for sending SMS through web page: `sudo nano /var/www/html/sms/index.php` and add this hash to a variable `$password`:
 
-    $password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+```php
+$password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+```
 
 ![SMS webpage](images/006_sms1.png)
 
@@ -604,12 +628,14 @@ Since I like to preserve my privacy, I am not disclosing my IMEI, IMSI, LAC code
 
 Now we can configure our dongle for calls and SMS messages. Open the config file: `nano /etc/asterisk/dongle.conf` and look for `[dongle0]`. You will see *audio* and *data* lines, and after that just add your *exten*, *imei* and *imsi* lines as in the following example:
 
-    [dongle0]
-    audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
-    data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
-    exten=+38641234567;
-    imei=xxxxxxxxxxxxxxx;
-    imsi=2934xxxxxxxxxxx;
+```ini
+[dongle0]
+audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
+data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
+exten=+38641234567;
+imei=xxxxxxxxxxxxxxx;
+imsi=2934xxxxxxxxxxx;
+```
 
 Save and close the file and login directly to Asterisk management console: `asterisk -rvvv`. Then type `dongle reload now`:
 
@@ -642,14 +668,16 @@ Unfortunately, **receiving MMS messages does not work** (and sending also not). 
 
 Anyway, e-mail message with received SMS looks really poor, so you can enter `nano /etc/asterisk/extensions_custom.conf` and add something like:
 
-    [from-trunk-dongle]
-    exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
-    exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
-    exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
-    exten => sms,n,System(sendmail -t < /tmp/sms.txt)
-    exten => sms,n,Hangup()
-    exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
-    exten => _.,n,Goto(from-trunk,${EXTEN},1)
+```ini
+[from-trunk-dongle]
+exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
+exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
+exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
+exten => sms,n,System(sendmail -t < /tmp/sms.txt)
+exten => sms,n,Hangup()
+exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
+exten => _.,n,Goto(from-trunk,${EXTEN},1)
+```
 
 Just be careful to enter your correct e-mail address.
 
@@ -927,9 +955,9 @@ I have performed several tests, and system is working quite well. I have also tr
 
 Now that you have your very own PBX, you may start wondering, would it be possible to connect a physical phone to it? The answer is an absolute yes! You can buy a SIP desk phone, connect it to a network and configure it as an extension on your RasPBX system. There are several SIP phones available on the market, but I suggest you [to check the list of supported devices first](https://wiki.freepbx.org/display/FPG/EPM-Supported+Devices).
 
-I decided to buy one of the [Aastra phones](https://wiki.freepbx.org/display/FOP/Aastra), namely [Aastra6730i](https://wiki.freepbx.org/display/FPG/Supported+Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), which is fully supported by FreePBX.
+I decided to buy one of the [Aastra phones](https://wiki.freepbx.org/display/FOP/Aastra), namely [Aastra 6730i](https://wiki.freepbx.org/display/FPG/Supported+Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), which is fully supported by FreePBX.
 
-I managed to order it from a local shop and was lucky to get a big discount. So one sunny morning a postman rang on my door and couple of minutes later, I had my brand new Aastra6730i unboxed on my table. Yupi!
+I managed to order it from a local shop and was lucky to get a big discount. So one sunny morning a postman rang on my door and couple of minutes later, I had my brand new *Aastra 6730i* unboxed on my table. Yupi!
 
 #### Configuring and connecting VoIP phone to your local network
 
@@ -956,8 +984,8 @@ Then I went to `Advanced Settings` → `Line 1` and set the following:
 - `Proxy Server`: `192.168.1.150`.
 - `Proxy Port`: `5060`.
 - `Outbound Proxy Server`: `192.168.1.150`.
-- `Outbound Proxy Port	`: `5060`.
-- `Registrar Server	`: `192.168.1.150`.
+- `Outbound Proxy Port`: `5060`.
+- `Registrar Server`: `192.168.1.150`.
 - `Registrar Port`: `5060`.
 
 The other settings were not changed. As you can see, I entered local IP address of my RasPBX `192.168.1.150` and port `5060` under *proxy server*, *outbound proxy server* and *registrar server*.
@@ -1017,6 +1045,7 @@ static ip_address=192.168.100.1/24
 static routers=192.168.100.254
 static domain_name_servers=8.8.8.8 1.1.1.1
 ```
+
 If you use "old" Debian style network interfaces configuration, everyting would kind of a work, but you will experience some really weird network behaviour.
 
 Anyway, this will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else. 
@@ -1101,16 +1130,20 @@ Then we can reload sysctl changes: `sudo sysctl -p` and that is it. We can check
 
 Now we need to tell the operating system exactly which traffic should be forwarded and where exactly. We want that traffic from a VoIP phone will be routed directly to VPN, in other words, we want this: `eth1` → `wg0`. So we tell the machine to do this:
 
-    sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
-    sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```sh
+sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
+sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```
 
 Now our VoIP phone has a direct access to our VPN network! We also want that these rules are persistent (remain active after reboot), so we create a small script: `sudo nano /etc/network/iptablesphone.sh` with these lines in it:
 
-    # eth1 to VPN routing!
-    sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
-    sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```sh
+# eth1 to VPN routing!
+sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
+sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```
 
 Then we open the file: `sudo nano /etc/network/interfaces` and add these line to the bottom of it:
 
@@ -1128,31 +1161,35 @@ Now the devices connected to RaspberryPi have the access to the VPN network, but
 
 We will solve this with web proxy. First, we install `nginx` web server: `sudo apt install nginx`. Then open the file `sudo nano /etc/nginx/nginx.conf` and change (or add) the line:
 
-    worker_processes 1;
+```nginx
+worker_processes 1;
+```
 
 Then we edit `sites-enabled` config file: `sudo nano /etc/nginx/sites-enabled/default`. It should contain the following text:
 
-    # Redirection to Aastra phone
-    server {
-	    listen 443 default_server;
-    
-	    root /var/www/html;
-        index index.html index.htm;
-        server_name _;
+```nginx
+# Redirection to Aastra phone
+server {
+    listen 443 default_server;
 
-        ssl on;
-        ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
-        ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
-    
-        location / {
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_redirect off;
-            proxy_pass https://192.168.100.51;
-            proxy_http_version 1.1;
-        }
+    root /var/www/html;
+    index index.html index.htm;
+    server_name _;
+
+    ssl on;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_redirect off;
+        proxy_pass https://192.168.100.51;
+        proxy_http_version 1.1;
     }
+}
+```
 
 What will that do? A couple of very nice things, actually.
 
@@ -1162,9 +1199,11 @@ And probably the most cool thing is, that when you will connect to `https://10.1
 
 Actually, in `/etc/nginx/sites-enabled/default` configuration file you can add these lines before the `location`:
 
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+```nginx
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+```
 
 And now, you will be able to establish high quality encryption connection (TLS 1.3 or 1.2) with your RaspberryPi *vpnbridge*, and then Nginx will establish less secure connection with VoIP phone, which is located in separate network.
 
@@ -1194,7 +1233,9 @@ First we need to encode default Aastra's phone username and password. We can do 
 
 Now open `sites-enabled` configuration file by typing `sudo nano /etc/nginx/sites-enabled/default`. Go to the `location` section and add this after `proxy_pass` line:
 
-    proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+```nginx
+proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+```
 
 Save the file and restart Nginx: `sudo service nginx restart`. Now you will be able to access the Aastra's phone web management directly, without need to entering username and password.
 
@@ -1210,8 +1251,10 @@ There is also another cool thing. You can add more users (with different passwor
 
 Anyway, we are not done yet. To enable authentication with `.htpasswd` file you need to open `sites-enabled` configuration file again (`sudo nano /etc/nginx/sites-enabled/default`) and add these two lines under `server` section:
 
-    auth_basic "VoIP phone";
-    auth_basic_user_file /etc/nginx/.htpasswd;
+```nginx
+auth_basic "VoIP phone";
+auth_basic_user_file /etc/nginx/.htpasswd;
+```
 
 Restart Nginx with `sudo service nginx restart` and you are done! Now your old tech VoIP phone is behind firewall, supports modern HTTPS protocols and you can change *unchangeable* passwords for accessing management interface too! Isn't that just great?
 
@@ -1240,7 +1283,8 @@ Now we can open `wpa_supplicant.conf` file: `sudo nano /etc/wpa_supplicant/wpa_s
     }
 
 Save the file and after a minute or so, RaspberryPi will automatically connect to `MyHome` WiFi network. You can check this with `iwconfig wlan0` or `iwgetid` commands. If device will not connect to the WiFi network automatically, you will have to reboot it.
- 
+
+``` 
 ifconfig wlan0
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
@@ -1250,6 +1294,7 @@ wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         RX errors 0  dropped 0  overruns 0  frame 0
         TX packets 39  bytes 5962 (5.8 KiB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```        
 
 And the best thing here is, that VPN will also be established automatically, so you do not need to change any configuration.
 
