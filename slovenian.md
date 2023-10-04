@@ -1006,7 +1006,7 @@ Ko kliknemo `Save Settings`, je potrebno telefon ponovno zagnati , pravi hekerji
 
 Ko se ponovno prijavite v telefon, to lahko vidite pod `Status` → `System Information`. `SIP Status`, ki dokazuje, da je vaš telefon povezan na RasPBX je izpisan na dnu strani.
 
-![Aastra 6730i VoIP phone](images/032_Aastra_phone.jpeg)
+![Aastra 6730i VoIP phone](images/032_Aastra_phone.webp)
 
 Zdaj seveda lahko kličemo, sprejemamo klice itd. ... in vse je super in krasno, a najprej je treba poskrbeti za varnost.
 
@@ -1310,7 +1310,7 @@ Sam sem to številko nastavil na `7` in glasovna sporočila so zdaj veliko glasn
 
 Upam, da je bil članek zanimiv, in če se vam kje v omari valja kakšen odvečen RaspberryPi, lahko poskusite tudi sami postaviti RasPBX.
 
-![Vse naprave na moji mizi](images/037_everything_together.jpg)
+![Vse naprave na moji mizi](images/037_everything_together.webp)
 
 Obstaja pa tudi nekaj, kar lahko storite tudi **vi**.
 

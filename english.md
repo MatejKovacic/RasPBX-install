@@ -996,7 +996,7 @@ After clicking `Save Settings` you need to reboot the phone, and true hackers pr
 
 When you log back into the phone, you can see that under `Status` → `System Information`. `SIP Status` is at the bottom of the page.
 
-![Aastra 6730i VoIP phone](images/032_Aastra_phone.jpeg)
+![Aastra 6730i VoIP phone](images/032_Aastra_phone.webp)
 
 Now you can call out, you can accept calls, etc., and that everything looks just fine, but we need to take care of security first.
 
@@ -1312,7 +1312,7 @@ I am now living in a different country and I am using RasPBX sucessfully for a c
 
 I hope you find this article interesting, and if you have a spare RaspberryPi laying around, you can try to set up RasPBX.
 
-![All devices on my desk](images/037_everything_together.jpg)
+![All devices on my desk](images/037_everything_together.webp)
 
 However, there are some things you, yes - **you** - can do.
 
