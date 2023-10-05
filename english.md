@@ -1,68 +1,70 @@
 # Installation of RasPBX
-*RasPBX installation for beginners*
+
+*RasPBX installation for beginners.*
 
 - [Basic concepts](#basic-concepts)
 - [What you will need](#what-you-will-need)
 - [Installation of the operating system](#installation-of-the-operating-system)
-  * [Write the RasPBX image to a SD card](#write-the-raspbx-image-to-a-sd-card)
-  * [Log in to the RasPBX device](#log-in-to-the-raspbx-device)
-  * [First things to do after login](#first-things-to-do-after-login)
+  - [Write the RasPBX image to a SD card](#write-the-raspbx-image-to-a-sd-card)
+  - [Log in to the RasPBX device](#log-in-to-the-raspbx-device)
+  - [First things to do after login](#first-things-to-do-after-login)
 - [PBX installation and configuration](#pbx-installation-and-configuration)
-  * [Setting up the e-mail system](#setting-up-the-e-mail-system)
-  * [Set up VPN client](#set-up-vpn-client)
-  * [Set up NTP](#set-up-ntp)
+  - [Setting up the e-mail system](#setting-up-the-e-mail-system)
+  - [Set up VPN client](#set-up-vpn-client)
+  - [Set up NTP](#set-up-ntp)
 - [The security of your system](#the-security-of-your-system)
-  * [Secure SSH](#secure-ssh)
-    + [Login with SSH key](#login-with-ssh-key)
-  * [Disable *root* user](#disable--root--user)
-  * [Install intrusion prevention](#install-intrusion-prevention)
-    + [How to unban IP address](#how-to-unban-ip-address)
-  * [Install firewall](#install-firewall)
+  - [Secure SSH](#secure-ssh)
+    - [Login with SSH key](#login-with-ssh-key)
+  - [Disable *root* user](#disable-root-user)
+  - [Install intrusion prevention](#install-intrusion-prevention)
+    - [How to unban IP address](#how-to-unban-ip-address)
+  - [Install firewall](#install-firewall)
 - [Installation of USB dongle](#installation-of-usb-dongle)
-  * [Dongle configuration](#dongle-configuration)
-  * [Freedom is calling... and sending SMS messages](#freedom-is-calling)
-  * [Install USSD webpage](#install-ussd-webpage)
-  * [Install additional codec](#install-additional-codec)
+  - [Dongle configuration](#dongle-configuration)
+  - [Freedom is calling... and sending SMS messages](#freedom-is-calling-and-sending-sms-messages)
+  - [Install USSD webpage](#install-ussd-webpage)
+  - [Install additional codec](#install-additional-codec)
 - [FreePBX configuration](#freepbx-configuration)
-  * [Set up the trunk](#set-up-the-trunk)
-  * [Set up outbound routes](#set-up-outbound-routes)
-    + [Setting up dial prefix for outgoing calls](#setting-up-dial-prefix-for-outgoing-calls)
-  * [Set up extensions](#set-up-extensions)
-  * [Set up inbound routes](#set-up-inbound-routes)
-  * [Additional SIP settings](#additional-sip-settings)
-  * [Enabling TCP instead of UDP](#enabling-tcp-instead-of-udp)
+  - [Set up the trunk](#set-up-the-trunk)
+  - [Set up outbound routes](#set-up-outbound-routes)
+    - [Setting up dial prefix for outgoing calls](#setting-up-dial-prefix-for-outgoing-calls)
+  - [Set up extensions](#set-up-extensions)
+  - [Set up inbound routes](#set-up-inbound-routes)
+  - [Additional SIP settings](#additional-sip-settings)
+  - [Enabling TCP instead of UDP](#enabling-tcp-instead-of-udp)
 - [Setting up SIP clients](#setting-up-sip-clients)
-  * [Your voicemail configuration](#your-voicemail-configuration)
-  * [Voicemail Admin e-mail configuration](#voicemail-admin-e-mail-configuration)
+  - [Your voicemail configuration](#your-voicemail-configuration)
+  - [Voicemail Admin e-mail configuration](#voicemail-admin-e-mail-configuration)
 - [Some other things to do](#some-other-things-to-do)
-  * [Block extension to call outside](#block-extension-to-call-outside)
-  * [Restrict extension to calling a specific number only](#restrict-extension-to-calling-a-specific-number-only)
+  - [Block extension to call outside](#block-extension-to-call-outside)
+  - [Restrict extension to calling a specific number only](#restrict-extension-to-calling-a-specific-number-only)
 - [Updating the system](#updating-the-system)
 - [Backups](#backups)
 - [Some other cool things to do](#some-other-cool-things-to-do)
-  * [Testing](#testing)
-  * [Connecting the physical phone](#connecting-the-physical-phone)
-    + [Configuring and connecting VoIP phone to your local network](#configuring-and-connecting-voip-phone-to-your-local-network)
-    + [Connecting VoIP phone to the VPN](#connecting-voip-phone-to-the-vpn)
+  - [Testing](#testing)
+  - [Connecting the physical phone](#connecting-the-physical-phone)
+    - [Configuring and connecting VoIP phone to your local network](#configuring-and-connecting-voip-phone-to-your-local-network)
+    - [Connecting VoIP phone to the VPN](#connecting-voip-phone-to-the-vpn)
       - [RaspberryPi as a router for the wired network](#raspberrypi-as-a-router-for-the-wired-network)
       - [Access to VoIP phone from the VPN network](#access-to-voip-phone-from-the-vpn-network)
-      - [Change unchangeable default password](#change--unchangeable--default-password)
+      - [Change unchangeable default password](#change-unchangeable-default-password)
       - [Make your old VoIP phone wireless](#make-your-old-voip-phone-wireless)
-  * [Volume in voicemail messages](#volume-in-voicemail-messages)
-- [And what can you do?](#and-what-can--you--do-)
+  - [Volume in voicemail messages](#volume-in-voicemail-messages)
+- [And what can you do?](#and-what-can-you-do)
 
 A few years ago I came across a very interesting project from some guy, who [created a GSM bridge between two RasPBX hosts](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html) and who wanted to make free long distance calls from Brazil to Germany with the help of his RaspberryPi. That sounded just cool, but other projects were waiting for me at that time and I didn't have time for that. Until now.
 
 So, what do we intend to do? I am going to show you, how you can install the [*Asterisk*](https://www.asterisk.org/) telephony server on a small single board computer [*RaspberryPi*](https://www.raspberrypi.org/) in order to be able to make calls from your computer or smartphone to ordinary phone numbers. So basically, you will literally end up with your own PBX in your pocket. Actually no, because RaspberryPi needs to be connected to a power supply and network, and you would look weird with cables going into your pocket, but you get the idea.
 
 But why would you do that? Well, besides that this sounds like a really cool project and you like hacking and learning, you can cover some interesting scenarios like:
+
 - You have a small company and you would like to have your own PBX with the ability to call outside.
 - Because of COVID-19, you would like that your employees can work at home, but have company phones.
 - You would like to have the ability that your customers can call you and use your own automated voice system for customer support.
 - You would like to have free telephone (audio and video) calls through the internet, but on your own infrastructure.
 - You live in one country, but you have business and a mobile phone from the other country. And roaming between these two countries is expensive, so you would like to be able to use the internet to relay your calls between these two countries via the internet for free.
 - You are travelling abroad and would like to reduce roaming costs, but be accessible on your home mobile number for calls and SMS messages.
-- You are travelling abroad, but would like your mobile operator to think you are located at your home (i. e. hide your location data). 
+- You are travelling abroad, but would like your mobile operator to think you are located at your home (i. e. hide your location data).
 
 For me, the most important scenario is, that I would like to travel abroad (in the countries with high roaming costs), and be able to receive calls and SMS messages to my home mobile number. So if I receive a SMS message from my bank, I want this SMS to be delivered to my e-mail address. I would also like to be able to send SMS messages back to my bank. I would like to be able to receive phone calls and if I am without internet connection, the person calling me should be able to leave me a voice message which will be then delivered into my e-mail address. And of course, I would like to be able to call them back from my number.
 
@@ -95,8 +97,9 @@ An **endpoint** is basically your internal phone number (in your PBX), which is 
 ## What you will need
 
 As we already mentioned, you will need:
+
 - A RaspberryPi 3 or RaspberryPi 4 (I have tested both, however, the RPi4 is much more powerful and can handle up to 200 concurrent phone calls (really, [I am not joking](https://www.youtube.com/watch?v=dVGf3HrKZl4)). I suggest you buy a RPi4 with 4 or 8 GB RAM);
-- a power supply for the RaspberryPi (3A 5V or more), a case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and a little bit higher quality); 
+- a power supply for the RaspberryPi (3A 5V or more), a case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and a little bit higher quality);
 - a compatible USB dongle (I am using the Huawei E1752C);
 - RasPBX, which you can freely [download from the official project's website](http://www.raspberry-asterisk.org/downloads/) (I am using version 10-10-2020);
 - internet connection.
@@ -124,7 +127,7 @@ Then insert the SD card into the RaspberryPi and the SIM card in your USB dongle
 
 After booting the RaspberryPi device, we need to find out it's IP address. There are several ways to do that, but a true hacker would prefer the **nmap** command line tool.
 
-So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you and your Raspberry are connected, in my case it was `192.168.1.0/24`, but your local network settings may be different), and look for a device like this: 
+So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you and your Raspberry are connected, in my case it was `192.168.1.0/24`, but your local network settings may be different), and look for a device like this:
 
     Nmap scan report for 192.168.1.150
     Host is up (0.0091s latency).
@@ -218,7 +221,7 @@ The basic configuration of the operating system is now over.
 ## PBX installation and configuration
 
 After the reboot, we would need to remove the identity of the old SSH key on our computer (where from we are connecting to RasPBX). Why? Because in the previous SSH session we issued the `regen-hostkeys` command to create new SSH host keys, that's why.
- 
+
 On my Ubuntu system I said: `ssh-keygen -f "/home/matej/.ssh/known_hosts" -R "192.168.1.150"`. Those using Windows systems need to figure this by themselves.
 
 Now we can make a SSH connection to our RasPBX: `ssh root@192.168.1.150`.
@@ -280,7 +283,7 @@ As I mentioned, we will fence our RasPBX into a VPN network. In that case, the R
 
 However, using a VPN for encryption of VoIP data could be a little problematic. Research has shown that using encrypted VBR (variable bit rate) encoding could pose a security risk. Why? Because when using the SRTP encryption with voice streams compressed using variable bit rate (VBR) codecs, the length of the compressed data packets depend on the characteristics of the speech signal. In other words, different sounds are encoded differently, and these small variations in packet sizes can be observed, and that could be used to reconstruct ("decrypt") encrypted data. This may sound very academic, but [researchers have shown](https://www.cs.jhu.edu/~fabian/papers/oakland08.pdf), that in specific circumstances phrases in a voice call could be recognised despite the encryption. (In short, researchers have shown that the lengths of encrypted VoIP packets can be used to identify the pre-recorded phrases spoken within a call.) So if you plan to do something really stupid (meaning: illegal) with your RasPBX, you should stop thinking about it right now.
 
-However, enclosing the VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal. 
+However, enclosing the VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal.
 
 Anyway, let's take a look into how connect RasPBX into the Wireguard network. As I mentioned, I already have my Wireguard server, so I will not cover that part. You can check out how to install Wireguard "server" and "client" on my [Wireguard guide](wireguard.md).
 
@@ -307,10 +310,11 @@ Then we can restart the NTP service: `service ntp restart`. Then we can check if
 ## The security of your system
 
 We have done a lot of things, but before we start installing the telephony part, we must take care of security for our RasPBX system. There are many important things, also in the telephony part, but for now, we will just take care of some basic stuff around SSH security and firewall. Please note that it is important to at least basically understand security considerations and mechanisms, if not, you can easily make a mistake or even lock yourself out of your system.
- 
+
 ### Secure SSH
 
 Regarding SSH security, there are several good practices, but we will implement the following:
+
 - disable empty passwords;
 - disable .rhosts files (verification);
 - specify supported HostKey algorithms, available KEX (Key Exchange) algorithms, allowed ciphers and available MAC (message authentication code) algorithms;
@@ -341,13 +345,13 @@ Then **specify the available KEX (Key Exchange) algorithms**:
 ```ssh-config
 KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
 ```
- 
+
 Specify the **allowed ciphers**:
 
 ```ssh-config
 Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
 ```
- 
+
 Specify the **available MAC (message authentication code) algorithms**:
 
 ```ssh-config
@@ -418,7 +422,7 @@ To do that, we need to create a new user, let's say *matej*. So we say: `adduser
         Other []: 
     Is the information correct? [Y/n] 
 
-Then we add this user to *sudo* group: `usermod -aG sudo matej`. *Sudo* is a program that enables Linux users to run programs with the security privileges of another user, by default the superuser (*root* or *admin*, if you prefer). 
+Then we add this user to *sudo* group: `usermod -aG sudo matej`. *Sudo* is a program that enables Linux users to run programs with the security privileges of another user, by default the superuser (*root* or *admin*, if you prefer).
 
 Now we try to login to the system as *matej*: `su - matej`. Now we can check which is the effective username of the current user by issuing a command `whoami`. We will see that our username is `matej` (which is obvious).
 
@@ -475,20 +479,20 @@ One simple thing you can do is to wait for half an hour. It is always time for a
 However, if you are in a little bit of hurry, you can *unban* the banned IP. First, you can check `fail2ban` status by typing `fail2ban-client status`:
 
     Status
-    |- Number of jail:	2
-    `- Jail list:	asterisk, sshd
+    |- Number of jail: 2
+    `- Jail list: asterisk, sshd
 
 Here you can see, we have two jails, one is named *asterisk* and the other *sshd*. So let's check *asterisk* jail. `fail2ban-client status asterisk` will show you who is banned:
 
     Status for the jail: asterisk
     |- Filter
-    |  |- Currently failed:	0
-    |  |- Total failed:	3
-    |  `- File list:	/var/log/asterisk/security_log
+    |  |- Currently failed: 0
+    |  |- Total failed: 3
+    |  `- File list: /var/log/asterisk/security_log
     `- Actions
-       |- Currently banned:	1
-       |- Total banned:	1
-       `- Banned IP list:	10.10.6.9
+       |- Currently banned: 1
+       |- Total banned: 1
+       `- Banned IP list: 10.10.6.9
 
 Now you can manually unban this IP address: `fail2ban-client set asterisk unbanip 10.10.6.9`. However, if user on this IP address is naughty (*and not banned yet*), you can also manually ban him with: `fail2ban-client set asterisk banip 10.10.6.9`.
 
@@ -506,8 +510,8 @@ ufw default allow outgoing
 ```
 
 Wait, what? How we will be able to call then, if incoming connections are not allowed???
-
 Hold your horses! This is just a general rule, and later we are going to define special rules allowing users to connect to our RasPBX. Actually, let's do this right now. So my rules are the following:
+
 - allow all connections from VPN networking (so VoIP clients will be able to connect to my system only from VPN);
 - from other networks (including my local network) allow only SSH connections to the system (this will allow me to perform basic management of the system from local network, in case VPN goes down);
 - web management is available only from VPN from a specific IP address (so other VPN users will not be able to login to web management interface).
@@ -519,6 +523,7 @@ My local network is in range 192.168.1.0/24, which means I can use IP addresses 
 But I am also using VPN (in range 10.10.6.0/24), and my RasPBX device has VPN IP address 10.10.6.150. In my VPN network there are several other devices, and I want that RasPBX web management will be accessible from 10.10.6.10.
 
 Therefore we will set up the firewall the following way:
+
 - first we will **allow SSH connections from anywhere** (SSH is running on TCP port 22): `ufw allow 22/tcp`;
 - then we will **allow web management from my computer, but only if it is connected to VPN** (my VPN IP si 10.10.6.10): `ufw allow from 10.10.6.10 to any port 80 proto tcp`;
 - then we will **block connections to web interface for all others**: `ufw deny to any port 80 proto tcp`;
@@ -580,7 +585,7 @@ Now show dongle devices through Asterisk management console: `asterisk -rx 'dong
     ID           Group State      RSSI Mode Submode Provider Name  Model      Firmware          IMEI             IMSI             Number        
     dongle0      0     Free       21   3    3       BOB            E1752      11.126.03.01.314  xxxxxxxxxxxxxxx  2934xxxxxxxxxxx  Unknown       
 
-You can see you have one USB dongle inserted (called *dongle0*), and several interesting info about that dongle, like IMEI, IMSI of your SIM card, etc. *State: Free* means that USB dongle is ready to accept calls. And if you are wondering if *dongle0* means there could also be *dongle1*, etc., the answer is yes, you can connect several dongles to your RaspberryPi (but note that you will need more power supply to power them). 
+You can see you have one USB dongle inserted (called *dongle0*), and several interesting info about that dongle, like IMEI, IMSI of your SIM card, etc. *State: Free* means that USB dongle is ready to accept calls. And if you are wondering if *dongle0* means there could also be *dongle1*, etc., the answer is yes, you can connect several dongles to your RaspberryPi (but note that you will need more power supply to power them).
 
 Let's get some more information about your dongle (*dongle0*). Type `asterisk -rx 'dongle show device state dongle0'` and you will get a lot of interesting information:
 
@@ -648,7 +653,7 @@ Save and close the file and login directly to Asterisk management console: `aste
 
 ### Freedom is calling and sending SMS messages
 
-As you can see, USB dongle is now ready. So let's check if we can send SMS message. In Asterisk management console type `dongle sms dongle0 +38640XXXXXX Test!`. This will send a SMS message to my personal mobile (*+38640XXXXXX*), with text "*Test!*.
+As you can see, USB dongle is now ready. So let's check if we can send SMS message. In Asterisk management console type `dongle sms dongle0 +38640XXXXXX Test!`. This will send a SMS message to my personal mobile (*+38640XXXXXX*), with text `Test!`.
 
 We can also check outgoing call by typing `channel originate dongle/dongle0/+38640XXXXXX application MusicOnHold`. In Asterisk management console you will see something like:
 
@@ -710,13 +715,16 @@ After successfull login to dashboard we need to apply the config. Now our system
 As I have explained, trunking is used to connect two systems together. With our trunk, we will connect our RasPBX system with our mobile operator through our USB dongle. From that trunk we will later route outgoing and incoming calls between our system and a public telephone network.
 
 So we first need to setup a new custom trunk for our dongle. In FreePBX web interface go to under `Connectivity` → `Trunks` → `Add Custom Trunk` and set these values:
+
 - `General` - `Trunk Name`: enter the name of your trunk, I used `gsm_dongle0`.
 - `General` - `Outbound CallerID`: enter the telephone number of your SIM card in USB dongle in E.164 format. I entered `+38640XXXXXX` (well, not really with x-es, because I want to keep my phone number for myself, but you got the point).
 - `Dialed Number Manipulation Rules`: here go to the field `match pattern` and enter `XXXXXXXXX`.
 - `Custom Settings` - `Custom Dial String`: `dongle/dongle0/$OUTNUM$`.
 
 ![Trunk- General trunk settings](images/010_trunk1.png)
+
 ![Trunk- Dialed Number Manipulation Rules](images/011_trunk2.png)
+
 ![Trunk- Custom Settings](images/012_trunk3.png)
 
 *Submit changes* (button down on the right) and then click to *Apply config* (upper right corner).
@@ -725,9 +733,10 @@ Now, before we continue, a little, but useful explanation regarding dialed numbe
 
 Under the trunk options, you can set rules to manipulate the dialed number before sending it out of the trunk. That means that you can add prefixes, etc. to the dialed number, before it is sent to the trunk. For instance, if user calls number *123456*, you can add *041* before that number, so the dialed number would be *041123456*. If no rule applies, the number is not changed. In our case we will not be applying any rules to the dialed numbers. However, we require that dialed numbers are 9 digits long, hence we used the pattern `XXXXXXXXX`.
 
-BTW, if you go to `Dialed Number Manipulation Rules` and to the field `prepend`, you can enter a number that will be added in front of the called number. For instance, if you enter `#31#`, this will hide Caller ID on your trunk (this code is used in Europe for hiding Caller ID). 
+BTW, if you go to `Dialed Number Manipulation Rules` and to the field `prepend`, you can enter a number that will be added in front of the called number. For instance, if you enter `#31#`, this will hide Caller ID on your trunk (this code is used in Europe for hiding Caller ID).
 
 Anyway, what about the X-es? These are patterns used to "interpret" the number:
+
 - **X** matches any digit from 0-9.
 - **Z** matches any digit from 1-9.
 - **N** matches any digit from 2-9.
@@ -745,13 +754,14 @@ Yes, you are correct. You can do that, but on outbound routes settings. And this
 The outbound routes are used to tell your RasPBX system which numbers your phones are permitted to call and which trunk to send the calls to. Here you can set the numbers that can never be dialed, which is an emergency route (we are not going to cover this in this guide), and a route for ordinary calls. There could also be some special routes for international calls, or calls to different networks (for instance some operators are offering unlimited free calls inside their network).
 
 So, we will set up the outgoing connection, that you will be able to call outside. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Now you should configure your outbound route:
+
 - `Route Name`: enter the name of your outbound route, I used `gsm_out`.
 - `Trunk Sequence for Matched Route`: from the drop down menu select `gsm_dongle0` (this is the name of our trunk we defined before).
 - `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
 
 This pattern will restrict user to be able to call only 9-digit numbers starting with 0 and followed with second digit, which could be any digit except 0 or 9. All other seven digits could be anything fro 0 to 9.
 
-What does this rule means? Basically no international calls, and calling only to local networks from 01 to 08. 090 network is not allowed, because 090 numbers in Slovenia are commercial numbers where you can call fortune tellers, hot lines and other stupid things, and these calls could be very expensive. 
+What does this rule means? Basically no international calls, and calling only to local networks from 01 to 08. 090 network is not allowed, because 090 numbers in Slovenia are commercial numbers where you can call fortune tellers, hot lines and other stupid things, and these calls could be very expensive.
 
 ![Outbound routes - route settings](images/013_outbound_routes1.png)
 
@@ -772,6 +782,7 @@ So when some local number (*extension*) would like to call outside number `03198
 Now we can setup our extensions. Extensions are local numbers, connected to our RasPBX system. In FreePBX click `Applications` → `Extensions`. Click on a button `Add Extension` and add new `SIP [chan_pjsip] extension`.
 
 Here you need to configure:
+
 - `User extension`: could be any number, I am using 4-digit local numbers and in my case I entered `1000`.
 - `Display name`: obviously, this is a name of the user or device. I entered `Matej - racunalnik`, which meaning is not so obvious for non-speakers of Slovenian language, but simply means `Matej - computer`. Because, I am using this extension on my computer, right?
 - Secret: this is a password for your extension (or your SIP account, if you prefer this way), and is auto generated, but you can change it whatever you like. For instance, I entered... well, I am not gonna tell you that. Because it is secret, right?
@@ -779,9 +790,10 @@ Here you need to configure:
 ![Extensions - general settings](images/016_extensions1.png)
 
 There are some other interesting things you can do. Under `Voicemail` you can enable voicemail. Some useful settings:
+
 - Set `Voicemail Password` (digits only).
 - `Disable (*) in Voicemail Menu`: set it to **no**, so you will be able to use voice menus.
-- `Require From Same Extension`: set it to **yes** (so user will be able to access their voicemail only from their extensions.
+- `Require From Same Extension`: set it to **yes**, so user will be able to access their voicemail only from their extensions.
 - Set your `e-mail address` (`pager address` is for sending just a really short messages or e-mails).
 - `Email Attachment`: set it to **yes**, which means voice messages will be sent to user by his e-mail.
 - `Delete Voicemail`: set it to **yes**, which means voice messages will be deleted from the system after they are sent by e-mail.
@@ -790,11 +802,12 @@ There are some other interesting things you can do. Under `Voicemail` you can en
 
 *Submit* changes and then *Apply config*. You can add several additional extensions to connect your friends and family on your RasPBX. However, under current setup all these extensions will be able to use your trunk for outgoing calls. But don't worry, we will take a look how to restrict them from calling outside.
 
-![List of extensions(images/023_extensions_list.png)
+![List of extensions](images/023_extensions_list.png)
 
 ### Set up inbound routes
 
 Finally, we can set up where (to which extensions) incoming calls are directed. In FreePBX click `Connectivity` → `Inbound routes`. Click the button `Inbound Route` and set:
+
 - `Description`: enter the name of your inbound route, I used `gsm_in`.
 - `Set destination` - `Select Extensions` and select your SIP extension. I selected `1000 - "Matej - racunalnik"`.
 
@@ -809,6 +822,7 @@ If we now call our RasPBX system (I mean the number on SIM card inserted in USB 
 ### Additional SIP settings
 
 Now we can configure some additional settings, including some **good security practices**. In FreePBX click `Settings` → `Asterisk SIP settings` and go to `General SIP Settings`. Here you have to set:
+
 - `Allow SIP Guests`: set it to **no**, because this is a good security practice.
 - Then you should enable additional codec `g729`, which we installed in terminal.
 - and you can also enable video support if you like (however, this will be working only for internal calls).
@@ -843,7 +857,7 @@ As mentioned, there are several SIP clients, but basically, you neet to setup us
 
 When your SIP client is successfully connected (in case you entered wrong password, `fail2ban` will block you for half an hour and you need to unban yourself), you can perform a test call out... and then of course a test call from the outside to your RasPBX. And you can also try internal calls between your extensions.
 
-### Your voicemail configuration 
+### Your voicemail configuration
 
 Now you can configure your voicemail (if you enabled it it FreePBX). From your SIP client call `*97`, type your password and listen to the voice menu. Basically, you can press `0` and the `1` for recording your "*not available message*". When finished, press `#` and then `1` to accept and save the message. You can also record "*busy message*", etc.
 
@@ -855,7 +869,7 @@ Anyway, you can go to `Settings` → `Voicemail Admin` → `Settings` → `Email
 
 ### Voicemail Admin e-mail configuration
 
-The e-mail configuration for Voicemail Admin could be found under `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Here you can edit the `from` field, `subject` and `body` of e-mail notification about new voicemail message. Also you should check the `Server e-mail` field and enter your notification e-mail address (in my case `obvestilo@xxxxx.si`.
+The e-mail configuration for Voicemail Admin could be found under `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Here you can edit the `from` field, `subject` and `body` of e-mail notification about new voicemail message. Also you should check the `Server e-mail` field and enter your notification e-mail address (in my case `obvestilo@xxxxx.si`).
 
 Just a note - if you have any troubles with e-mail delivery, you should check `exim4` mail server logs on your RasPBX device. Just SSH to your RasPBX and list the content of a logfile with: `cat /var/log/exim4/mainlog`.
 
@@ -866,6 +880,7 @@ Just a note - if you have any troubles with e-mail delivery, you should check `e
 I promised I will show you how you can block a specific extension from calling outside. So let's take a look.
 
 There are several ways how to do this, but we will done this by creating a specific outbound route for this extension only. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Define some things:
+
 - `Route Name`: we will call this route `4000_no_out`, because we will block extension number `4000` from calling outside.
 - `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
 - `Dial Patterns`: here go to the field `CallerID` and enter the extension number you want to block, in our case `4000`.
@@ -886,16 +901,19 @@ So, you want that a specific extension, let's say `3000` will be able to call ou
 Yes, it is, but it this is a tricky one. You need to set up two outbound routes and you have to keep in mind that outbound routes are top-down matching. That means first rule is checked first, then the second, etc.
 
 So we will have the following algorithm:
+
 - First rule: if extension `3000` calls outside number `031987654`, the call is allowed.
 - If extension `3000` calls any other outside number, jump to the second rule.
 - Second rule: if extension `3000` calls any outside number (not any other, but any!), call is not allowed. And this is end of the rules for extension `3000`.
 
 So, we will set up the first outgoing connection, saying, that extension `3000` can call outside number `031987654`. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Now you should configure your outbound route:
+
 - `Route Name`: `3000_to_my_mobile` (meaning this extension can call my personal mobile only).
 - `Trunk Sequence for Matched Route`: from the drop down menu select `gsm_dongle0`.
 - `Dial Patterns`: here go to the field `match pattern` and enter `031987654` (outside number that is allowed to be called).
 
 Now we add another rule. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Define some things:
+
 - `Route Name`: `3000_no_out`.
 - `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
 - `Dial Patterns`: here go to the field `CallerID` and enter the extension number you want to block, in our case `3000`.
@@ -904,6 +922,7 @@ Now we add another rule. In FreePBX click `Connectivity` → `Outbound routes` a
 Finally arrange your newly created routes in such a a way, that first rule will be `3000_to_my_mobile` and the second `3000_no_out`. Your default route `gsm_out` should be at the bottom of the list. Then click *Apply config*, and that is it.
 
 This all sounds quite straightforward, but the problem is if you have many routes, the whole system becomes very confusing. One of the solutions is to use dial patterns in the Caller ID field. When setting up outbound route go to the `Dial Patterns` in the field `CallerID` and enter the dial pattern of extension number you want to block, for instance `3XXX`. That means that the outbound route will apply to all extensions from `3000` to `3999`. Then you can have the following number assigning scheme:
+
 - 1XXX extensions are assigned to you and your friends,
 - 3XXX extensions are assigned to people who like you (so they can call you), but you don't like them (and are not allowing them to call anyone else),
 - 4XXX extensions are assigned to people you don't like at all, so they cannot call outside your system,
@@ -911,7 +930,7 @@ This all sounds quite straightforward, but the problem is if you have many route
 
 ![Upgrading FreePBX](images/030_outbound_routes.png)
 
-Or you can do something else, but you probably got the idea how to use these dial patterns, right? 
+Or you can do something else, but you probably got the idea how to use these dial patterns, right?
 
 ## Updating the system
 
@@ -1033,6 +1052,7 @@ As we now know the drill, let's go quickly through RaspberryPi installation. I c
 Then I logged in my freshly installed RaspberryPi with `ssh pi@192.168.1.228`. Default username is `pi` and the default password is `raspberry`.
 
 A quick walk through:
+
 - Change the password with `passwd` command.
 - Update the system (`sudo apt update`, `sudo apt upgrade`) and remove unused packages (`sudo apt autoremove`).
 - Run `sudo raspi-config` and under `System Options` set hostname (I changed it to `vpnbridge`), under `Localisation Options` set your time zone, keyboard and WLAN country. Finally, under `Advanced Options` select `Expand Filesystem`. After that RaspberryPi needs to be rebooted.
@@ -1051,7 +1071,7 @@ static domain_name_servers=8.8.8.8 1.1.1.1
 
 If you use "old" Debian style network interfaces configuration, everyting would kind of a work, but you will experience some really weird network behaviour.
 
-Anyway, this will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else. 
+Anyway, this will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else.
 
 Now we need to install DHCP server:
 `sudo apt install isc-dhcp-server`
@@ -1223,6 +1243,7 @@ And finally, you can restart Nginx server: `sudo service nginx restart`. Now I w
 ![Aastra 6730i SIP settings](images/033_Aastra_SIP_config.png)
 
 Finally, we will install firewall (`sudo apt install ufw`) and set it up:
+
 - Set default rule-set (`sudo ufw default deny incoming` and `sudo ufw default allow outgoing`).
 - Allow SSH connections from anywhere: `sudo ufw allow 22/tcp`.
 - Allow web management of VoIP phone from my computer, **but only if it is connected to VPN** (my VPN IP is `10.10.6.10`): `sudo ufw allow from 10.10.6.10 to any port 443 proto tcp`.
@@ -1270,7 +1291,7 @@ Anyway, if you are using VoIP phone over VPN network, you may experience larger 
 
 ##### Make your old VoIP phone wireless
 
-Now, what if we want to make our old VoIP phone "wireless", i. e. that it will connect to network through WiFi and not through wired connection? 
+Now, what if we want to make our old VoIP phone "wireless", i. e. that it will connect to network through WiFi and not through wired connection?
 
 Usually, we would not want that, because WiFi networks are not reliable as wired ones. But in case you don't have the option to install the Ethernet cable, you can connect RaspberryPi to WiFi instead. However, to do this, we must first scan available WiFi networks.
 
@@ -1290,7 +1311,7 @@ Now we can open `wpa_supplicant.conf` file: `sudo nano /etc/wpa_supplicant/wpa_s
 
 Save the file and after a minute or so, RaspberryPi will automatically connect to `MyHome` WiFi network. You can check this with `iwconfig wlan0` or `iwgetid` commands. If device will not connect to the WiFi network automatically, you will have to reboot it.
 
-``` 
+```
 ifconfig wlan0
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
@@ -1300,7 +1321,7 @@ wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         RX errors 0  dropped 0  overruns 0  frame 0
         TX packets 39  bytes 5962 (5.8 KiB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-```        
+```
 
 And the best thing here is, that VPN will also be established automatically, so you do not need to change any configuration.
 
@@ -1331,6 +1352,7 @@ You can suggest me which SIP clients are nice looking and easy to use (and witho
 There are probably many things that could be done with RasPBX, and I would like to hear your ideas, thoughts, experience and questions. I suggest you open Github issue and share that with me. Also, you can point me on my errors or if I wrote something stupid (which I probably did).
 
 And finally, you can check out some of my lectures and projects, for instance:
+
 - [Video demonstration of CallerID spoofing and live interception of VoIP communications](http://videolectures.net/single_kovacic_varnost_voip/).
 - [GSM hacking and GSM security](http://videolectures.net/single_kovacic_phonebusters/) ([PDF slides](https://telefoncek.si/static/2014/01/The_Phonebusters_2014.pdf)).
 - [All about VPN's](http://videolectures.net/water4cities_kovacic_virtual_private_networks/) ([PDF slides](https://telefoncek.si/predavanja/VPN_2021.pdf)).

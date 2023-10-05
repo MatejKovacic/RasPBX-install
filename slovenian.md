@@ -1,61 +1,63 @@
 # Namestitev RasPBX
-*Namestitev RasPBX za začetnike*
+
+*Namestitev RasPBX za začetnike.*
 
 - [Osnovni koncepti](#osnovni-koncepti)
 - [Kaj bomo potrebovali](#kaj-bomo-potrebovali)
 - [Namestitev operacijskega sistema](#namestitev-operacijskega-sistema)
-  * [Zapis RasPBX operacijskega sistema na kartico SD](#zapis-raspbx-operacijskega-sistema-na-kartico-sd)
-  * [Prijava v RasPBX](#prijava-v-raspbx)
-  * [Kaj postoriti po prvi prijavi?](#kaj-postoriti-po-prvi-prijavi-)
+  - [Zapis RasPBX operacijskega sistema na kartico SD](#zapis-raspbx-operacijskega-sistema-na-kartico-sd)
+  - [Prijava v RasPBX](#prijava-v-raspbx)
+  - [Kaj postoriti po prvi prijavi?](#kaj-postoriti-po-prvi-prijavi)
 - [Namestitev in konfiguracija PBX](#namestitev-in-konfiguracija-pbx)
-  * [Nastavitev e-poštnega sistema](#nastavitev-e-po-tnega-sistema)
-  * [Nastavite odjemalca VPN](#nastavite-odjemalca-vpn)
-  * [Nastavite NTP](#nastavite-ntp)
+  - [Nastavitev e-poštnega sistema](#nastavitev-e-poštnega-sistema)
+  - [Nastavite odjemalca VPN](#nastavite-odjemalca-vpn)
+  - [Nastavite NTP](#nastavite-ntp)
 - [Varnost sistema](#varnost-sistema)
-  * [Varen SSH](#varen-ssh)
-    + [Prijavite se s ključem SSH](#prijavite-se-s-klju-em-ssh)
-  * [Onemogočanje (*root*) uporabnika](#onemogo-anje---root---uporabnika)
-  * [Namestitev sistema za preprečevanje vdorov](#namestitev-sistema-za-prepre-evanje-vdorov)
-    + [Kako odblokirati IP naslov](#kako-odblokirati-ip-naslov)
-  * [Namestitev požarnega zidu](#namestitev-po-arnega-zidu)
+  - [Varen SSH](#varen-ssh)
+    - [Prijavite se s ključem SSH](#prijavite-se-s-ključem-ssh)
+  - [Onemogočanje (*root*) uporabnika](#onemogočanje-root-uporabnika)
+  - [Namestitev sistema za preprečevanje vdorov](#namestitev-sistema-za-preprečevanje-vdorov)
+    - [Kako odblokirati IP naslov](#kako-odblokirati-ip-naslov)
+  - [Namestitev požarnega zidu](#namestitev-požarnega-zidu)
 - [Namestitev USB modema](#namestitev-usb-modema)
-  * [Konfiguracija USB modema](#konfiguracija-usb-modema)
-  * [Svoboda kliče](#svoboda-kli-e)
-  * [Namestitev spletnega vmesnika za USSD](#namestitev-spletnega-vmesnika-za-ussd)
-  * [Namestitev dodatnega kodeka](#namestitev-dodatnega-kodeka)
+  - [Konfiguracija USB modema](#konfiguracija-usb-modema)
+  - [Svoboda kliče](#svoboda-kliče)
+  - [Namestitev spletnega vmesnika za USSD](#namestitev-spletnega-vmesnika-za-ussd)
+  - [Namestitev dodatnega kodeka](#namestitev-dodatnega-kodeka)
 - [FreePBX konfiguracija](#freepbx-konfiguracija)
-  * [Nastavitev trunk povezave](#nastavitev-trunk-povezave)
-  * [Nastavljanje izhodnih povezav](#nastavljanje-izhodnih-povezav)
-    + [Nastavitev klicnih predpon za odhodne klice](#nastavitev-klicnih-predpon-za-odhodne-klice)
-  * [Nastavitev internih telefonskih številk](#nastavitev-internih-telefonskih--tevilk)
-  * [Nastavljanje dohodnih povezav](#nastavljanje-dohodnih-povezav)
-  * [Dodatne SIP nastavitve](#dodatne-sip-nastavitve)
-  * [Omogočanje TCP namesto UDP](#omogo-anje-tcp-namesto-udp)
+  - [Nastavitev trunk povezave](#nastavitev-trunk-povezave)
+  - [Nastavljanje izhodnih povezav](#nastavljanje-izhodnih-povezav)
+    - [Nastavitev klicnih predpon za odhodne klice](#nastavitev-klicnih-predpon-za-odhodne-klice)
+  - [Nastavitev internih telefonskih številk](#nastavitev-internih-telefonskih-številk)
+  - [Nastavljanje dohodnih povezav](#nastavljanje-dohodnih-povezav)
+  - [Dodatne SIP nastavitve](#dodatne-sip-nastavitve)
+  - [Omogočanje TCP namesto UDP](#omogočanje-tcp-namesto-udp)
 - [Nastavljanje SIP odjemalcev](#nastavljanje-sip-odjemalcev)
-  * [Nastavitve glasovne pošte](#nastavitve-glasovne-po-te)
-  * [Nastavitve e-pošte skrbnika glasovne pošte](#nastavitve-e-po-te-skrbnika-glasovne-po-te)
-- [Še nekaj drugih malenkosti](#-e-nekaj-drugih-malenkosti)
-  * [Blokada odhodnih klicev](#blokada-odhodnih-klicev)
-  * [Omejevanje interne številko na klicanje samo določene zunanje številke](#omejevanje-interne--tevilko-na-klicanje-samo-dolo-ene-zunanje--tevilke)
+  - [Nastavitve glasovne pošte](#nastavitve-glasovne-pošte)
+  - [Nastavitve e-pošte skrbnika glasovne pošte](#nastavitve-e-pošte-skrbnika-glasovne-pošte)
+- [Še nekaj drugih malenkosti](#še-nekaj-drugih-malenkosti)
+  - [Blokada odhodnih klicev](#blokada-odhodnih-klicev)
+  - [Omejevanje interne številko na klicanje samo določene zunanje številke](#omejevanje-interne-številko-na-klicanje-samo-določene-zunanje-številke)
 - [Posodabljanje sistema](#posodabljanje-sistema)
 - [Varnostne kopije](#varnostne-kopije)
-- [Kaj še lahko naredimo s takim sistemom?](#kaj--e-lahko-naredimo-s-takim-sistemom-)
-  * [Testiranje](#testiranje)
-  * [Povezava fizičnega telefona](#povezava-fizi-nega-telefona)
-    + [Konfiguriranje in povezava VoIP telefona v lokalno omrežje](#konfiguriranje-in-povezava-voip-telefona-v-lokalno-omre-je)
-    + [Povezovanje VoIP telefona prekp VPN](#povezovanje-voip-telefona-prekp-vpn)
-      - [RaspberryPi kot usmerjevalnik za žično omrežje](#raspberrypi-kot-usmerjevalnik-za--i-no-omre-je)
-      - [Dostop do VoIP telefona iz omrežja VPN](#dostop-do-voip-telefona-iz-omre-ja-vpn)
-      - [Spreminjanje *nespremenljivega* privzetega gesla](#spreminjanje--nespremenljivega--privzetega-gesla)
-      - [Pa naredimo svoj stari VoIP telefon še brezžičen](#pa-naredimo-svoj-stari-voip-telefon--e-brez-i-en)
-  * [Glasnost sporočil glasovne pošte](#glasnost-sporo-il-glasovne-po-te)
-- [Kaj pa lahko naredite *vi*?](#kaj-pa-lahko-naredite--vi--)
+- [Kaj še lahko naredimo s takim sistemom?](#kaj-še-lahko-naredimo-s-takim-sistemom)
+  - [Testiranje](#testiranje)
+  - [Povezava fizičnega telefona](#povezava-fizičnega-telefona)
+    - [Konfiguriranje in povezava VoIP telefona v lokalno omrežje](#konfiguriranje-in-povezava-voip-telefona-v-lokalno-omrežje)
+    - [Povezovanje VoIP telefona prekp VPN](#povezovanje-voip-telefona-prekp-vpn)
+      - [RaspberryPi kot usmerjevalnik za žično omrežje](#raspberrypi-kot-usmerjevalnik-za-žično-omrežje)
+      - [Dostop do VoIP telefona iz omrežja VPN](#dostop-do-voip-telefona-iz-omrežja-vpn)
+      - [Spreminjanje *nespremenljivega* privzetega gesla](#spreminjanje-nespremenljivega-privzetega-gesla)
+      - [Pa naredimo svoj stari VoIP telefon še brezžičen](#pa-naredimo-svoj-stari-voip-telefon-še-brezžičen)
+  - [Glasnost sporočil glasovne pošte](#glasnost-sporočil-glasovne-pošte)
+- [Kaj pa lahko naredite *vi*?](#kaj-pa-lahko-naredite-vi)
 
 Pred nekaj leti sem naletel na zanimiv projekt nekoga, ki je [ustvaril GSM povezavo med dvema RasPBX strežnikoma](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html), da je lahko brezplačno klical iz Brazilije v Nemčijo in obratno. Žal takrat za take projekte nisem imel dovolj časa, a povezava na spletno stran je ostala med zaznamki in čakala... do zdaj.
 
 V današnjem prispevku si bomo ogledali kako namestimo telefonski strežnik [*Asterisk*](https://www.asterisk.org/) na mini računalnik [*RaspberryPi*](https://www.raspberrypi.org/) ter kako vse skupaj nastavimo, da omogoča klicanje iz računalnika ali pametnega telefona na običajne telefonske številke. Povedano drugače – ogledali si bomo, kako si postaviti lastno telefonsko centralo, ki jo lahko pospravimo v žep. No, pravzaprav ne povsem dobesedno, saj mora biti RaspberryPi povezan v omrežje, potrebujemo pa tudi napajanje. Sprehajanje s telefonsko centralo v žepu, povezano s kabli v omrežje in na napajalnik pa je precej... nepraktično, ampak saj razumemo poanto, kajne?
 
 Prvo vprašanje, preden se lotimo takšnega projekta je seveda - zakaj? Poleg tega, da je tak projekt videti zares »kul« ter da vam je verjetno všeč hekanje in učenje novih stvari, lahko s takšnim projektom pokrijete kar nekaj zanimivih scenarijev. Na primer:
+
 - Imate majhno podjetje in bi radi imeli svojo lastno telefonsko centralo z možnostjo klicanja na zunanje številke.
 - Zaradi COVID-19 bi želeli, da bi vaši zaposleni lahko delali od doma in pri tem uporabljali službene telefone.
 – Želite imeti možnost, da vaše stranke pokličejo na določeno telefonsko številko, kjer za podporo strankam uporabljate lasten avtomatiziran glasovni sistem.
@@ -73,6 +75,7 @@ Poglejmo si torej kako vse to dejansko naredimo. Natančneje, pogledali si bomo,
 Ampak najprej nekaj osnov . RaspberryPi, RasPBX, Asterisk, FreePBX, USB ključ, trunk povezava, interne telefonske številke... o čem točno je govora???
 
 ## Osnovni koncepti
+
 Najprej zelo kratka razlaga osnovnih pojmov. **RaspberryPi** je majhen računalnik, ki je bil prvotno razvit za promocijo poučevanja računalništva v šolah. Vendar se je projekt razvil in danes je na voljo več modelov RaspberryPi z mnogimi moduli in dodatki. Najpomembneje pa je, da so računalniki RaspberryPi relativno poceni (stanejo med 40 in 100 EUR, odvisno od modela in dodatne opreme, ki jo želite kupiti) in so predvsem odlično orodje za učenje novih stvari. Vse to so razlogi, da bi vsak pravi heker - in tukaj uporabljamo izraz heker na pozitiven način, torej pod heker mislimo strokovnjaka za programiranje in reševanje težav z računalnikom - moral imeti vsaj eno (še raje pa več) teh naprav v svojem arzenalu.
 
 Za zagon RasPBX potrebujete RaspberryPi 3 ali RaspberryPi 4, poleg tega pa potrebujete dovolj močan napajalnik (3A), smiselno pa je kupiti tudi ohišje za vaš RaspberryPi. Če napajalnik ni dovolj močan, RaspberryPi ne bo zmogel zagotoviti dovolj električne energije za GSM ključek, kar se bo manifestiralo v pogostih ponovnih zagonih tega mini računalnika. V tem primeru boste morali kupiti USB razdelilec z zunanjim napajanjem.
@@ -94,7 +97,9 @@ V telekomunikacijah se izraz **trunk** uporablja za povezavo dveh sistemov. Prep
 Dovolj govorjenja, čas je, da se lotimo izvedbe projekta!
 
 ## Kaj bomo potrebovali
+
 Kot smo že omenili, bomo potrebovali:
+
 - RaspberryPi 3 ali RaspberryPi 4 (preizkusil sem oba, vendar je RPi4 veliko zmogljivejši in zmore obdelati do 200 sočasnih telefonskih klicev (dejansko, [brez heca](https://www.youtube.com/watch?v=dVGf3HrKZl4)). Predlagam, da kupite RPi4 s 4 ali 8 GB RAM-a);
 - napajalnik za RaspberryPi (3A ali več), ohišje za RaspberryPi in SD kartico (8 GB je minimalno, predlagam pa nakup nekoliko bolj kvalitetne 32 GB kartice);
 - združljiv GSM USB ključek (npr. Huawei E1752C);
@@ -106,6 +111,7 @@ Pogledali si bomo tudi kako svojo telefonsko centralo postavimo znotraj omrežja
 *Pa začnimo.*
 
 ## Namestitev operacijskega sistema
+
 Najprej si bomo ogledali namestitev osnovnega sistema. Ker je le-ta Linux, seveda pomaga, če poznate vsaj nekaj osnov dela v Linuxu. Če pa se z Linuxom še niste srečali, pa brez panike – ostanite odprtega duha in sledite navodilom za namestitev. Predpostavljam sicer, da veste, kako uporabljati terminal in kako se prijaviti v oddaljeni sistem Linux s pomočjo SSH. Namig: v operacijskem sistemu Windows lahko uporabite PuTTY ali vgrajenega odjemalca SSH iz ukaznega poziva Windows.
 
 > [!NOTE]
@@ -169,7 +175,6 @@ Zdaj se lahko z RasPBX napravo povežemo prek SSH. Uporabniško ime je **root** 
 
 ![Prijava v sistem preko SSH](images/005_login.png)
 
-
 ### Kaj postoriti po prvi prijavi?
 
 Najprej spremenite geslo z ukazom `passwd`.
@@ -218,7 +223,7 @@ Osnovna konfiguracija operacijskega sistema je zdaj končana.
 ## Namestitev in konfiguracija PBX
 
 Po ponovnem zagonu je potrebno najprej odstraniti identiteto starega ključa SSH RasPBX naprave. Ta identiteta mora biti seveda odstranjena na računalniku iz katerega se povezujemo na RasPBX. Zakaj? Zato, ker smo v prejšnji SSH seji izvedli ukaz `regen-hostkeys` za ustvarjanje novih gostiteljskih ključev SSH in imamo sedaj na RasPBX strežniku nove SSH ključe.
- 
+
 Če se na RasPBX povezujemo iz Linux sistema, to naredimo z ukazom: `ssh-keygen -f "/home/matej/.ssh/known_hosts" -R "192.168.1.150"`. Tisti, ki uporabljate sisteme Windows, pa sami ugotovite kako in kaj.
 
 Zdaj lahko vzpostavimo SSH povezavo z našim RasPBX strežnikom: `ssh root@192.168.1.150`.
@@ -241,7 +246,7 @@ Za preostanek konfiguracije lahko še naprej sprejemamo privzete vrednosti.
 
 V primeru, da ste se pri vnosu zatipkali ali ste celo pozabili nastaviti strežnik svojega ponudnika e-pošte (*kot se je zgodilo meni...*), samo znova zaženite ukaz `dpkg-reconfigure exim4-config`.
 
-Nato je potrebno urediti datoteko `/etc/exim4/passwd.client`. Sam uporabljam urejevalnik besedil *nano*, vi pa lahko uporabite svoj najljubši urejevalnik besedil. Za tiste, ki ne poznajo Linuxa, ko v urejevalniku *nano* končamo z urejanjem besedilne datoteke, pritisnemo `ctrl-x` in *nano* vas bo vprašal, ali želimo shraniti spremembe ("*Save modified buffer?*"), na kar seveda odgovorimo z ** y** (Da). Nato nas bo *nano* vprašal, v katero datoteko želimo shraniti spremembe, in tukaj samo pritisnemo Enter, kar pomeni, da shranimo spremembe v trenutno odprto datoteko, in to je to.
+Nato je potrebno urediti datoteko `/etc/exim4/passwd.client`. Sam uporabljam urejevalnik besedil *nano*, vi pa lahko uporabite svoj najljubši urejevalnik besedil. Za tiste, ki ne poznajo Linuxa, ko v urejevalniku *nano* končamo z urejanjem besedilne datoteke, pritisnemo `ctrl-x` in *nano* vas bo vprašal, ali želimo shraniti spremembe ("*Save modified buffer?*"), na kar seveda odgovorimo z **y** (Da). Nato nas bo *nano* vprašal, v katero datoteko želimo shraniti spremembe, in tukaj samo pritisnemo Enter, kar pomeni, da shranimo spremembe v trenutno odprto datoteko, in to je to.
 
 Torej vtipkamo ukaz: `nano /etc/exim4/passwd.client`
 
@@ -280,7 +285,7 @@ Kot sem že omenil, bomo naš RasPBX postavili v omrežje VPN. S tem bodo RasPBX
 
 Se je pa ob tem treba zavedati, da je zgolj uporaba VPN-ja za šifriranje VoIP podatkov nekoliko problematična. Raziskave so namreč pokazale, da lahko uporaba VBR kodekov (tim. kodeki, ki uporabljajo spremenljivo bitno hitrost) predstavlja varnostno tveganje. Zakaj?
 
-Če pri uporabi SRTP šifriranja uporabimo kodeke s spremenljivo bitno hitrostjo (VBR), je dolžina stisnjenih podatkovnih paketov odvisna od značilnosti govornega signala. Z drugimi besedami, različni zvoki so kodirani na različne načine, in te majhne razlike v velikostih paketov je mogoče uporabiti za rekonstrukcijo ("dešifriranje") šifriranih podatkov. To se morda sliši zelo akademsko, toda [raziskovalci so pokazali] (https://www.cs.jhu.edu/~fabian/papers/oakland08.pdf), da je v določenih okoliščinah posamezne fraze v glasovnem klicu mogoče prepoznati kljub šifriranju. (Na kratko, raziskovalci so pokazali, da se lahko dolžine šifriranih VoIP paketov uporabijo za identifikacijo vnaprej posnetih besednih zvez, izgovorjenih v klicu.) Torej, če nameravate s svojim RasPBX narediti nekaj zares neumnega (kar pomeni: nezakonitega), takoj prenehajte razmišljati o tem in se raje lotite česa bolj koristnega.
+Če pri uporabi SRTP šifriranja uporabimo kodeke s spremenljivo bitno hitrostjo (VBR), je dolžina stisnjenih podatkovnih paketov odvisna od značilnosti govornega signala. Z drugimi besedami, različni zvoki so kodirani na različne načine, in te majhne razlike v velikostih paketov je mogoče uporabiti za rekonstrukcijo ("dešifriranje") šifriranih podatkov. To se morda sliši zelo akademsko, toda [raziskovalci so pokazali] (<https://www.cs.jhu.edu/~fabian/papers/oakland08.pdf>), da je v določenih okoliščinah posamezne fraze v glasovnem klicu mogoče prepoznati kljub šifriranju. (Na kratko, raziskovalci so pokazali, da se lahko dolžine šifriranih VoIP paketov uporabijo za identifikacijo vnaprej posnetih besednih zvez, izgovorjenih v klicu.) Torej, če nameravate s svojim RasPBX narediti nekaj zares neumnega (kar pomeni: nezakonitega), takoj prenehajte razmišljati o tem in se raje lotite česa bolj koristnega.
 
 Načeloma pa zamejitev VoIP komunikacije v šifrirano VPN omrežje ni slaba ideja in negativni vpliv uporabe VBR kodekov v VPN omrežju bi moral biti minimalen.
 
@@ -319,10 +324,11 @@ Nato lahko znova zaženemo storitev NTP: `service ntp restart`. Sedaj lahko prev
 ## Varnost sistema
 
 Preden se zares lotimo namestitve telefonskega dela sistema, moramo poskrbeti še za varnost naše RasPBX naprave. V zvezi z varnostjo je potrebno nastaviti kar nekaj stvari, tudi v tim. telefonskem delu, a za zdaj bomo poskrbeli le za nekaj osnovnih varnostnih nastavitev povezanih s SSH in požarnim zidom. Pri vsem skupaj pa upoštevajte, da je varnostne premisleke in mehanizme pomembno razumeti vsaj v osnovi, sicer se vam hitro zgodi, da naredite napako ali se celo zaklenete iz svojega lastnega sistema.
- 
+
 ### Varen SSH
 
 Kar zadeva varnost SSH, obstaja več dobrih praks, na našem sistemu pa bomo implementirali naslednje:
+
 - onemogočili bomo prazna gesla;
 - onemogočili bomo datoteke .rhosts (tim. preverjanje);
 - določili bomo podprte algoritme HostKey, razpoložljive algoritme KEX (Key Exchange), dovoljene šifrirne algoritme in razpoložljive algoritme MAC (message authentication code);
@@ -353,13 +359,13 @@ Nato **določite razpoložljive algoritme KEX (Key Exchange)**:
 ```ssh-config
 KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
 ```
- 
+
 Določite **dovoljene šifrirne algoritme**:
 
 ```ssh-config
 Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
 ```
- 
+
 Določite **razpoložljive MAC (message authentication code) algoritme**:
 
 ```ssh-config
@@ -454,7 +460,7 @@ PasswordAuthentication no
 UsePAM no
 ```
 
-Preden konfiguracijsko datoteko zapremo, bomo onemogočili še prijavo za root uporabnika. To lahko storimo tako, da spremenimo spremenljivko "PermitRootLogin" v vrednost "n0":
+Preden konfiguracijsko datoteko zapremo, bomo onemogočili še prijavo za root uporabnika. To lahko storimo tako, da spremenimo spremenljivko `PermitRootLogin` v vrednost `n0`:
 
 ```ssh-config
 PermitRootLogin no
@@ -485,20 +491,20 @@ Prva stvar, ki jo lahko storite, je, da počakate pol ure. Vedno je čas za dobr
 Če pa se vam malo mudi, lahko blokirani IP *odblokirate*. Najprej lahko preverite stanje `fail2ban` tako, da vnesete `fail2ban-client status`:
 
     Status
-    |- Number of jail:	2
-    `- Jail list:	asterisk, sshd
+    |- Number of jail: 2
+    `- Jail list: asterisk, sshd
 
 Vidimo lahko, da imamo dve ječi v katere `fail2ban` zaklepa poredne uporabnike. Enase imenuje *asterisk* in druga *sshd*. Torej preverimo ječo *asterisk*. Ukaz `fail2ban-client status asterisk` vam bo pokazal, kateri IP je zaprt v tem zaporu:
 
     Status for the jail: asterisk
     |- Filter
-    |  |- Currently failed:	0
-    |  |- Total failed:	3
-    |  `- File list:	/var/log/asterisk/security_log
+    |  |- Currently failed: 0
+    |  |- Total failed: 3
+    |  `- File list: /var/log/asterisk/security_log
     `- Actions
-       |- Currently banned:	1
-       |- Total banned:	1
-       `- Banned IP list:	10.10.8.9
+       |- Currently banned: 1
+       |- Total banned: 1
+       `- Banned IP list: 10.10.8.9
 
 Zdaj lahko ta naslov IP ročno odblokirate: `fail2ban-client set asterisk unbanip 10.10.8.9`. No, hudobne in nagajive IP naslove, ki *še niso v ječi*, pa lahko tja zaprete z ukazom: `fail2ban-client set asterisk banip 10.10.8.9`.
 
@@ -518,6 +524,7 @@ ufw default allow outgoing
 Samo malo, kaj pa je sedaj to?? Kako bomo potem lahko sploh uporabljali sistem, če dohodne omrežne povezave niso dovoljene???
 
 Brez panike! To je le splošno pravilo, kasneje pa bomo definirali posebna pravila, ki uporabnikom omogočajo povezavo z našo RasPBX centralo. Pravzaprav to naredimo kar takoj. Moja pravila so torej naslednja:
+
 - dovoli vse povezave iz omrežja VPN (tako da se bodo VoIP odjemalci lahko povezali z mojim sistemom samo iz VPN);
 - iz drugih omrežij (vključno z mojim lokalnim omrežjem) dovoli samo SSH povezave s sistemom (to mi bo omogočilo osnovno upravljanje sistema iz lokalnega omrežja, če VPN izpade);
 - spletni vmesnik je na voljo samo iz VPN-ja z določenega naslova IP (nepooblaščeni uporabniki VPN-ja se ne bodo mogli prijaviti v spletni vmesnik in upravljati sistema).
@@ -529,6 +536,7 @@ Moje lokalno omrežje je v območju 192.168.1.0/24, kar pomeni, da lahko uporabl
 Uporabljam pa tudi VPN (v območju 10.10.8.0/24), moja naprava RasPBX pa ima naslov IP v VPN omrežju 10.10.8.150. V mojem omrežju VPN je več drugih naprav in želim, da bo spletno upravljanje RasPBX dostopno iz IP naslova 10.10.8.10.
 
 Če sedaj to prevedemo v jezik, ki ga razume požarni zid, bodo nastavitve naslednje:
+
 - najprej bomo **dovolili povezave SSH od koder koli** (SSH deluje na TCP vratih 22): `ufw allow 22/tcp`;
 - potem bomo **dovolili spletno upravljanje iz mojega računalnika, vendar le, če je povezan z VPN** (moj VPN IP je 10.10.8.10): `ufw allow from 10.10.8.10 to any port 80 proto tcp`;
 - potem bomo **blokirali povezave s spletnim vmesnikom za vse ostale**: `ufw deny to any port 80 proto tcp`;
@@ -646,7 +654,7 @@ data=/dev/ttyUSB2               ; tty port for AT commands;             no defau
 exten=+38641234567;
 imei=xxxxxxxxxxxxxxx;
 imsi=2934xxxxxxxxxxx;
-```    
+```
 
 Shranite in zaprite datoteko ter se prijavite neposredno v upravljalno konzolo Asterisk: `asterisk -rvvv`. Nato vnesite ukaz `dongle reload now`:
 
@@ -659,7 +667,7 @@ Shranite in zaprite datoteko ter se prijavite neposredno v upravljalno konzolo A
 
 ### Svoboda kliče
 
-Kot lahko vidite, je USB ključek zdaj pripravljen. Najprej preverimo, ali lahko pošljemo SMS sporočilo. V upravljalni konzoli Asterisk vnesite `dongle sms dongle0 +38640XXXXXX Test!`. To bo na moj osebni mobilni telefon (*+38640XXXXXX*) poslalo SMS sporočilo z besedilom "*Test!*.
+Kot lahko vidite, je USB ključek zdaj pripravljen. Najprej preverimo, ali lahko pošljemo SMS sporočilo. V upravljalni konzoli Asterisk vnesite `dongle sms dongle0 +38640XXXXXX Test!`. To bo na moj osebni mobilni telefon (*+38640XXXXXX*) poslalo SMS sporočilo z besedilom `Test!`.
 
 Odhodni klic pa lahko sprožimo z ukazom `channel originate dongle/dongle0/+38640XXXXXX application MusicOnHold`. V upravljalni konzoli Asterisk se bo izpisalo nekaj takega:
 
@@ -708,6 +716,8 @@ In to je zaenkrat to. Konzolo lahko zaenkrat pustite ob strani, nadaljnja konfig
 
 Zdaj pa se začne prava zabava. Odprite spletni brskalnik in vnesite naslov IP vaše RasPBX. V mojem primeru `http://10.10.8.150`.
 
+![Login to FreePBX](images/008_freepbx_login.png)
+
 Ko se poskušamo prvič prijaviti v spletni vmesnik FreePBX, se izvedejo začetne nastavitve sistema. Najprej moramo nastaviti privzeti jezik. Toplo vam priporočam, da izberete angleščino, saj sta tako dokumentacija, kot pomoč na forumih večinoma v angleščini. Prav tako boste morali nastaviti svoj časovni pas ter seveda uporabniško ime in geslo. In ne pozabite na e-naslov za e-pošto z obvestili. Prav tako vam močno priporočam, da omogočite samodejne posodobitve.
 
 ![Nadzorna plošča FreePBX](images/009_freepbx-dashboard.png)
@@ -719,6 +729,7 @@ Po uspešni prijavi na nadzorno ploščo moramo klikniti na "Apply config" s či
 Kot smo pojasnili, se trunk povezave uporabljajo za povezavo dveh telefonskih sistemov (izmenjavo prometa med njima). Z našo trunk povezavo bomo naš sistem RasPBX preko USB modema povezali z mobilnim operaterjem. Iz te povezave bomo kasneje usmerjali odhodne in dohodne klice med našim telefonskim sistemom in javnim telefonskim omrežjem.
 
 Najprej moramo seveda ustvariti novo trunk povezavo za naš GSM ključek. V spletnem vmesniku FreePBX izberite `Connectivity` → `Trunks` → `Add Custom Trunk` in nastavite naslednje vrednosti:
+
 - `General` - `Trunk Name`: vnesite ime trunk povezave, sam sem uporabil `gsm_dongle0`.
 - `General` - `Outbound CallerID`: vnesite telefonsko številko vaše SIM kartice, ki je vstavljena v USB modem. Številka naj bo v E.164 zapisu. Sam sem vnesel `+38640XXXXXX` (no, v resnici nisem vnesel X-ov, ker pač ne želim razkriti svoje telefonske številko, ampak saj razumete bistvo, kajne?).
 - `Dialed Number Manipulation Rules`: tukaj izberite polje `match pattern` in vnesite `XXXXXXXXX` (ja, tukaj je pa treba vnesti X-e).
@@ -739,6 +750,7 @@ Med nastavitvami trunk povezave lahko nastavite pravila za manipulacijo klicane 
 Če pa bi želeli pred številko dodati predpono, pa izberete `Dialed Number Manipulation Rules` in v polje `prepend`, vnesete številko, ki bo dodana pred vsako klicano številko na tej trunk povezavi. Če na primer vnesete `#31#`, bo to na dani trunk povezavi skrilo ID klicatelja (omenjena koda se v Evropi uporablja za skrivanje klicne identitete).
 
 Ampak kaj pa pomenijo ti X-i? To so vzorci, ki se uporabljajo za "razlago" oblike števila:
+
 - **X** se ujema s katero koli številko od 0-9.
 - **Z** se ujema s katero koli številko od 1 do 9.
 - **N** se ujema s katero koli številko od 2 do 9.
@@ -756,6 +768,7 @@ Imate prav. To je mogoče narediti, vendar bomo to naredili v nastavitvah odhodn
 Tim. izhodne povezave (*outbound routes*) se uporabljajo za to, da vaš RasPBX sistem ve, katere številke lahko kličejo vaši uporabniki (oz. vaše interne telefonske številke) in na katero trunk povezavo naj se posredujejo posamezni odhodni klici. Tukaj lahko nastavite številke, ki jih uporabniki ne morejo klicati, npr. številke za klic v sili (tega v tem vodiču sicer ne bomo obravnavali) in pot za običajne klice. Nastavimo pa lahko tudi posebno poti za mednarodne klice ali klice v različna omrežja (nekateri operaterji na primer ponujajo neomejene brezplačne klice znotraj svojega omrežja) – vsaka od teh poti lahko poteka po svoji trunk povezavi.
 
 Poglejmo si torej kako nastaviti izhodno povezavo, preko katere boste lahko s pomočjo GSM modema klicali ven iz vašega RasPBX sistema. V FreePBX klinite `Connectivity` → `Outbound routes` in nato gumb `Add Outbound Route`. Sedaj nastavite svojo izhodno povezavo:
+
 - `Route Name`: vnesite ime izhodne povezave, sam sem uporabil `gsm_out`.
 - `Trunk Sequence for Matched Route`: iz menija izberite `gsm_dongle0` (to je ime trunk povezave, ki smo jo nastavili v prejšnjem koraku).
 - `Dial Patterns`: tukaj izberite polje `match pattern` in vnesite `0[12345678]XXXXXXX`.
@@ -783,6 +796,7 @@ S tem boste nastavili, da ko bo neka vaša interni uporabnik želel poklicati zu
 Zdaj lahko končno nastavimo naše interne telefonske številke. V telefonski terminologiji se za to uporablja angleški izraz *extension*, kar bi lahko zelo grobo prevedli kot *razširitev*. Gre za lokalne telefonske številke znotraj našega telefonskega sistema. V FreePBX kliknite `Applications` → `Extensions`. Kliknite na gumb `Add Extension` in dodajte novo številko tipa `SIP [chan_pjsip] extension`.
 
 Nato sledijo nastavite:
+
 - `User extension`: lahko je poljubna številka, sam sem se odločil za 4-mestne številke in v mojem primeru sem vnesel `1000`.
 - `Display name`: prikazno ime je seveda ime uporabnika ali naprave. Sam sem vpisal `Matej - racunalnik`, saj to številko nameravam uporabljati na svojem računalniku.
 - `Secret`: tukaj se nahaja geslo za vašo interno telefonsko številko (oziroma vaš SIP račun). to geslo je samodejno ustvarjeno, lahko pa ga poljubno spremenite. Na primer, v ... no, tega vam seveda ne izdam, saj morajo gesla ostati tajna, kajne?
@@ -790,6 +804,7 @@ Nato sledijo nastavite:
 ![Interne telefonske številke – splošne nastavitve](images/016_extensions1.png)
 
 Na tem mestu pa lahko postorite še nekaj zanimivih stvari. Pod izbiro `Voicemail` lahko omogočite zvočno pošto. Poglejmo si nekaj uporabnih nastavitev:
+
 - Nastavitev gesla `Voicemail Password` (uporabite samo številke).
 - `Disable (*) in Voicemail Menu`: nastavite na **ne** (**no**), kar vam bo omogočilo, da s pomočjo telefona lahko uporabljate zvočne menije.
 - `Require From Same Extension`: nastavite na **da** (**yes**), s čimer določite, da uporabnik do svoje zvočne pošte lahko dostopa samo preko svoje interne telefonske številke.
@@ -806,6 +821,7 @@ Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*. Seveda v siste
 ### Nastavljanje dohodnih povezav
 
 Končno lahko nastavimo še, kam (na katere interne telefonske številke) bodo usmerjeni dohodni klici. V FreePBX kliknite `Connectivity` → `Inbound routes`. Kliknite gumb 'Inbound Route' in nastavite:
+
 - `Description`: vnesite ime vaše dohodne povezave, sam sem uporabil `gsm_in`.
 - `Set destination` - `Select Extensions` in izberite interno telefonsko številko, kamor bodo posredovani dohodni klici. Sam sem izbral `1000 - "Matej - racunalnik"`.
 
@@ -820,6 +836,7 @@ Kliknite *Submit* za pošiljanje sprememb in nato *Apply config*. In to je to. P
 ### Dodatne SIP nastavitve
 
 Zdaj lahko nastavimo še nekaj dodatnih stvari, vključno z nekaterimi **dobrimi varnostnimi praksami**. V FreePBX kliknite `Settings` → `Asterisk SIP settings` in pojdite na `General SIP Settings`. Tukaj morate nastaviti:
+
 - `Allow SIP Guests`: nastavite na **ne** (**no**), saj je to dobra varnostna praksa.
 - omogočite dodatni kodek `g729`, ki smo ga namestili v terminalu.
 - lahko omogočite tudi video podporo, če želite (vendar bo to delovalo samo za interne klice).
@@ -856,7 +873,7 @@ Ko je vaš SIP odjemalec uspešno poveže na telefonsko centralo (če ste vnesli
 
 ### Nastavitve glasovne pošte
 
-Zdaj lahko nastavite še svojo glasovno pošto (če ste jo pred tem omogočili v FreePBX). S SIP odjemalcem pokličite `*97` vnesite svoje geslo za glasovno pošto in že lahko slišite glasovni meni. Sedaj pritisnite "0" in "1", da posnamete svoje *sporočilo o tem, da niste dosegljivi*. Ko končate, pritisnite `#` in nato `1`, da sprejmete in shranite sporočilo. Posnamete lahko tudi *sporočilo, da ste zasedeni* itd.
+Zdaj lahko nastavite še svojo glasovno pošto (če ste jo pred tem omogočili v FreePBX). S SIP odjemalcem pokličite `*97` vnesite svoje geslo za glasovno pošto in že lahko slišite glasovni meni. Sedaj pritisnite "0" in `1`, da posnamete svoje *sporočilo o tem, da niste dosegljivi*. Ko končate, pritisnite `#` in nato `1`, da sprejmete in shranite sporočilo. Posnamete lahko tudi *sporočilo, da ste zasedeni* itd.
 
 Nato svojega SIP odjemalca odjavite iz sistema (da ne bo dosegljiv) in ga poskusite poklicati. Če ste vse nastavili pravilno, boste slišali *sporočilo o tem, da niste dosegljivi*, sistem pa vam bo nato omogočil, da pustite glasovno sporočilo. To sporočilo bo posneto in poslano na vaš e-poštni naslov, kjer si ga lahko predvajate. To pa je kul rešitev, kaj?
 
@@ -866,7 +883,7 @@ Naj na koncu omenimo še eno malenkost. Če greste v FreePBX v `Settings` → `V
 
 ### Nastavitve e-pošte skrbnika glasovne pošte
 
-E-pošto za skrbnika glasovne pošte najdete pod `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Tukaj lahko urejate polje `from`, `subject` in `body` e-poštnega obvestila o novem sporočilu glasovne pošte. Preverite tudi polje `Server e-mail` in vnesite svoj elektronski naslov za obvestila (v mojem primeru `obvestilo@xxxxx.si`.
+E-pošto za skrbnika glasovne pošte najdete pod `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Tukaj lahko urejate polje `from`, `subject` in `body` e-poštnega obvestila o novem sporočilu glasovne pošte. Preverite tudi polje `Server e-mail` in vnesite svoj elektronski naslov za obvestila (v mojem primeru `obvestilo@xxxxx.si`).
 
 Še kratka opomba - če imate težave z dostavo e-pošte, preverite dnevniške zapise poštnega strežnika `exim4` na vašem RasPBX. Na RasPBX se povežite preko SSH in si oglejte vsebino datoteke z dnevniškimi zapisi z ukazom: `cat /var/log/exim4/mainlog`.
 
@@ -877,6 +894,7 @@ E-pošto za skrbnika glasovne pošte najdete pod `Settings` → `Voicemail Admin
 Pozorni bralci se spomnite obljube, da si bomo pogledali, kako lahko blokiramo določeno interno številko, da ne more klicati ven. Čas je za izpolnitev obljube.
 
 Blokado odhodnih klicev lahko naredimo na več načinov, v našem primeru pa bomo to naredili tako, da bomo za konkretno interno telefonsko številko ustvarili posebno izhodno povezavo. V FreePBX kliknemo `Connectivity` → `Outbound routes` in nato na gumb `Add Outbound Route`. Zdaj nastavimo naslednje:
+
 - `Route Name`: to povezavo bomo poimenovali `4000_no_out`, saj je povezava namenjena blokadi izhodnih klicev interne številke `4000`.
 - `Dial Patterns`: iizberemo polje `match pattern` in vnesemo `0[12345678]XXXXXXX`.
 - `Dial Patterns`: izberemo polje `CallerID` in vnesemo interno telefonsko številko, za katero želimo blokirati odhodne klice, v našem primeru je to `4000`.
@@ -897,16 +915,19 @@ Kaj pa, če želimo, da bo določena interna številka, recimo "3000", lahko kli
 Seveda se da, je pa nekoliko zapleteno. Nastaviti je potrebno izhodni povezavi, pri čemer pa je potrebno upoštevati, da se izhodne povezave procesirajo od zgoraj navzdol. To pomeni, da se najprej preveri prvo pravilo, nato drugo itd.
 
 Torej bomo imeli naslednji algoritem:
+
 - Prvo pravilo: če interna telefonska številka `3000` kliče zunanjo številko `031987654`, je klic dovoljen.
 - Če interna telefonska številka 3000 pokliče katero koli drugo zunanjo številko, skočimo na drugo pravilo.
 - Drugo pravilo: če interna telefonska številka `3000` pokliče katero koli zunanjo številko (ne katero koli drugo, ampak katero koli!), klic ni dovoljen. In to je konec pravil za interno telefonsko številko "3000".
 
 Sedaj ustvarimo prvo pravilo (prvo izhodno povezavo), ki bo določilo, da interna telefonska številka 3000 lahko pokliče zunanjo številko 031987654. V FreePBX kliknemo `Connectivity` → `Outbound routes` in nato gumb `Add Outbound Route`. Sedaj definiramo izhodno povezavo:
+
 - `Route Name`: `3000_to_my_mobile` (ta interna številka bo lahko klicala samo mojo mobilno številko).
 - `Trunk Sequence for Matched Route`: iz menija izberemo `gsm_dongle0`.
 - `Dial Patterns`: v polje `match pattern` vnesemo`031987654` (zunanja številka, katere klicanje je dovoljeno).
 
 Zdaj dodamo še drugo pravilo (oz. drugo izhodno povezavo). V FreePBX kliknemo `Connectivity` → `Outbound routes` in nato gumb `Add Outbound Route`. Sedaj definiramo:
+
 - `Route Name`: `3000_no_out`.
 - `Dial Patterns`: v polje `match pattern` vnesemo `0[12345678]XXXXXXX`.
 - `Dial Patterns`: v polje `CallerID` vnesemo interno telefonsko številko, ki jo želimo blokirati, v našem primeru `3000`.
@@ -915,6 +936,7 @@ Zdaj dodamo še drugo pravilo (oz. drugo izhodno povezavo). V FreePBX kliknemo `
 Na koncu pravila za izhodne povezave uredite tako, da bo prvo pravilo `3000_to_my_mobile`, drugo pa `3000_no_out`. Privzeta pot `gsm_out` pa ostane na dnu seznama. Nato kliknite *Apply config* in to je to.
 
 Vse to zveni precej preprosto, a je težava v tem, da če imate veliko pravil, celoten sistem hitro postane zelo nepregleden. Ena od rešitev je uporaba vzorcev klicanja v polju ID klicatelja. Ko nastavljate izhodne povezave, pojdite na `Dial Patterns` v polju `CallerID` in vnesite vzorec klicanja interne številke, ki jo želite blokirati, na primer `3XXX`. To pomeni, da bo izhodna pot veljala za vse razširitve od »3000« do »3999«. Potem imate lahko naslednjo shemo dodeljevanja številk:
+
 - 1XXX številke so dodeljene vam in vašim prijateljem,
 - 3XXX številke so dodeljene ljudem, ki vas imajo radi (in vas torej lahko pokličejo), vendar jih vi ne marate (zato jim ne dovolite, da oni pokličejo koga drugega),
 - 4XXX razširitve so dodeljene osebam, ki jih sploh ne marate, zato sploh ne morejo klicati zunaj vašega sistema,
@@ -1016,7 +1038,7 @@ Zdaj seveda lahko kličemo, sprejemamo klice itd. ... in vse je super in krasno,
 
 Prva stvar, ki se je bomo znebili je zastareli HTTPS protokol SSL 3.0 HTTPS. Gremo v `Advanced Settings` → `Network` in pod `HTTPS Settings` nastavimo `HTTPS Client Method` na `TLS 1.0`. To sicer ni idealno, saj se v letu 2021 vse HTTPS kriptografske protokole manj od TLS 1.2 šteje za ne dovolj varne, je pa veliko boljše od prazgodovinskega SSL 3.0. A po drugi strani to ni zelo pomembno, če hkrati ne moremo spremeniti privzetega skrbniškega gesla. A vseeno, pokažimo, da varnost jemljemo resno!
 
-Naslednja težava je, da je strojna programska oprema na telefonu nekoliko zastarel in ji posodobitev ne bi škodila. Na žalost strojne programske opreme za ta telefon na uradnem spletnem mestu Aastre ni mogoče najti, sem jo pa našel na [Softpediji](https://drivers.softpedia.com/get/VoIP-Voice-over-IP/Aastra/Aastra-6730i -SIP-Phone-Firmware-3312217.shtml). Vendar pa postopek posodobitve strojne programske opreme sploh ni enostaven. Najprej si moramo datoteko s končnico `.st` shraniti na naš strežnik, in sicer TFTP, FTP ali HTTP. Nato je potrebno v telefon vnesti IP naslov strežnika in ime datoteke z nadgradnjo, to datoteko ročno prenesti na telefon in posodobitev nato ročno zagnati. Priznam, tega se nisem lotil, med drugim tudi zato, ker iz priloženih navodil ni jasno kako, oziroma ali sploh se preverja integriteta posodobitvenega paketa s strojno programsko opremo. In če gre med nadgradnjo kaj narobe, se mimogrede zgodim da bomo telefon popolnoma okvarili. Tako okvarjen telefon pa uporaben kvečjemu kot – kos opeke. Teoretično bi lahko *oblokiranje* tako okvarjeneg atelefona naredili tako, da telefon opremo ter notranji pomnilnik preprogramiramo s pomočjo programatorja strojne opreme... Vendar za to potrebujemo posebno opremo, ustrezno znanje o strojni opremi telefona, itd. Vse to pa je nekaj, s čimer se običajni uporabniki navadno ne želijo ukvarjati. Tako bo strojna programska oprema na telefonu zaenkrat ostalo takšna, kakršna je.
+Naslednja težava je, da je strojna programska oprema na telefonu nekoliko zastarel in ji posodobitev ne bi škodila. Na žalost strojne programske opreme za ta telefon na uradnem spletnem mestu Aastre ni mogoče najti, sem jo pa našel na [Softpediji](https://drivers.softpedia.com/get/VoIP-Voice-over-IP/Aastra/Aastra-6730i-SIP-Phone-Firmware-3312217.shtml). Vendar pa postopek posodobitve strojne programske opreme sploh ni enostaven. Najprej si moramo datoteko s končnico `.st` shraniti na naš strežnik, in sicer TFTP, FTP ali HTTP. Nato je potrebno v telefon vnesti IP naslov strežnika in ime datoteke z nadgradnjo, to datoteko ročno prenesti na telefon in posodobitev nato ročno zagnati. Priznam, tega se nisem lotil, med drugim tudi zato, ker iz priloženih navodil ni jasno kako, oziroma ali sploh se preverja integriteta posodobitvenega paketa s strojno programsko opremo. In če gre med nadgradnjo kaj narobe, se mimogrede zgodim da bomo telefon popolnoma okvarili. Tako okvarjen telefon pa uporaben kvečjemu kot – kos opeke. Teoretično bi lahko *oblokiranje* tako okvarjeneg atelefona naredili tako, da telefon opremo ter notranji pomnilnik preprogramiramo s pomočjo programatorja strojne opreme... Vendar za to potrebujemo posebno opremo, ustrezno znanje o strojni opremi telefona, itd. Vse to pa je nekaj, s čimer se običajni uporabniki navadno ne želijo ukvarjati. Tako bo strojna programska oprema na telefonu zaenkrat ostalo takšna, kakršna je.
 
 #### Povezovanje VoIP telefona prekp VPN
 
@@ -1043,6 +1065,7 @@ Postopek poznamo, zato se samo na hitro sprehodimo čez namestitev RaspberryPi O
 Nato se z ukazom `ssh pi@192.168.1.228` prijavimo v sveže nameščen RaspberryPi OS (tukaj seveda vpišete IP vaše naprave). Privzeto uporabniško ime je `pi`, privzeto geslo pa `raspberry`.
 
 Hiter sprehod skozi ukaze:
+
 - Z ukazom `passwd` spremenimo geslo.
 - Posodobimo sistem (`sudo apt update`, `sudo apt upgrade`) in odstranimo neuporabljene pakete (`sudo apt autoremove`).
 - Zaženimo `sudo raspi-config` in pod `System Options` nastavimo ime gostitelja (sam sem ga spremenil v `vpnbridge`), pod `Localisation Options` nastavimo svoj časovni pas, tipkovnico in WLAN državo. Nazadnje pod `Advanced Options` izberemo `Expand Filesystem`. Po tem je treba RaspberryPi ponovno zagnati.
@@ -1060,7 +1083,8 @@ Zdaj moramo nastaviti samo še vmesnik USB na Ethernet. V našem sistemu se imen
 To bo operacijskemu sistemu povedalo, naj na omrežni vmesnik `eth1` (pretvornik USB na RJ45) nastavi statični naslov IP in ta IP naslov naj bo `192.168.100.1`. Za omrežje vezano na `eth1` vmesnik moramo namreč uporabiti druge omrežne nastavitve (drug nabor IP naslovov), kot se uporabljajo na omrežju vezanem na vmesnik `eth0`. Seveda pa glede na vaše omrežne nastavitve lahko uporabite drugačen IP naslov, pomembno je le, da razumete logiko delovanja omrežij in ne naredite kakšne napake.
 
 Zdaj moramo namestiti strežnik DHCP:
-`sudo apt install isc-dhcp-server`
+
+    sudo apt install isc-dhcp-server
 
 Nastavimo ga tako, da odpremo konfiguracijsko datoteko z ukazom: `sudo nano /etc/dhcp/dhcpd.conf`. V datoteki je treba nastaviti `domain-name` in `domain-name-servers`:
 
@@ -1158,7 +1182,7 @@ Zdaj ima naš VoIP telefon neposreden dostop do omrežja VPN! Seveda želimo, da
 sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
 sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
 sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
-```    
+```
 
 ![Povezava VoIP telefona preko VPN](images/035_VoIP_over_VPN.png)
 
@@ -1226,6 +1250,7 @@ Končno lahko Nginx spletni strežnik ponovno zaženemo: `sudo service nginx res
 ![Aastra 6730i SIP nastavitve](images/033_Aastra_SIP_config.png)
 
 Na koncu bomo nastavili še požarni zid (`sudo apt install ufw`) ter določili naslednja pravila:
+
 - nabor privzetih pravil (`sudo ufw default deny incoming` in `sudo ufw default allow outgoing`);
 - dovolimo povezave SSH od kjerkoli: `sudo ufw allow 22/tcp`;
 - dovolimo dostop do spletnega vmesnika VoIP telefona iz mojega računalnika, **vendar le, če je povezan v VPN** (moj VPN IP je `10.10.8.10`): `sudo ufw allow from 10.10.8.10 to any port 443 proto tcp`.
@@ -1293,7 +1318,7 @@ Zdaj lahko odpremo datoteko `wpa_supplicant.conf` z ukazom: `sudo nano /etc/wpa_
 
 Datoteko shranimo in čez nekaj trenutkov se bo RaspberryPi samodejno povezal v naše WiFi omrežje (`MyHome`). To lahko preverimo z ukazoma `iwconfig wlan0` ali `iwgetid` commands. Če se RaspberryPi v WiFi omrežje ne bo povezal samodejno, pa bo potreben njegov ponoven zagon.
 
-``` 
+```
 ifconfig wlan0
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
@@ -1335,6 +1360,6 @@ Za konec pa si lahko ogledate nekaj mojih predavanj in projektov, na primer:
 - [Hekanje GSM telefonije in nekaj malega o varnosti GSM telefonije](http://videolectures.net/single_kovacic_phonebusters/) ([PDF prosojnice](https://telefoncek.si/static/2014/01/The_Phonebusters_2014.pdf)).
 - [Vse o VPNjih](http://videolectures.net/water4cities_kovacic_virtual_private_networks/) ([PDF prosojnice](https://telefoncek.si/predavanja/VPN_2021.pdf)).
 - [Forenzična analiza omrežnega prometa mobilnega telefona](http://videolectures.net/water4cities_kovacic_network_forensic_analysis/) ([PDF prosojnice](https://telefoncek.si/predavanja/Network_forensic_analysis_of_a_mobile_phone_2021.pdf)).
-- ...in še [mnogo več ](https://telefoncek.si/predavanja/).
+- ...in še [mnogo več](https://telefoncek.si/predavanja/).
 
 *Ostanite z nami in veselo hekanje še naprej!*
