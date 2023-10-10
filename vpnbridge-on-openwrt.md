@@ -460,20 +460,11 @@ After reboot *Raspberry Pi* shoud have access to internet via secondary Ethernet
   - Allow forwarding between `lan` and `vpn` zones:
 
     ```sh
-    uci add firewall include
-    uci set firewall.@include[-1].type=nftables
-    uci set firewall.@include[-1].path=/etc/fw4/forward-vpn-to-lan.nft
-    uci set firewall.@include[-1].chain=forward_vpn
-    uci set firewall.@include[-1].position=chain-post
-
     uci add firewall forwarding
     uci set firewall.@forwarding[-1].src=lan
     uci set firewall.@forwarding[-1].dest=vpn
 
     uci commit
-
-    mkdir -p /etc/fw4
-    echo 'oifname $lan_devices ct state { related, established } counter accept comment "Limited forwarding from vpn to lan"' > /etc/fw4/forward-vpn-to-lan.nft
     ```
 
   - Configure DHCP server
