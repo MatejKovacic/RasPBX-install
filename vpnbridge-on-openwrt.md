@@ -766,6 +766,43 @@ rm /etc/config/luci
 rm /etc/config/uhttpd
 ```
 
+### Enable NTP server
+
+- Enable NTP server
+
+  Enable local NTP (time) server:
+
+  ```sh
+  uci set system.ntp.enable_server=1
+  uci commit
+  ```
+
+- Configure DHCP
+
+  Serve local NTP server via DHCP:
+
+  ```sh
+  uci add_list dhcp.lan.dhcp_option='option:ntp-server,192.168.100.1'
+  uci commit
+  ```
+
+- Configure firewall
+
+  Redirect all outgoing NTP requests to local NTP server:
+
+  ```sh
+  uci add firewall redirect
+  firewall.@redirect[-1].name='Redirect NTP requiests to local server'
+  firewall.@redirect[-1].src=lan
+  firewall.@redirect[-1].src_dport=123
+  firewall.@redirect[-1].dest=wan
+  firewall.@redirect[-1].target=DNAT
+  firewall.@redirect[-1].dest_ip=192.168.100.1
+  uci commit
+
+  reboot
+  ```
+
 ### Install `rng-tools`
 
 ```sh
@@ -828,6 +865,7 @@ reboot
 - [*OpenWRT* - Logging messages](https://openwrt.org/docs/guide-user/base-system/log.essentials)
 - [*OpenWRT* - DHCP and DNS configuration](https://openwrt.org/docs/guide-user/dhcp/dhcp_configuration)
 - [*OpenWRT* - Firewall configuration](https://openwrt.org/docs/guide-user/firewall/firewall_configuration)
+- [*OpenWRT* - NTP](https://openwrt.org/docs/guide-user/advanced/ntp_configuration)
 - [*OpenWRT* - WireGuard client](https://openwrt.org/docs/guide-user/services/vpn/wireguard/client)
 - [*EKO ONE* - WireGuard](https://eko.one.pl/?p=openwrt-wireguard) (polish)
 - [*OpenWRT* - LED Configuration](https://openwrt.org/docs/guide-user/base-system/led_configuration)
