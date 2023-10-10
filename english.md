@@ -1,72 +1,74 @@
 # Installation of RasPBX
-*RasPBX installation for beginners*
+
+*RasPBX installation for beginners.*
 
 - [Basic concepts](#basic-concepts)
 - [What you will need](#what-you-will-need)
 - [Installation of the operating system](#installation-of-the-operating-system)
-  * [Write the RasPBX image to a SD card](#write-the-raspbx-image-to-a-sd-card)
-  * [Log in to the RasPBX device](#log-in-to-the-raspbx-device)
-  * [First things to do after login](#first-things-to-do-after-login)
+  - [Write the RasPBX image to a SD card](#write-the-raspbx-image-to-a-sd-card)
+  - [Log in to the RasPBX device](#log-in-to-the-raspbx-device)
+  - [First things to do after login](#first-things-to-do-after-login)
 - [PBX installation and configuration](#pbx-installation-and-configuration)
-  * [Setting up the e-mail system](#setting-up-the-e-mail-system)
-  * [Set up VPN client](#set-up-vpn-client)
-  * [Set up NTP](#set-up-ntp)
+  - [Setting up the e-mail system](#setting-up-the-e-mail-system)
+  - [Set up VPN client](#set-up-vpn-client)
+  - [Set up NTP](#set-up-ntp)
 - [The security of your system](#the-security-of-your-system)
-  * [Secure SSH](#secure-ssh)
-    + [Login with SSH key](#login-with-ssh-key)
-  * [Disable *root* user](#disable--root--user)
-  * [Install intrusion prevention](#install-intrusion-prevention)
-    + [How to unban IP address](#how-to-unban-ip-address)
-  * [Install firewall](#install-firewall)
+  - [Secure SSH](#secure-ssh)
+    - [Login with SSH key](#login-with-ssh-key)
+  - [Disable *root* user](#disable-root-user)
+  - [Install intrusion prevention](#install-intrusion-prevention)
+    - [How to unban IP address](#how-to-unban-ip-address)
+  - [Install firewall](#install-firewall)
 - [Installation of USB dongle](#installation-of-usb-dongle)
-  * [Dongle configuration](#dongle-configuration)
-  * [Freedom is calling... and sending SMS messages](#freedom-is-calling)
-  * [Install USSD webpage](#install-ussd-webpage)
-  * [Install additional codec](#install-additional-codec)
+  - [Dongle configuration](#dongle-configuration)
+  - [Freedom is calling... and sending SMS messages](#freedom-is-calling-and-sending-sms-messages)
+  - [Install USSD webpage](#install-ussd-webpage)
+  - [Install additional codec](#install-additional-codec)
 - [FreePBX configuration](#freepbx-configuration)
-  * [Set up the trunk](#set-up-the-trunk)
-  * [Set up outbound routes](#set-up-outbound-routes)
-    + [Setting up dial prefix for outgoing calls](#setting-up-dial-prefix-for-outgoing-calls)
-  * [Set up extensions](#set-up-extensions)
-  * [Set up inbound routes](#set-up-inbound-routes)
-  * [Additional SIP settings](#additional-sip-settings)
-  * [Enabling TCP instead of UDP](#enabling-tcp-instead-of-udp)
+  - [Set up the trunk](#set-up-the-trunk)
+  - [Set up outbound routes](#set-up-outbound-routes)
+    - [Setting up dial prefix for outgoing calls](#setting-up-dial-prefix-for-outgoing-calls)
+  - [Set up extensions](#set-up-extensions)
+  - [Set up inbound routes](#set-up-inbound-routes)
+  - [Additional SIP settings](#additional-sip-settings)
+  - [Enabling TCP instead of UDP](#enabling-tcp-instead-of-udp)
 - [Setting up SIP clients](#setting-up-sip-clients)
-  * [Your voicemail configuration](#your-voicemail-configuration)
-  * [Voicemail Admin e-mail configuration](#voicemail-admin-e-mail-configuration)
+  - [Your voicemail configuration](#your-voicemail-configuration)
+  - [Voicemail Admin e-mail configuration](#voicemail-admin-e-mail-configuration)
 - [Some other things to do](#some-other-things-to-do)
-  * [Block extension to call outside](#block-extension-to-call-outside)
-  * [Restrict extension to calling a specific number only](#restrict-extension-to-calling-a-specific-number-only)
+  - [Block extension to call outside](#block-extension-to-call-outside)
+  - [Restrict extension to calling a specific number only](#restrict-extension-to-calling-a-specific-number-only)
 - [Updating the system](#updating-the-system)
 - [Backups](#backups)
 - [Some other cool things to do](#some-other-cool-things-to-do)
-  * [Testing](#testing)
-  * [Connecting the physical phone](#connecting-the-physical-phone)
-    + [Configuring and connecting VoIP phone to your local network](#configuring-and-connecting-voip-phone-to-your-local-network)
-    + [Connecting VoIP phone to the VPN](#connecting-voip-phone-to-the-vpn)
+  - [Testing](#testing)
+  - [Connecting the physical phone](#connecting-the-physical-phone)
+    - [Configuring and connecting VoIP phone to your local network](#configuring-and-connecting-voip-phone-to-your-local-network)
+    - [Connecting VoIP phone to the VPN](#connecting-voip-phone-to-the-vpn)
       - [RaspberryPi as a router for the wired network](#raspberrypi-as-a-router-for-the-wired-network)
       - [Access to VoIP phone from the VPN network](#access-to-voip-phone-from-the-vpn-network)
-      - [Change unchangeable default password](#change--unchangeable--default-password)
+      - [Change unchangeable default password](#change-unchangeable-default-password)
       - [Make your old VoIP phone wireless](#make-your-old-voip-phone-wireless)
-  * [Volume in voicemail messages](#volume-in-voicemail-messages)
-- [And what can you do?](#and-what-can--you--do-)
+  - [Volume in voicemail messages](#volume-in-voicemail-messages)
+- [And what can you do?](#and-what-can-you-do)
 
 A few years ago I came across a very interesting project from some guy, who [created a GSM bridge between two RasPBX hosts](http://www.otubo.net/2015/06/gsm-bridge-between-two-raspbx-hosts.html) and who wanted to make free long distance calls from Brazil to Germany with the help of his RaspberryPi. That sounded just cool, but other projects were waiting for me at that time and I didn't have time for that. Until now.
 
 So, what do we intend to do? I am going to show you, how you can install the [*Asterisk*](https://www.asterisk.org/) telephony server on a small single board computer [*RaspberryPi*](https://www.raspberrypi.org/) in order to be able to make calls from your computer or smartphone to ordinary phone numbers. So basically, you will literally end up with your own PBX in your pocket. Actually no, because RaspberryPi needs to be connected to a power supply and network, and you would look weird with cables going into your pocket, but you get the idea.
 
 But why would you do that? Well, besides that this sounds like a really cool project and you like hacking and learning, you can cover some interesting scenarios like:
+
 - You have a small company and you would like to have your own PBX with the ability to call outside.
 - Because of COVID-19, you would like that your employees can work at home, but have company phones.
 - You would like to have the ability that your customers can call you and use your own automated voice system for customer support.
 - You would like to have free telephone (audio and video) calls through the internet, but on your own infrastructure.
 - You live in one country, but you have business and a mobile phone from the other country. And roaming between these two countries is expensive, so you would like to be able to use the internet to relay your calls between these two countries via the internet for free.
 - You are travelling abroad and would like to reduce roaming costs, but be accessible on your home mobile number for calls and SMS messages.
-- You are travelling abroad, but would like your mobile operator to think you are located at your home (i. e. hide your location data). 
+- You are travelling abroad, but would like your mobile operator to think you are located at your home (i. e. hide your location data).
 
 For me, the most important scenario is, that I would like to travel abroad (in the countries with high roaming costs), and be able to receive calls and SMS messages to my home mobile number. So if I receive a SMS message from my bank, I want this SMS to be delivered to my e-mail address. I would also like to be able to send SMS messages back to my bank. I would like to be able to receive phone calls and if I am without internet connection, the person calling me should be able to leave me a voice message which will be then delivered into my e-mail address. And of course, I would like to be able to call them back from my number.
 
-<img src="images/034_target_setup.png" alt="What do we want to do" width="300"/>
+![What do we want to do](images/034_target_setup.png)
 
 So in this article I will show you how you can do that. More specifically, how to install RasPBX to RaspberryPi, install a USB dongle and create a trunk to mobile phone network through that dongle for your endpoints. Sounds complicated? Well, it turns out, it is not.
 
@@ -95,8 +97,9 @@ An **endpoint** is basically your internal phone number (in your PBX), which is 
 ## What you will need
 
 As we already mentioned, you will need:
+
 - A RaspberryPi 3 or RaspberryPi 4 (I have tested both, however, the RPi4 is much more powerful and can handle up to 200 concurrent phone calls (really, [I am not joking](https://www.youtube.com/watch?v=dVGf3HrKZl4)). I suggest you buy a RPi4 with 4 or 8 GB RAM);
-- a power supply for the RaspberryPi (3A 5V or more), a case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and a little bit higher quality); 
+- a power supply for the RaspberryPi (3A 5V or more), a case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and a little bit higher quality);
 - a compatible USB dongle (I am using the Huawei E1752C);
 - RasPBX, which you can freely [download from the official project's website](http://www.raspberry-asterisk.org/downloads/) (I am using version 10-10-2020);
 - internet connection.
@@ -109,13 +112,14 @@ Additionally I am also using my own VPN network, and I will show you how to fenc
 
 First we will take a look into the installation of a basic system. Since it is Linux, it helps if you are familiar with Linux, but if you are not, just follow the installation instructions and you will be fine. However, I assume you already know how to use terminal and how to login to a remote Linux system using SSH. Hint: under Windows you can use PuTTY or the built-in SSH client from Windows command prompt.
 
-**Also, please note that I am using Ubuntu Linux as my main operating system, and setting up some things (like SSH connections) are a little bit different under Linux and Windows. But don't worry, you can always use your favourite search engine and learn something new. (Or maybe you can start using Linux?)**
+> [!NOTE]
+> I am using Ubuntu Linux as my main operating system, and setting up some things (like SSH connections) are a little bit different under Linux and Windows. But don't worry, you can always use your favourite search engine and learn something new. (Or maybe you can start using Linux?)
 
 ### Write the RasPBX image to a SD card
 
 After you download the RasPBX file *raspbx-10-10-2020.zip* you should unzip it and write the .IMG file to your SD card. For this I prefer Ubuntu's **Disks** tool, but if you are using other operating systems, just perform an online search and find out which tools can you use for that.
 
-<img src="images/001_SD_card.png" alt="Disks utility" width="300"/>
+![Disks utility](images/001_SD_card.png)
 
 Then insert the SD card into the RaspberryPi and the SIM card in your USB dongle. Connect the USB dongle to the RaspberryPi. Connect your network cable... And finally - connect the RaspberryPi to the power supply.
 
@@ -123,7 +127,7 @@ Then insert the SD card into the RaspberryPi and the SIM card in your USB dongle
 
 After booting the RaspberryPi device, we need to find out it's IP address. There are several ways to do that, but a true hacker would prefer the **nmap** command line tool.
 
-So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you and your Raspberry are connected, in my case it was `192.168.1.0/24`, but your local network settings may be different), and look for a device like this: 
+So lets say `nmap 192.168.1.0/24` in your terminal (use the network where you and your Raspberry are connected, in my case it was `192.168.1.0/24`, but your local network settings may be different), and look for a device like this:
 
     Nmap scan report for 192.168.1.150
     Host is up (0.0091s latency).
@@ -167,7 +171,7 @@ Now you can connect to a device via **SSH**. The username is **root** and the de
     install-dongle      Install GSM/3G calling capability with chan_dongle
     raspbx-backup       Backup your complete system to an image file
 
-<img src="images/005_login.png" alt="Login to the system with SSH" width="300"/>
+![Login to the system with SSH](images/005_login.png)
 
 ### First things to do after login
 
@@ -177,7 +181,7 @@ Then create new SSH host keys in order to have individual keys for your setup: `
 
 Then configure your timezone: `configure-timezone`. Since I live in Slovenia, Europe, I set it to `Europe/Ljubljana`.
 
-<img src="images/002_configure_locales.png" alt="Reconfiguring locales" width="300"/>
+![Reconfiguring locales](images/002_configure_locales.png)
 
 Then you should reconfigure locales: `dpkg-reconfigure locales`. In my case I added support for Slovenian local settings (`sl_SI.UTF-8 UTF-8`), and for default locale I selected `en_GB.UTF-8`.
 
@@ -217,7 +221,7 @@ The basic configuration of the operating system is now over.
 ## PBX installation and configuration
 
 After the reboot, we would need to remove the identity of the old SSH key on our computer (where from we are connecting to RasPBX). Why? Because in the previous SSH session we issued the `regen-hostkeys` command to create new SSH host keys, that's why.
- 
+
 On my Ubuntu system I said: `ssh-keygen -f "/home/matej/.ssh/known_hosts" -R "192.168.1.150"`. Those using Windows systems need to figure this by themselves.
 
 Now we can make a SSH connection to our RasPBX: `ssh root@192.168.1.150`.
@@ -228,11 +232,11 @@ First, we will set up the e-mail system, because our RasPBX sends us and our use
 
 Now we are guided through different settings. On the first configuration page we should select "*mail sent by smarthost; received via SMTP or fetchmail*".
 
-<img src="images/003_mail_server1.png" alt="Configuring mail" width="300"/>
+![Configuring mail](images/003_mail_server1.png)
 
 On the following pages we can just keep the default values by pressing enter. We keep doing so until we reach the page starting with the "*Please enter the IP address or the host name of a mail server...*" Here we need to enter the SMTP hostname of our email provider. Since I also use my own mail server, I have entered the settings of my mail server, but you can also use GMail or some other mail provider (preferably not one from the big evil tech companies).
 
-<img src="images/004_mail_server2.png" alt="Configuring mail" width="300"/>
+![Configuring mail](images/004_mail_server2.png)
 
 Anyway, here is a little trick: you need to enter the FQDN name and port of your mail server delimited by a double colon. For example: `mail.example.com::587` - please note the double colon (`::`) between FQDN and the port. Oh, and for the *non-hackers* not knowing what FQDN stands for - it means *fully qualified domain name*, so it is basically a domain name that specifies the location of your mail server exact location in the tree hierarchy of the Domain Name System.
 
@@ -279,7 +283,7 @@ As I mentioned, we will fence our RasPBX into a VPN network. In that case, the R
 
 However, using a VPN for encryption of VoIP data could be a little problematic. Research has shown that using encrypted VBR (variable bit rate) encoding could pose a security risk. Why? Because when using the SRTP encryption with voice streams compressed using variable bit rate (VBR) codecs, the length of the compressed data packets depend on the characteristics of the speech signal. In other words, different sounds are encoded differently, and these small variations in packet sizes can be observed, and that could be used to reconstruct ("decrypt") encrypted data. This may sound very academic, but [researchers have shown](https://www.cs.jhu.edu/~fabian/papers/oakland08.pdf), that in specific circumstances phrases in a voice call could be recognised despite the encryption. (In short, researchers have shown that the lengths of encrypted VoIP packets can be used to identify the pre-recorded phrases spoken within a call.) So if you plan to do something really stupid (meaning: illegal) with your RasPBX, you should stop thinking about it right now.
 
-However, enclosing the VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal. 
+However, enclosing the VoIP data transfer into encrypted VPN tunnels is not a bad idea and the negative impact of using VBR codecs with VPN encryption should be minimal.
 
 Anyway, let's take a look into how connect RasPBX into the Wireguard network. As I mentioned, I already have my Wireguard server, so I will not cover that part. You can check out how to install Wireguard "server" and "client" on my [Wireguard guide](wireguard.md).
 
@@ -306,10 +310,11 @@ Then we can restart the NTP service: `service ntp restart`. Then we can check if
 ## The security of your system
 
 We have done a lot of things, but before we start installing the telephony part, we must take care of security for our RasPBX system. There are many important things, also in the telephony part, but for now, we will just take care of some basic stuff around SSH security and firewall. Please note that it is important to at least basically understand security considerations and mechanisms, if not, you can easily make a mistake or even lock yourself out of your system.
- 
+
 ### Secure SSH
 
 Regarding SSH security, there are several good practices, but we will implement the following:
+
 - disable empty passwords;
 - disable .rhosts files (verification);
 - specify supported HostKey algorithms, available KEX (Key Exchange) algorithms, allowed ciphers and available MAC (message authentication code) algorithms;
@@ -317,29 +322,41 @@ Regarding SSH security, there are several good practices, but we will implement 
 
 **Disabling empty passwords**: to explicitly disallow remote login from accounts with empty passwords, open the SSHd config file: `nano /etc/ssh/sshd_config` and add/enable the following line:
 
-    PermitEmptyPasswords no
+```ssh-config
+PermitEmptyPasswords no
+```
 
 Disabling .rhosts files: to prevent reading the user’s `~/.rhosts` and `~/.shosts` files, open the SSHd config file: `nano /etc/ssh/sshd_config` and add/enable the following line:
 
-    IgnoreRhosts yes
+```ssh-config
+IgnoreRhosts yes
+```
 
 In the same file **set supported HostKey algorithms by order of preference**:
 
-    HostKey /etc/ssh/ssh_host_ed25519_key
-    HostKey /etc/ssh/ssh_host_rsa_key
-    HostKey /etc/ssh/ssh_host_ecdsa_key
+```ssh-config
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+```
 
 Then **specify the available KEX (Key Exchange) algorithms**:
 
-    KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
- 
+```ssh-config
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+```
+
 Specify the **allowed ciphers**:
 
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
- 
+```ssh-config
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+```
+
 Specify the **available MAC (message authentication code) algorithms**:
 
-    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+```ssh-config
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+```
 
 #### Login with SSH key
 
@@ -370,9 +387,11 @@ After that, try to login to your RasPBX with key only (to see if everything work
 
 And now the final step - disable password authentication **on a RasPBX system** completely, so only users with SSH keys will be able to login to you RasPBX. So, **on your RasPBX** run the command: `nano /etc/ssh/sshd_config`, and change the following values as described:
 
-    ChallengeResponseAuthentication no
-    PasswordAuthentication no
-    UsePAM no
+```ssh-config
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+```
 
 When you are finished, you should test SSH config with a command: `sshd -t`, or even run some more extended test: `sshd -T`.
 
@@ -403,7 +422,7 @@ To do that, we need to create a new user, let's say *matej*. So we say: `adduser
         Other []: 
     Is the information correct? [Y/n] 
 
-Then we add this user to *sudo* group: `usermod -aG sudo matej`. *Sudo* is a program that enables Linux users to run programs with the security privileges of another user, by default the superuser (*root* or *admin*, if you prefer). 
+Then we add this user to *sudo* group: `usermod -aG sudo matej`. *Sudo* is a program that enables Linux users to run programs with the security privileges of another user, by default the superuser (*root* or *admin*, if you prefer).
 
 Now we try to login to the system as *matej*: `su - matej`. Now we can check which is the effective username of the current user by issuing a command `whoami`. We will see that our username is `matej` (which is obvious).
 
@@ -411,21 +430,27 @@ But if we say: `sudo whoami`, we will be asked for our password and we will see 
 
 Now we need to copy our SSH keys to user *matej*. So we first need to became a root with `sudo su` and then open SSH configuration file: `nano /etc/ssh/sshd_config` and change the following values as described:
 
-    ChallengeResponseAuthentication yes
-    PasswordAuthentication yes
-    UsePAM yes
+```ssh-config
+ChallengeResponseAuthentication yes
+PasswordAuthentication yes
+UsePAM yes
+```
 
 Then we restart SSH: `systemctl restart ssh` and from **our computer** copy our public SSH key to user *matej* **on RasPBX** (**not** *root*!): `ssh-copy-id matej@192.168.1.150`.
 
 Check that we are able to SSH, go back to OpenSSH configuration (`nano /etc/ssh/sshd_config`) and change the settings back:
 
-    ChallengeResponseAuthentication no
-    PasswordAuthentication no
-    UsePAM no
+```ssh-config
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+```
 
 Now, before closing the file, we will also disable login for root user. We can do this by changing the `PermitRootLogin` variable to `no`:
 
-    PermitRootLogin no
+```ssh-config
+PermitRootLogin no
+```
 
 Save the file, restart SSH (`systemctl restart ssh`) and you are done.
 
@@ -454,20 +479,20 @@ One simple thing you can do is to wait for half an hour. It is always time for a
 However, if you are in a little bit of hurry, you can *unban* the banned IP. First, you can check `fail2ban` status by typing `fail2ban-client status`:
 
     Status
-    |- Number of jail:	2
-    `- Jail list:	asterisk, sshd
+    |- Number of jail: 2
+    `- Jail list: asterisk, sshd
 
 Here you can see, we have two jails, one is named *asterisk* and the other *sshd*. So let's check *asterisk* jail. `fail2ban-client status asterisk` will show you who is banned:
 
     Status for the jail: asterisk
     |- Filter
-    |  |- Currently failed:	0
-    |  |- Total failed:	3
-    |  `- File list:	/var/log/asterisk/security_log
+    |  |- Currently failed: 0
+    |  |- Total failed: 3
+    |  `- File list: /var/log/asterisk/security_log
     `- Actions
-       |- Currently banned:	1
-       |- Total banned:	1
-       `- Banned IP list:	10.10.6.9
+       |- Currently banned: 1
+       |- Total banned: 1
+       `- Banned IP list: 10.10.6.9
 
 Now you can manually unban this IP address: `fail2ban-client set asterisk unbanip 10.10.6.9`. However, if user on this IP address is naughty (*and not banned yet*), you can also manually ban him with: `fail2ban-client set asterisk banip 10.10.6.9`.
 
@@ -479,12 +504,14 @@ So, let's install `ufw` by typing the command: `apt install ufw`.
 
 Now it is a time to set up some rules. First, we will deny all incoming connections, and allow all outgoing connections:
 
-    ufw default deny incoming
-    ufw default allow outgoing
+```sh
+ufw default deny incoming
+ufw default allow outgoing
+```
 
 Wait, what? How we will be able to call then, if incoming connections are not allowed???
-
 Hold your horses! This is just a general rule, and later we are going to define special rules allowing users to connect to our RasPBX. Actually, let's do this right now. So my rules are the following:
+
 - allow all connections from VPN networking (so VoIP clients will be able to connect to my system only from VPN);
 - from other networks (including my local network) allow only SSH connections to the system (this will allow me to perform basic management of the system from local network, in case VPN goes down);
 - web management is available only from VPN from a specific IP address (so other VPN users will not be able to login to web management interface).
@@ -496,6 +523,7 @@ My local network is in range 192.168.1.0/24, which means I can use IP addresses 
 But I am also using VPN (in range 10.10.6.0/24), and my RasPBX device has VPN IP address 10.10.6.150. In my VPN network there are several other devices, and I want that RasPBX web management will be accessible from 10.10.6.10.
 
 Therefore we will set up the firewall the following way:
+
 - first we will **allow SSH connections from anywhere** (SSH is running on TCP port 22): `ufw allow 22/tcp`;
 - then we will **allow web management from my computer, but only if it is connected to VPN** (my VPN IP si 10.10.6.10): `ufw allow from 10.10.6.10 to any port 80 proto tcp`;
 - then we will **block connections to web interface for all others**: `ufw deny to any port 80 proto tcp`;
@@ -530,17 +558,19 @@ Then you need to enter e-mail address for sending incoming SMS messages (I enter
 
 Anyway, if you forgot password for SMS page, just open a terminal and write: `echo -n "myNEWpassword" | sha1sum`. You will get SHA1 hash of a password (in our case it is: `72358c1e53720d0b9d6bcd377516fdcc96ecb931`). Now open the file for sending SMS through web page: `sudo nano /var/www/html/sms/index.php` and add this hash to a variable `$password`:
 
-    $password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+```php
+$password = '72358c1e53720d0b9d6bcd377516fdcc96ecb931'; 
+```
 
-<img src="images/006_sms1.png" alt="SMS webpage" width="300"/>
+![SMS webpage](images/006_sms1.png)
 
 Regarding this webpage on RasPBX for sending SMS messages. If you are a web designer, it could look really insulting for your eyes. But this is not a problem, because you can change the outlook of SMS sending page. HTML files are located in `/var/www/html/sms` and you can edit them freely. If you managed to put together some likeble webpage, it would be much appreciated if you can share it with me.
 
-<img src="images/007_sms2.png" alt="Old design of a SMS webpage" width="300"/>
+![Old design of a SMS webpage](images/007_sms2.png)
 
 Actually... I already did it. You can download my [SMS sending script](send-sms.php), rename it to `index.php` and copy it into `/var/www/html/sms` directory. But don't judge me for bad programming. And don't run HTML validator on this script.
 
-<img src="images/send_sms.png" alt="This is hopefully much beter design of a SMS webpage" width="300"/>
+![This is hopefully much beter design of a SMS webpage](images/send_sms.png)
 
 Now you can insert your USB dongle into your RaspberryPi. If it was already connected before, unplug it and plug it in again. However, some older modems require a complete reboot of the RaspberryPi, so you can just do that by typing `reboot`.
 
@@ -555,7 +585,7 @@ Now show dongle devices through Asterisk management console: `asterisk -rx 'dong
     ID           Group State      RSSI Mode Submode Provider Name  Model      Firmware          IMEI             IMSI             Number        
     dongle0      0     Free       21   3    3       BOB            E1752      11.126.03.01.314  xxxxxxxxxxxxxxx  2934xxxxxxxxxxx  Unknown       
 
-You can see you have one USB dongle inserted (called *dongle0*), and several interesting info about that dongle, like IMEI, IMSI of your SIM card, etc. *State: Free* means that USB dongle is ready to accept calls. And if you are wondering if *dongle0* means there could also be *dongle1*, etc., the answer is yes, you can connect several dongles to your RaspberryPi (but note that you will need more power supply to power them). 
+You can see you have one USB dongle inserted (called *dongle0*), and several interesting info about that dongle, like IMEI, IMSI of your SIM card, etc. *State: Free* means that USB dongle is ready to accept calls. And if you are wondering if *dongle0* means there could also be *dongle1*, etc., the answer is yes, you can connect several dongles to your RaspberryPi (but note that you will need more power supply to power them).
 
 Let's get some more information about your dongle (*dongle0*). Type `asterisk -rx 'dongle show device state dongle0'` and you will get a lot of interesting information:
 
@@ -603,12 +633,14 @@ Since I like to preserve my privacy, I am not disclosing my IMEI, IMSI, LAC code
 
 Now we can configure our dongle for calls and SMS messages. Open the config file: `nano /etc/asterisk/dongle.conf` and look for `[dongle0]`. You will see *audio* and *data* lines, and after that just add your *exten*, *imei* and *imsi* lines as in the following example:
 
-    [dongle0]
-    audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
-    data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
-    exten=+38641234567;
-    imei=xxxxxxxxxxxxxxx;
-    imsi=2934xxxxxxxxxxx;
+```ini
+[dongle0]
+audio=/dev/ttyUSB1              ; tty port for audio connection;        no default value
+data=/dev/ttyUSB2               ; tty port for AT commands;             no default value
+exten=+38641234567;
+imei=xxxxxxxxxxxxxxx;
+imsi=2934xxxxxxxxxxx;
+```
 
 Save and close the file and login directly to Asterisk management console: `asterisk -rvvv`. Then type `dongle reload now`:
 
@@ -621,7 +653,7 @@ Save and close the file and login directly to Asterisk management console: `aste
 
 ### Freedom is calling and sending SMS messages
 
-As you can see, USB dongle is now ready. So let's check if we can send SMS message. In Asterisk management console type `dongle sms dongle0 +38640XXXXXX Test!`. This will send a SMS message to my personal mobile (*+38640XXXXXX*), with text "*Test!*.
+As you can see, USB dongle is now ready. So let's check if we can send SMS message. In Asterisk management console type `dongle sms dongle0 +38640XXXXXX Test!`. This will send a SMS message to my personal mobile (*+38640XXXXXX*), with text `Test!`.
 
 We can also check outgoing call by typing `channel originate dongle/dongle0/+38640XXXXXX application MusicOnHold`. In Asterisk management console you will see something like:
 
@@ -641,14 +673,16 @@ Unfortunately, **receiving MMS messages does not work** (and sending also not). 
 
 Anyway, e-mail message with received SMS looks really poor, so you can enter `nano /etc/asterisk/extensions_custom.conf` and add something like:
 
-    [from-trunk-dongle]
-    exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
-    exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
-    exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
-    exten => sms,n,System(sendmail -t < /tmp/sms.txt)
-    exten => sms,n,Hangup()
-    exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
-    exten => _.,n,Goto(from-trunk,${EXTEN},1)
+```ini
+[from-trunk-dongle]
+exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
+exten => sms,n,System(echo "To: matej.kovacic@xxxxx.si\nSubject: Incoming SMS from ${CALLERID(num)}\n\nHi,\n\non a nice day of ${STRFTIME(${EPOCH},,%d. %m. %Y at %H:%M:%S)} you have received SMS from number ${CALLERID(num)}.\n\nSMS content:\n " > /tmp/sms.txt)
+exten => sms,n,Set(FILE(/tmp/sms.txt,,,a)=${BASE64_DECODE(${SMS_BASE64})})
+exten => sms,n,System(sendmail -t < /tmp/sms.txt)
+exten => sms,n,Hangup()
+exten => _.,1,Set(CALLERID(name)=${CALLERID(num)})
+exten => _.,n,Goto(from-trunk,${EXTEN},1)
+```
 
 Just be careful to enter your correct e-mail address.
 
@@ -668,11 +702,11 @@ And that is it. You can let the console some rest for now.
 
 Now the fun begins. Open your web browser and type the IP address of your RasPBX. In my case `http://10.10.6.150`.
 
-<img src="images/008_freepbx_login.png" alt="Login to FreePBX" width="300"/>
+![Login to FreePBX](images/008_freepbx_login.png)
 
 When we are trying to login to the FreePBX web interface for the first time, initial setup will be performed. Here we need to set default language. I strongly suggest you to select English, because if you need help on forums and browse the documentation, everything is mostly in English. You will also need to setup your time zone, and of course username and a password. And don't forget notification e-mail. I also strongly suggest you to enable automatic updates.
 
-<img src="images/009_freepbx-dashboard.png" alt="FreePBX dashboard" width="300"/>
+![FreePBX dashboard](images/009_freepbx-dashboard.png)
 
 After successfull login to dashboard we need to apply the config. Now our system is ready for further settings.
 
@@ -681,16 +715,17 @@ After successfull login to dashboard we need to apply the config. Now our system
 As I have explained, trunking is used to connect two systems together. With our trunk, we will connect our RasPBX system with our mobile operator through our USB dongle. From that trunk we will later route outgoing and incoming calls between our system and a public telephone network.
 
 So we first need to setup a new custom trunk for our dongle. In FreePBX web interface go to under `Connectivity` → `Trunks` → `Add Custom Trunk` and set these values:
+
 - `General` - `Trunk Name`: enter the name of your trunk, I used `gsm_dongle0`.
 - `General` - `Outbound CallerID`: enter the telephone number of your SIM card in USB dongle in E.164 format. I entered `+38640XXXXXX` (well, not really with x-es, because I want to keep my phone number for myself, but you got the point).
 - `Dialed Number Manipulation Rules`: here go to the field `match pattern` and enter `XXXXXXXXX`.
 - `Custom Settings` - `Custom Dial String`: `dongle/dongle0/$OUTNUM$`.
 
-<img src="images/010_trunk1.png" alt="Trunk- General trunk settings" width="300"/>
+![Trunk- General trunk settings](images/010_trunk1.png)
 
-<img src="images/011_trunk2.png" alt="Trunk- Dialed Number Manipulation Rules" width="300"/>
+![Trunk- Dialed Number Manipulation Rules](images/011_trunk2.png)
 
-<img src="images/012_trunk3.png" alt="Trunk- Custom Settings" width="300"/>
+![Trunk- Custom Settings](images/012_trunk3.png)
 
 *Submit changes* (button down on the right) and then click to *Apply config* (upper right corner).
 
@@ -698,9 +733,10 @@ Now, before we continue, a little, but useful explanation regarding dialed numbe
 
 Under the trunk options, you can set rules to manipulate the dialed number before sending it out of the trunk. That means that you can add prefixes, etc. to the dialed number, before it is sent to the trunk. For instance, if user calls number *123456*, you can add *041* before that number, so the dialed number would be *041123456*. If no rule applies, the number is not changed. In our case we will not be applying any rules to the dialed numbers. However, we require that dialed numbers are 9 digits long, hence we used the pattern `XXXXXXXXX`.
 
-BTW, if you go to `Dialed Number Manipulation Rules` and to the field `prepend`, you can enter a number that will be added in front of the called number. For instance, if you enter `#31#`, this will hide Caller ID on your trunk (this code is used in Europe for hiding Caller ID). 
+BTW, if you go to `Dialed Number Manipulation Rules` and to the field `prepend`, you can enter a number that will be added in front of the called number. For instance, if you enter `#31#`, this will hide Caller ID on your trunk (this code is used in Europe for hiding Caller ID).
 
 Anyway, what about the X-es? These are patterns used to "interpret" the number:
+
 - **X** matches any digit from 0-9.
 - **Z** matches any digit from 1-9.
 - **N** matches any digit from 2-9.
@@ -718,21 +754,22 @@ Yes, you are correct. You can do that, but on outbound routes settings. And this
 The outbound routes are used to tell your RasPBX system which numbers your phones are permitted to call and which trunk to send the calls to. Here you can set the numbers that can never be dialed, which is an emergency route (we are not going to cover this in this guide), and a route for ordinary calls. There could also be some special routes for international calls, or calls to different networks (for instance some operators are offering unlimited free calls inside their network).
 
 So, we will set up the outgoing connection, that you will be able to call outside. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Now you should configure your outbound route:
+
 - `Route Name`: enter the name of your outbound route, I used `gsm_out`.
 - `Trunk Sequence for Matched Route`: from the drop down menu select `gsm_dongle0` (this is the name of our trunk we defined before).
 - `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
 
 This pattern will restrict user to be able to call only 9-digit numbers starting with 0 and followed with second digit, which could be any digit except 0 or 9. All other seven digits could be anything fro 0 to 9.
 
-What does this rule means? Basically no international calls, and calling only to local networks from 01 to 08. 090 network is not allowed, because 090 numbers in Slovenia are commercial numbers where you can call fortune tellers, hot lines and other stupid things, and these calls could be very expensive. 
+What does this rule means? Basically no international calls, and calling only to local networks from 01 to 08. 090 network is not allowed, because 090 numbers in Slovenia are commercial numbers where you can call fortune tellers, hot lines and other stupid things, and these calls could be very expensive.
 
-<img src="images/013_outbound_routes1.png" alt="Outbound routes - route settings" width="300"/>
+![Outbound routes - route settings](images/013_outbound_routes1.png)
 
-<img src="images/014_outbound_routes2.png" alt="Outbound routes - dial patterns" width="300"/>
+![Outbound routes - dial patterns](images/014_outbound_routes2.png)
 
 Anyway, click *Submit* changes and then *Apply config*.
 
-<img src="images/015_outbound_routes3.png" alt="List of outbound routes" width="300"/>
+![List of outbound routes](images/015_outbound_routes3.png)
 
 #### Setting up dial prefix for outgoing calls
 
@@ -745,50 +782,54 @@ So when some local number (*extension*) would like to call outside number `03198
 Now we can setup our extensions. Extensions are local numbers, connected to our RasPBX system. In FreePBX click `Applications` → `Extensions`. Click on a button `Add Extension` and add new `SIP [chan_pjsip] extension`.
 
 Here you need to configure:
+
 - `User extension`: could be any number, I am using 4-digit local numbers and in my case I entered `1000`.
 - `Display name`: obviously, this is a name of the user or device. I entered `Matej - racunalnik`, which meaning is not so obvious for non-speakers of Slovenian language, but simply means `Matej - computer`. Because, I am using this extension on my computer, right?
 - Secret: this is a password for your extension (or your SIP account, if you prefer this way), and is auto generated, but you can change it whatever you like. For instance, I entered... well, I am not gonna tell you that. Because it is secret, right?
 
-<img src="images/016_extensions1.png" alt="Extensions - general settings" width="300"/>
+![Extensions - general settings](images/016_extensions1.png)
 
 There are some other interesting things you can do. Under `Voicemail` you can enable voicemail. Some useful settings:
+
 - Set `Voicemail Password` (digits only).
 - `Disable (*) in Voicemail Menu`: set it to **no**, so you will be able to use voice menus.
-- `Require From Same Extension`: set it to **yes** (so user will be able to access their voicemail only from their extensions.
+- `Require From Same Extension`: set it to **yes**, so user will be able to access their voicemail only from their extensions.
 - Set your `e-mail address` (`pager address` is for sending just a really short messages or e-mails).
 - `Email Attachment`: set it to **yes**, which means voice messages will be sent to user by his e-mail.
 - `Delete Voicemail`: set it to **yes**, which means voice messages will be deleted from the system after they are sent by e-mail.
 
-<img src="images/017_extension2.png" alt="Voicemail" width="300"/>
+![Voicemail](images/017_extension2.png)
 
 *Submit* changes and then *Apply config*. You can add several additional extensions to connect your friends and family on your RasPBX. However, under current setup all these extensions will be able to use your trunk for outgoing calls. But don't worry, we will take a look how to restrict them from calling outside.
 
-<img src="images/023_extensions_list.png" alt="List of extensions" width="300"/>
+![List of extensions](images/023_extensions_list.png)
 
 ### Set up inbound routes
 
 Finally, we can set up where (to which extensions) incoming calls are directed. In FreePBX click `Connectivity` → `Inbound routes`. Click the button `Inbound Route` and set:
+
 - `Description`: enter the name of your inbound route, I used `gsm_in`.
 - `Set destination` - `Select Extensions` and select your SIP extension. I selected `1000 - "Matej - racunalnik"`.
 
 *Submit* changes and then *Apply config*. That is it! Well, not really. But we can do some testing.
 
-<img src="images/018_inbound_routes1.png" alt="Inbound routes" width="300"/>
+![Inbound routes](images/018_inbound_routes1.png)
 
-<img src="images/019_inbound_routes2.png" alt="List of inbound routes" width="300"/>
+![List of inbound routes](images/019_inbound_routes2.png)
 
 If we now call our RasPBX system (I mean the number on SIM card inserted in USB dongle) from the mobile or ordinary phone, we will get the voice message, that extension number 1000 is not available. This means our system is working, but because we did not configure any SIP client yet, so we are unable accept the call on our computer or smartphone.
 
 ### Additional SIP settings
 
 Now we can configure some additional settings, including some **good security practices**. In FreePBX click `Settings` → `Asterisk SIP settings` and go to `General SIP Settings`. Here you have to set:
+
 - `Allow SIP Guests`: set it to **no**, because this is a good security practice.
 - Then you should enable additional codec `g729`, which we installed in terminal.
 - and you can also enable video support if you like (however, this will be working only for internal calls).
 
 Now you select `SIP Legacy Settings [chan_sip]` (`Settings` → `Asterisk SIP settings` and go to `SIP Legacy Settings [chan_sip]`. Go to `Other SIP Settings` and enter `alwaysauthreject`=`yes` (this is also a good security practice).
 
-<img src="images/020_sip_settings1.png" alt="General SIP settings" width="300"/>
+![General SIP settings](images/020_sip_settings1.png)
 
 *Submit* changes and then *Apply config*.
 
@@ -802,7 +843,7 @@ My solution was to disable UDP and enable TCP. For those who don't know what I a
 
 In FreePBX click `Settings` → `Asterisk SIP settings` and go to `SIP Settings [chan_pjsip]`. Here you can disable UDP and enable TCP.
 
-<img src="images/021_sip_settings2.png" alt="Disabling UDP and enabling TCP" width="300"/>
+![Disabling UDP and enabling TCP](images/021_sip_settings2.png)
 
 *Submit* changes and then *Apply config*.
 
@@ -812,23 +853,23 @@ Now we can setup our SIP clients (sofphones). I am using several operating syste
 
 As mentioned, there are several SIP clients, but basically, you neet to setup user ID or username (this is your extension number, for instance `1000`), domain (this is an IP address of your RasPBX device; it is also nice to add a port number, which is in our case 5060, so you would enter `10.10.6.150:5060`) and a password (which is a secret of your extension). Usually, you will need to select transport, which in our case is `TCP`.
 
-<img src="images/022_zoiper_client.png" alt="Zoiper client on Linux" width="300"/>
+![Zoiper client on Linux](images/022_zoiper_client.png)
 
 When your SIP client is successfully connected (in case you entered wrong password, `fail2ban` will block you for half an hour and you need to unban yourself), you can perform a test call out... and then of course a test call from the outside to your RasPBX. And you can also try internal calls between your extensions.
 
-### Your voicemail configuration 
+### Your voicemail configuration
 
 Now you can configure your voicemail (if you enabled it it FreePBX). From your SIP client call `*97`, type your password and listen to the voice menu. Basically, you can press `0` and the `1` for recording your "*not available message*". When finished, press `#` and then `1` to accept and save the message. You can also record "*busy message*", etc.
 
 Then you can disconnect your SIP client (that it will be unavailable), and try to call its extension. You should be able to hear "*not available message*" and to leave voice message. This message will be recorded and then sent to your e-mail where you can play it. How cool is that, ha?
 
-<img src="images/027_voicemail_admin.png" alt="Customizing voicemail e-mail notifications" width="300"/>
+![Customizing voicemail e-mail notifications](images/027_voicemail_admin.png)
 
 Anyway, you can go to `Settings` → `Voicemail Admin` → `Settings` → `Email Config` and change the content of the notification e-mail sent to user when voicemail is received. You should remove the reference to `http://AMPWEBADDRESS/ucp`, because *User Control Panel* module is not being used any more in FreePBX. And I personally think that it is easier sending voice messages as attachments to users.
 
 ### Voicemail Admin e-mail configuration
 
-The e-mail configuration for Voicemail Admin could be found under `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Here you can edit the `from` field, `subject` and `body` of e-mail notification about new voicemail message. Also you should check the `Server e-mail` field and enter your notification e-mail address (in my case `obvestilo@xxxxx.si`.
+The e-mail configuration for Voicemail Admin could be found under `Settings` → `Voicemail Admin` → `Settings` → `Email Config`. Here you can edit the `from` field, `subject` and `body` of e-mail notification about new voicemail message. Also you should check the `Server e-mail` field and enter your notification e-mail address (in my case `obvestilo@xxxxx.si`).
 
 Just a note - if you have any troubles with e-mail delivery, you should check `exim4` mail server logs on your RasPBX device. Just SSH to your RasPBX and list the content of a logfile with: `cat /var/log/exim4/mainlog`.
 
@@ -839,18 +880,19 @@ Just a note - if you have any troubles with e-mail delivery, you should check `e
 I promised I will show you how you can block a specific extension from calling outside. So let's take a look.
 
 There are several ways how to do this, but we will done this by creating a specific outbound route for this extension only. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Define some things:
+
 - `Route Name`: we will call this route `4000_no_out`, because we will block extension number `4000` from calling outside.
 - `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
 - `Dial Patterns`: here go to the field `CallerID` and enter the extension number you want to block, in our case `4000`.
 - **Do not set** `Trunk Sequence for Matched Routes`.
 
-<img src="images/024_4000_no_out1.png" alt="Blocking outside calls" width="300"/>
+![Blocking outside calls](images/024_4000_no_out1.png)
 
-<img src="images/025_4000_no_out2.png" alt="Blocking outside calls" width="300"/>
+![Blocking outside calls](images/025_4000_no_out2.png)
 
 When you click *Submit* changes, you will be returned to a screen showing all outbound routes. Grab your newly created route from the bottom of the list and *drag it to the top of the list*. Then click *Apply config*.
 
-<img src="images/026_outbound_routes.png" alt="List of outbound routes" width="300"/>
+![List of outbound routes](images/026_outbound_routes.png)
 
 ### Restrict extension to calling a specific number only
 
@@ -859,16 +901,19 @@ So, you want that a specific extension, let's say `3000` will be able to call ou
 Yes, it is, but it this is a tricky one. You need to set up two outbound routes and you have to keep in mind that outbound routes are top-down matching. That means first rule is checked first, then the second, etc.
 
 So we will have the following algorithm:
+
 - First rule: if extension `3000` calls outside number `031987654`, the call is allowed.
 - If extension `3000` calls any other outside number, jump to the second rule.
 - Second rule: if extension `3000` calls any outside number (not any other, but any!), call is not allowed. And this is end of the rules for extension `3000`.
 
 So, we will set up the first outgoing connection, saying, that extension `3000` can call outside number `031987654`. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Now you should configure your outbound route:
+
 - `Route Name`: `3000_to_my_mobile` (meaning this extension can call my personal mobile only).
 - `Trunk Sequence for Matched Route`: from the drop down menu select `gsm_dongle0`.
 - `Dial Patterns`: here go to the field `match pattern` and enter `031987654` (outside number that is allowed to be called).
 
 Now we add another rule. In FreePBX click `Connectivity` → `Outbound routes` and click on a button `Add Outbound Route`. Define some things:
+
 - `Route Name`: `3000_no_out`.
 - `Dial Patterns`: here go to the field `match pattern` and enter `0[12345678]XXXXXXX`.
 - `Dial Patterns`: here go to the field `CallerID` and enter the extension number you want to block, in our case `3000`.
@@ -877,14 +922,15 @@ Now we add another rule. In FreePBX click `Connectivity` → `Outbound routes` a
 Finally arrange your newly created routes in such a a way, that first rule will be `3000_to_my_mobile` and the second `3000_no_out`. Your default route `gsm_out` should be at the bottom of the list. Then click *Apply config*, and that is it.
 
 This all sounds quite straightforward, but the problem is if you have many routes, the whole system becomes very confusing. One of the solutions is to use dial patterns in the Caller ID field. When setting up outbound route go to the `Dial Patterns` in the field `CallerID` and enter the dial pattern of extension number you want to block, for instance `3XXX`. That means that the outbound route will apply to all extensions from `3000` to `3999`. Then you can have the following number assigning scheme:
+
 - 1XXX extensions are assigned to you and your friends,
 - 3XXX extensions are assigned to people who like you (so they can call you), but you don't like them (and are not allowing them to call anyone else),
 - 4XXX extensions are assigned to people you don't like at all, so they cannot call outside your system,
 - you do not assign any numbers to people you really hate.
 
-<img src="images/030_outbound_routes.png" alt="Upgrading FreePBX" width="300"/>
+![Upgrading FreePBX](images/030_outbound_routes.png)
 
-Or you can do something else, but you probably got the idea how to use these dial patterns, right? 
+Or you can do something else, but you probably got the idea how to use these dial patterns, right?
 
 ## Updating the system
 
@@ -892,9 +938,9 @@ Your FreePBX system is configured for automatic updates (but not the RaspPBX ope
 
 In FreePBX click `Admin` → `Module Admin`, click `Check Online` and it will find modules that need to be updated. You should try updating several times, because sometimes updates get stalled.
 
-<img src="images/028_freepbx_upgrade1.png" alt="Upgrading FreePBX" width="300"/>
+![Upgrading FreePBX](images/028_freepbx_upgrade1.png)
 
-<img src="images/029_freepbx_upgrade2.png" alt="Upgrading FreePBX" width="300"/>
+![Upgrading FreePBX](images/029_freepbx_upgrade2.png)
 
 For updating operating system, you should SSH to your Raspberry and enter the command `raspbx-upgrade`.
 
@@ -906,7 +952,7 @@ In FreePBX now click `Admin` and select `Backup & Restore`. Then select `+Add Ba
 
 Click *Submit* in the lower right corner of the page. On the main `Backup & Restore` page you can run backup manually. Of course, you can also schedule automatic backups.
 
-<img src="images/031_backups.png" alt="Backups" width="300"/>
+![Backups](images/031_backups.png)
 
 Backups are located in directory `/var/spool/asterisk/backup`. You can SSH into your RasPBX device and enter the command `ls -lha /var/spool/asterisk/backup` to see all the backups:
 
@@ -928,9 +974,9 @@ I have performed several tests, and system is working quite well. I have also tr
 
 Now that you have your very own PBX, you may start wondering, would it be possible to connect a physical phone to it? The answer is an absolute yes! You can buy a SIP desk phone, connect it to a network and configure it as an extension on your RasPBX system. There are several SIP phones available on the market, but I suggest you [to check the list of supported devices first](https://wiki.freepbx.org/display/FPG/EPM-Supported+Devices).
 
-I decided to buy one of the [Aastra phones](https://wiki.freepbx.org/display/FOP/Aastra), namely [Aastra6730i](https://wiki.freepbx.org/display/FPG/Supported+Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), which is fully supported by FreePBX.
+I decided to buy one of the [Aastra phones](https://wiki.freepbx.org/display/FOP/Aastra), namely [Aastra 6730i](https://wiki.freepbx.org/display/FPG/Supported+Devices-Aastra#SupportedDevices-Aastra-Aastra6730i&6731i), which is fully supported by FreePBX.
 
-I managed to order it from a local shop and was lucky to get a big discount. So one sunny morning a postman rang on my door and couple of minutes later, I had my brand new Aastra6730i unboxed on my table. Yupi!
+I managed to order it from a local shop and was lucky to get a big discount. So one sunny morning a postman rang on my door and couple of minutes later, I had my brand new *Aastra 6730i* unboxed on my table. Yupi!
 
 #### Configuring and connecting VoIP phone to your local network
 
@@ -949,17 +995,20 @@ Then it was the turn for the SIP account settings! In FreePBX I created new `SIP
 Through web interface of the VoIP phone I went to `Advanced Settings` → `Global SIP` and under `Advanced SIP Settings` changed `Transport Protocol` to `TCP` and confirmed that `Local SIP UDP/TCP Port` in `5060`. I also changed `Codec Preference List` (I set `G.729` to the top), and then clicked `Save Settings`.
 
 Then I went to `Advanced Settings` → `Line 1` and set the following:
-- `Screen Name`: `Matej` (that's my name, obviously).
-- `Phone Number`: `7000`.
-- `Caller ID`: `7000`.
-- `Authentication Name`: `7000` (all these three are the extension number).
-- `Password`: I just entered my extension's password.
-- `Proxy Server`: `192.168.1.150`.
-- `Proxy Port`: `5060`.
-- `Outbound Proxy Server`: `192.168.1.150`.
-- `Outbound Proxy Port	`: `5060`.
-- `Registrar Server	`: `192.168.1.150`.
-- `Registrar Port`: `5060`.
+
+| Option | Value |
+| :----- | :---- |
+|`Screen Name`|`Matej` (that's my name, obviously)|
+|`Phone Number`|`7000`|
+|`Caller ID`|`7000`|
+|`Authentication Name`|`7000` (all these three are the extension number)|
+|`Password`|I just entered my extension's password|
+|`Proxy Server`|`192.168.1.150`|
+|`Proxy Port`|`5060`|
+|`Outbound Proxy Server`|`192.168.1.150`|
+|`Outbound Proxy Port`|`5060`|
+|`Registrar Server`|`192.168.1.150`|
+|`Registrar Port`|`5060`|
 
 The other settings were not changed. As you can see, I entered local IP address of my RasPBX `192.168.1.150` and port `5060` under *proxy server*, *outbound proxy server* and *registrar server*.
 
@@ -969,7 +1018,7 @@ After clicking `Save Settings` you need to reboot the phone, and true hackers pr
 
 When you log back into the phone, you can see that under `Status` → `System Information`. `SIP Status` is at the bottom of the page.
 
-<img src="images/032_Aastra_phone.jpeg" alt="Aastra 6730i VoIP phone" width="300"/>
+![Aastra 6730i VoIP phone](images/032_Aastra_phone.webp)
 
 Now you can call out, you can accept calls, etc., and that everything looks just fine, but we need to take care of security first.
 
@@ -998,11 +1047,12 @@ Now, this idea looks fine, but RaspberryPi has only one Ethernet connection. Tha
 
 As we now know the drill, let's go quickly through RaspberryPi installation. I copied RaspberryPi OS to an SD card with *RaspberryPi Imager* and before ejecting the card, I created a file named `ssh` on a `/boot` partition. Why? Because this enables SSH server on a RaspberryPi - and I want to work on these devices remotely, over the network. In Linux you just go to the `/boot` folder of the SD cart and use command `touch ssh`.
 
-<img src="images/036_RPi_imager.png" alt="RaspberryPi Imager" width="300"/>
+![RaspberryPi Imager](images/036_RPi_imager.png)
 
 Then I logged in my freshly installed RaspberryPi with `ssh pi@192.168.1.228`. Default username is `pi` and the default password is `raspberry`.
 
 A quick walk through:
+
 - Change the password with `passwd` command.
 - Update the system (`sudo apt update`, `sudo apt upgrade`) and remove unused packages (`sudo apt autoremove`).
 - Run `sudo raspi-config` and under `System Options` set hostname (I changed it to `vpnbridge`), under `Localisation Options` set your time zone, keyboard and WLAN country. Finally, under `Advanced Options` select `Expand Filesystem`. After that RaspberryPi needs to be rebooted.
@@ -1018,9 +1068,10 @@ static ip_address=192.168.100.1/24
 static routers=192.168.100.254
 static domain_name_servers=8.8.8.8 1.1.1.1
 ```
+
 If you use "old" Debian style network interfaces configuration, everyting would kind of a work, but you will experience some really weird network behaviour.
 
-Anyway, this will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else. 
+Anyway, this will tell the operating system to set static IP address to our `eth1` network interface (USB to RJ45 adapter) and this IP will be `192.168.100.1`. Of course, we should use different network range on `eth1` as it is used on `eth0`, that's why we used this specific network range. But depending on your network settings, you can use something else.
 
 Now we need to install DHCP server:
 `sudo apt install isc-dhcp-server`
@@ -1050,9 +1101,12 @@ All these settings will tell the DHCP server to listen to network interface `eth
 Now we can reboot the device: `sudo reboot`.
 
 After the device boots up again, we can SSH to it. Device now has three network interfaces (actually more, but one is local host and one Wi-Fi interface):
-- `eth0`: where RaspberryPi is connected to the internet.
-- `eth1`: we will connect VoIP phone here.
-- `tun0`: where RaspberryPi is connected to VPN network.
+
+| Interface | Description |
+| --------- | ----------- |
+| `eth0` | where RaspberryPi is connected to the internet (WAN) |
+| `eth1` | we will connect VoIP phone here (LAN) |
+| `wg0` | where RaspberryPi is connected to VPN network |
 
 So let's connect the phone to USB to ethernet adapter.
 
@@ -1102,16 +1156,20 @@ Then we can reload sysctl changes: `sudo sysctl -p` and that is it. We can check
 
 Now we need to tell the operating system exactly which traffic should be forwarded and where exactly. We want that traffic from a VoIP phone will be routed directly to VPN, in other words, we want this: `eth1` → `wg0`. So we tell the machine to do this:
 
-    sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
-    sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```sh
+sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
+sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```
 
 Now our VoIP phone has a direct access to our VPN network! We also want that these rules are persistent (remain active after reboot), so we create a small script: `sudo nano /etc/network/iptablesphone.sh` with these lines in it:
 
-    # eth1 to VPN routing!
-    sudo iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
-    sudo iptables -A FORWARD -i tun0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth1 -o tun0 -j ACCEPT
+```sh
+# eth1 to VPN routing!
+sudo iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE
+sudo iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+```
 
 Then we open the file: `sudo nano /etc/network/interfaces` and add these line to the bottom of it:
 
@@ -1119,7 +1177,7 @@ Then we open the file: `sudo nano /etc/network/interfaces` and add these line to
 
 This will run the firewall script when the network interfaces are set up.
 
-<img src="images/035_VoIP_over_VPN.png" alt="The complete setup of VoIP phone over VPN" width="300"/>
+![The complete setup of VoIP phone over VPN](images/035_VoIP_over_VPN.png)
 
 After reboot, any device connected on USB to Ethernet adapter will be assigned an IP address from a range `192.168.100.50` - `192.168.100.240` and will have a direct access to our VPN network.
 
@@ -1129,31 +1187,35 @@ Now the devices connected to RaspberryPi have the access to the VPN network, but
 
 We will solve this with web proxy. First, we install `nginx` web server: `sudo apt install nginx`. Then open the file `sudo nano /etc/nginx/nginx.conf` and change (or add) the line:
 
-    worker_processes 1;
+```nginx
+worker_processes 1;
+```
 
 Then we edit `sites-enabled` config file: `sudo nano /etc/nginx/sites-enabled/default`. It should contain the following text:
 
-    # Redirection to Aastra phone
-    server {
-	    listen 443 default_server;
-    
-	    root /var/www/html;
-        index index.html index.htm;
-        server_name _;
+```nginx
+# Redirection to Aastra phone
+server {
+    listen 443 default_server;
 
-        ssl on;
-        ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
-        ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
-    
-        location / {
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_redirect off;
-            proxy_pass https://192.168.100.51;
-            proxy_http_version 1.1;
-        }
+    root /var/www/html;
+    index index.html index.htm;
+    server_name _;
+
+    ssl on;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_redirect off;
+        proxy_pass https://192.168.100.51;
+        proxy_http_version 1.1;
     }
+}
+```
 
 What will that do? A couple of very nice things, actually.
 
@@ -1163,9 +1225,11 @@ And probably the most cool thing is, that when you will connect to `https://10.1
 
 Actually, in `/etc/nginx/sites-enabled/default` configuration file you can add these lines before the `location`:
 
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+```nginx
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers 'TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-256-GCM-SHA384:TLS13-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+```
 
 And now, you will be able to establish high quality encryption connection (TLS 1.3 or 1.2) with your RaspberryPi *vpnbridge*, and then Nginx will establish less secure connection with VoIP phone, which is located in separate network.
 
@@ -1176,9 +1240,10 @@ But first we need to test the Nginx configuration: `sudo nginx -t` - hopefully y
 
 And finally, you can restart Nginx server: `sudo service nginx restart`. Now I was able to open my browser and connect to my Aastra VoIP phone through **vpnbridge** device: `https://10.10.6.127/`.
 
-<img src="images/033_Aastra_SIP_config.png" alt="Aastra 6730i SIP settings" width="300"/>
+![Aastra 6730i SIP settings](images/033_Aastra_SIP_config.png)
 
 Finally, we will install firewall (`sudo apt install ufw`) and set it up:
+
 - Set default rule-set (`sudo ufw default deny incoming` and `sudo ufw default allow outgoing`).
 - Allow SSH connections from anywhere: `sudo ufw allow 22/tcp`.
 - Allow web management of VoIP phone from my computer, **but only if it is connected to VPN** (my VPN IP is `10.10.6.10`): `sudo ufw allow from 10.10.6.10 to any port 443 proto tcp`.
@@ -1195,7 +1260,9 @@ First we need to encode default Aastra's phone username and password. We can do 
 
 Now open `sites-enabled` configuration file by typing `sudo nano /etc/nginx/sites-enabled/default`. Go to the `location` section and add this after `proxy_pass` line:
 
-    proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+```nginx
+proxy_set_header Authorization "Basic YWRtaW46MjIyMjI=";
+```
 
 Save the file and restart Nginx: `sudo service nginx restart`. Now you will be able to access the Aastra's phone web management directly, without need to entering username and password.
 
@@ -1211,8 +1278,10 @@ There is also another cool thing. You can add more users (with different passwor
 
 Anyway, we are not done yet. To enable authentication with `.htpasswd` file you need to open `sites-enabled` configuration file again (`sudo nano /etc/nginx/sites-enabled/default`) and add these two lines under `server` section:
 
-    auth_basic "VoIP phone";
-    auth_basic_user_file /etc/nginx/.htpasswd;
+```nginx
+auth_basic "VoIP phone";
+auth_basic_user_file /etc/nginx/.htpasswd;
+```
 
 Restart Nginx with `sudo service nginx restart` and you are done! Now your old tech VoIP phone is behind firewall, supports modern HTTPS protocols and you can change *unchangeable* passwords for accessing management interface too! Isn't that just great?
 
@@ -1222,7 +1291,7 @@ Anyway, if you are using VoIP phone over VPN network, you may experience larger 
 
 ##### Make your old VoIP phone wireless
 
-Now, what if we want to make our old VoIP phone "wireless", i. e. that it will connect to network through WiFi and not through wired connection? 
+Now, what if we want to make our old VoIP phone "wireless", i. e. that it will connect to network through WiFi and not through wired connection?
 
 Usually, we would not want that, because WiFi networks are not reliable as wired ones. But in case you don't have the option to install the Ethernet cable, you can connect RaspberryPi to WiFi instead. However, to do this, we must first scan available WiFi networks.
 
@@ -1241,7 +1310,8 @@ Now we can open `wpa_supplicant.conf` file: `sudo nano /etc/wpa_supplicant/wpa_s
     }
 
 Save the file and after a minute or so, RaspberryPi will automatically connect to `MyHome` WiFi network. You can check this with `iwconfig wlan0` or `iwgetid` commands. If device will not connect to the WiFi network automatically, you will have to reboot it.
- 
+
+```
 ifconfig wlan0
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.200.221  netmask 255.255.255.0  broadcast 192.168.200.255
@@ -1251,6 +1321,7 @@ wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         RX errors 0  dropped 0  overruns 0  frame 0
         TX packets 39  bytes 5962 (5.8 KiB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
 
 And the best thing here is, that VPN will also be established automatically, so you do not need to change any configuration.
 
@@ -1268,7 +1339,7 @@ I am now living in a different country and I am using RasPBX sucessfully for a c
 
 I hope you find this article interesting, and if you have a spare RaspberryPi laying around, you can try to set up RasPBX.
 
-<img src="images/037_everything_together.jpg" alt="All devices on my desk" width="300"/>
+![All devices on my desk](images/037_everything_together.webp)
 
 However, there are some things you, yes - **you** - can do.
 
@@ -1281,6 +1352,7 @@ You can suggest me which SIP clients are nice looking and easy to use (and witho
 There are probably many things that could be done with RasPBX, and I would like to hear your ideas, thoughts, experience and questions. I suggest you open Github issue and share that with me. Also, you can point me on my errors or if I wrote something stupid (which I probably did).
 
 And finally, you can check out some of my lectures and projects, for instance:
+
 - [Video demonstration of CallerID spoofing and live interception of VoIP communications](http://videolectures.net/single_kovacic_varnost_voip/).
 - [GSM hacking and GSM security](http://videolectures.net/single_kovacic_phonebusters/) ([PDF slides](https://telefoncek.si/static/2014/01/The_Phonebusters_2014.pdf)).
 - [All about VPN's](http://videolectures.net/water4cities_kovacic_virtual_private_networks/) ([PDF slides](https://telefoncek.si/predavanja/VPN_2021.pdf)).
