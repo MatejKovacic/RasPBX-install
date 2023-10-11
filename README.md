@@ -21,5 +21,6 @@ How to do that? Well, check the following guides:
 - [How to install Wireguard for RasPBX network](wireguard.md)
 - [Sending AT commands to modem and using 2G network only](modem-at-commands.md)
 - [VPN Bridge on *OpenWRT*](vpnbridge-on-openwrt.md)
+- [VPN Bridge with pocket router](vpnbridge-on-pocket-router.md)
 
 I am preparing additional guides, so stay tuned!
