@@ -30,7 +30,7 @@ Luckily, I was able to solve the problem. In the web management of the VoIP phon
 
 Just a funny note, this setting has been originally set to `60` (seconds), which is exactly that one minute when my extension went from `ONLINE` to `OFFLINE`. Also, if you are experiencing that your calls are cutting out, or the phone loses registration, setting the `Registration Period` to lower number is also the right solution.
 
-![The final setup](images/Shadow_Aastra.png)
+![The final setup](images/Shadow_Aastra.jpg)
 
 Since the *Shadow* router is really small, the final setup is highly portable. You can also run *Shadow* router on a power bank (I tested 50.000 mAh and it is running around three days), however you will need electricity for powering VoIP phone.
 
