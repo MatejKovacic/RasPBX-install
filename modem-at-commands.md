@@ -45,10 +45,30 @@ sudo su
 asterisk -rvvv
 dongle cmd dongle0 AT^SYSCFG=13,1,3FFFFFFF,2,4
 ```
-
 But because you want this to be set automatically when the system boots up, just add this line into your root crontab (`sudo crontab -e`):
 ```
 @reboot /usr/sbin/asterisk -rx 'dongle cmd dongle0 AT^SYSCFG=13,1,3FFFFFFF,2,4'
 ```
 
 After reboot, your USB GSM modem will be automatically instructed to use 2G network only.
+
+# Some other dongle commands
+
+There are [several useful commands you can send to your dongle](http://asterisk-service.com/en_US/page/chan-dongle-use) through terminal.
+
+For instance, you can see the dongle status:
+```
+sudo su
+/usr/sbin/asterisk -rx 'dongle show device state dongle0'
+```
+Or dongle statistics:
+```
+sudo su
+/usr/sbin/asterisk -rx 'dongle show device statistics dongle0
+```
+
+If you want to stop GSM dongle completely from the terminal, you can enter this command:
+```
+sudo su
+/usr/sbin/asterisk -rx 'dongle stop gracefully dongle0'
+```
