@@ -19,8 +19,9 @@ How to do that? Well, check the following guides:
 - [RasPBX guide - English version](english.md)
 - [RasPBX guide - Slovenian version (slovenska različica)](slovenian.md)
 - [How to install Wireguard for RasPBX network](wireguard.md)
-- [Sending AT commands to modem and using 2G network only](modem-at-commands.md)
+- [Sending AT commands to modem and using 2G network only and some useful dongle commands](modem-at-commands.md)
 - [VPN Bridge on *OpenWRT*](vpnbridge-on-openwrt.md)
 - [VPN Bridge with pocket router](vpnbridge-on-pocket-router.md)
+- [Using Gmail with Exim4](https://wiki.debian.org/Exim4Gmail)
 
 I am preparing additional guides, so stay tuned!
