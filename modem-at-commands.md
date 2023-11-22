@@ -72,3 +72,19 @@ If you want to stop GSM dongle completely from the terminal, you can enter this 
 sudo su
 /usr/sbin/asterisk -rx 'dongle stop gracefully dongle0'
 ```
+
+Another way to stop GSM dongle (quickly):
+```
+sudo su
+/usr/sbin/asterisk -rx 'dongle stop now dongle0'
+```
+
+You can start dongle with command:
+```
+sudo su/usr/sbin/asterisk -rx 'dongle start dongle0'
+```
+
+And then you can check it's status:
+```
+sudo su/usr/sbin/asterisk -rx 'dongle show device state dongle0'
+```
