@@ -81,10 +81,12 @@ sudo su
 
 You can start dongle with command:
 ```
-sudo su/usr/sbin/asterisk -rx 'dongle start dongle0'
+sudo su
+/usr/sbin/asterisk -rx 'dongle start dongle0'
 ```
 
 And then you can check it's status:
 ```
-sudo su/usr/sbin/asterisk -rx 'dongle show device state dongle0'
+sudo su
+/usr/sbin/asterisk -rx 'dongle show device state dongle0'
 ```
