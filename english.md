@@ -101,7 +101,7 @@ As we already mentioned, you will need:
 - A RaspberryPi 3 or RaspberryPi 4 (I have tested both, however, the RPi4 is much more powerful and can handle up to 200 concurrent phone calls (really, [I am not joking](https://www.youtube.com/watch?v=dVGf3HrKZl4)). I suggest you buy a RPi4 with 4 or 8 GB RAM);
 - a power supply for the RaspberryPi (3A 5V or more), a case for RaspberryPi and a SD card (8 GB is minimum, but I suggest buying 32 GB and a little bit higher quality);
 - a compatible USB dongle (I am using the Huawei E1752C);
-- RasPBX, which you can freely [download from the official project's website](http://www.raspberry-asterisk.org/downloads/) (I am using version 10-10-2020);
+- RasPBX, which you can freely [download from the official project's website](http://www.raspbx.org/downloads/) (I am using version 10-10-2020);
 - internet connection.
 
 Additionally I am also using my own VPN network, and I will show you how to fence your PBX inside the VPN network. I am using Wireguard, with several security enhancements, hardened cryptography settings, etc. But I am not going to talk about how to set up your own VPN network, I will just assume you already have one. However, you can check my [guide how to set up Wireguard server](wireguard.md).
