@@ -1,6 +1,6 @@
 <?php
 /*********************************************************************
- *  Chan_Dongle SMS Script v.0.04
+ *  Chan_Dongle SMS Script v.0.05
  *  for The Raspberry Asterisk
  *
  *   Author: Troy Nahrwold
@@ -20,7 +20,7 @@
  *   (c) Copyright 2011, Troy A Nahrwold, Eternal Works, LLC.  
  *       All Rights Reserved.
  *
- *  Script design updated to be mobile friendly by:
+ *  Script design updated to be mobile friendly and responsive by:
  *   Matej Kovacic, https://telefoncek.si in 2025.
  *********************************************************************/
 
@@ -34,7 +34,7 @@ $password = '579b6757c7b4d23d354a11bb61d6339aaa87bdf2';
 *  If you forgot password, just open a terminal and write:
 *  echo -n "myNEWpassword" | sha1sum
 *  You will get SHA1 hash of a password.
- *********************************************************************/
+*********************************************************************/
 
 session_start();
 if (!isset($_SESSION['loggedIn'])) {
@@ -143,7 +143,7 @@ if(isset($_REQUEST['phonenumbers']) && !empty($_REQUEST['phonenumbers']) && !emp
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SMS Gateway</title>
+  <title>Send SMS</title>
   <style>
     body {
       font-family: sans-serif;
@@ -188,6 +188,7 @@ if(isset($_REQUEST['phonenumbers']) && !empty($_REQUEST['phonenumbers']) && !emp
       font-size: 1.1em;
       min-height: 120px;
       box-sizing: border-box;
+      resize: none;
     }
     .note {
       font-size: 0.9em;
@@ -206,6 +207,19 @@ if(isset($_REQUEST['phonenumbers']) && !empty($_REQUEST['phonenumbers']) && !emp
       margin: 10px 0;
       cursor: pointer;
     }
+    .char-counter {
+      text-align: right;
+      font-size: 0.9em;
+      color: #666;
+      margin: 5px 0 15px;
+    }
+    .char-counter.warning {
+      color: #e67e22;
+    }
+    .char-counter.error {
+      color: #e74c3c;
+      font-weight: bold;
+    }
     @media (max-width: 480px) {
       body { padding: 15px; font-size: 20px; }
       .container { padding: 20px; }
@@ -213,6 +227,32 @@ if(isset($_REQUEST['phonenumbers']) && !empty($_REQUEST['phonenumbers']) && !emp
       button { padding: 22px; }
     }
   </style>
+  <script>
+    function updateCharCounter() {
+      const messageField = document.getElementById('message');
+      const counter = document.getElementById('charCounter');
+      const remaining = 160 - messageField.value.length;
+      
+      counter.textContent = `${remaining} characters remaining`;
+      
+      counter.className = 'char-counter';
+      if (remaining < 20) {
+        counter.classList.add('warning');
+      }
+      if (remaining < 0) {
+        counter.classList.add('error');
+        counter.textContent = `${Math.abs(remaining)} characters over limit!`;
+      }
+    }
+    
+    function limitMessageLength() {
+      const messageField = document.getElementById('message');
+      if (messageField.value.length > 160) {
+        messageField.value = messageField.value.substring(0, 160);
+        updateCharCounter();
+      }
+    }
+  </script>
 </head>
 <body>
   <div class="container">
@@ -224,21 +264,33 @@ if(isset($_REQUEST['phonenumbers']) && !empty($_REQUEST['phonenumbers']) && !emp
       </div>
     <?php endif; ?>
     
-    <form action="index.php" method="post">
-      <label for="phonenumbers">Phone Numbers:</label>
-      <p class="note">(Format: NXXNXXXXXX (example: +38646123456). Separate with commas or newlines.)</p>
+    <form action="index.php" method="post" onsubmit="limitMessageLength();">
+      <label for="phonenumbers">Phone Number(s):</label>
+      <p class="note">(Format: NXXNXXXXXX (example: +38646123456). Separate with commas or newlines.)
+</p>
       <textarea id="phonenumbers" name="phonenumbers" required></textarea>
       
       <label for="message">Message:</label>
       <p class="note">(Max 160 characters, will be truncated.)</p>
-      <textarea id="message" name="message" maxlength="160" required></textarea>
+      <textarea id="message" name="message" 
+                maxlength="160" 
+                oninput="updateCharCounter()"
+                onkeydown="updateCharCounter()"
+                onkeyup="updateCharCounter()"
+                onpaste="setTimeout(updateCharCounter, 10)"
+                required></textarea>
+      <div id="charCounter" class="char-counter">160 characters remaining</div>
       
       <button type="submit">Send SMS</button>
     </form>
     
     <form action="index.php" method="get">
-      <button type="submit">Clear form</button>
+      <button type="submit">Clear</button>
     </form>
   </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', updateCharCounter);
+  </script>
 </body>
 </html>
