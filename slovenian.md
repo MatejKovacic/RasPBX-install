@@ -700,6 +700,10 @@ exten => _.,n,Goto(from-trunk,${EXTEN},1)
 
 Pazite le, da vnesete pravilen e-poštni naslov.
 
+#### Pomembna posodobitev!
+
+Za pošiljanje in sprejemanje SMS sporočil ter sprejemanje MMS sporočil lahko uporabite skripte na [SMS and MMS podstrani](https://github.com/MatejKovacic/RasPBX-install/blob/main/SMS_and_MMS/README.md)!
+
 ### Namestitev spletnega vmesnika za USSD
 
 *Unstructured Supplementary Service Data* (USSD), včasih imenovani tudi *quick codes* ali *feature codes*, je komunikacijski protokol, ki ga mobilni telefoni GSM uporabljajo za komunikacijo z računalniki operaterja mobilnega omrežja. USSD se lahko uporablja za brskanje po WAP, predplačniško storitev povratnega klica, storitve mobilnega plačevanja, različne lokacijske storitve ali kot del konfiguracije telefona v omrežju. Sporočila USSD so dolga do 182 alfanumeričnih znakov, vendar za razliko od sporočil SMS sporočila USSD med samo sejo ustvarijo povezavo v realnem času. Povezava ostane odprta, kar omogoča dvosmerno izmenjavo podatkov.
