@@ -345,7 +345,7 @@ Finally we just need to reload the dialplan and then you can test receiving SMS 
 /usr/sbin/asterisk -rx 'dialplan reload'
 ```
 
-## SMS sender script
+## SMS sender and SMS viewer script
 
 SMS sender script is based on Chan_Dongle SMS Script by Troy Nahrwold, which was developed many years ago. This updated script is:
 - mobile friendly
@@ -394,3 +394,14 @@ $USERS = [
 
 In [index.php](index.php) select the correct regex for phone number validation (currently it is enabled Slovenian phone numbers validation).
 
+### Login window
+
+<img width="446" height="336" alt="image" src="https://github.com/user-attachments/assets/727a5f97-1295-4357-b415-218b9d5939c2" />
+
+### SMS sender
+
+<img width="873" height="626" alt="image" src="https://github.com/user-attachments/assets/c163e89a-69ee-45f4-a105-4d8e22593323" />
+
+### SMS viewer
+
+<img width="1245" height="409" alt="image" src="https://github.com/user-attachments/assets/05020a7a-b34b-450b-bc1e-51e27aff586e" />
