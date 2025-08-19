@@ -686,6 +686,10 @@ exten => _.,n,Goto(from-trunk,${EXTEN},1)
 
 Just be careful to enter your correct e-mail address.
 
+#### Important update!
+
+I prepared new scripts for sending and receiving SMS messages and for receiving MMS messages. You can check them on [SMS and MMS subpage](https://github.com/MatejKovacic/RasPBX-install/blob/main/SMS_and_MMS/README.md)!
+
 ### Install USSD webpage
 
 *Unstructured Supplementary Service Data* (USSD), sometimes also called *quick codes* or *feature codes*, is a communications protocol used by GSM cellular telephones to communicate with the mobile network operator's computers. USSD can be used for WAP browsing, prepaid callback service, mobile-money services, location-based content services, menu-based information services or as part of configuring the phone on the network. USSD messages are up to 182 alphanumeric characters long, but unlike SMS messages, USSD messages create a real-time connection during a USSD session. The connection remains open, allowing a two-way exchange of a sequence of data.
