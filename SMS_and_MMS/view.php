@@ -1,66 +1,13 @@
 <?php
+
+require_once __DIR__ . '/auth.php';
+check_login();
+
 session_start();
 
 // ================== Configuration ==================
 $MESSAGE_DIR   = '/var/opt/raspbx/sent_messages';
-$CONTACTS_FILE = '/var/opt/raspbx/my_contacts.txt';
-
-// bcrypt-hashed password (generate with command:
-// php -r "echo password_hash('ChangeYourPassword', PASSWORD_DEFAULT) . PHP_EOL;"
-$HASHED_PASS = '$2y$10$ZmvNl.Lij63pCYBGsrrC8.IeV8ftipv5VZLu6b4e4xw6CaLet8LNG';
-
-// ================== Handle Login ==================
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: ".$_SERVER['PHP_SELF']);
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
-    if (password_verify($_POST['password'], $HASHED_PASS)) {
-        $_SESSION['auth'] = true;
-        header("Location: ".$_SERVER['PHP_SELF']);
-        exit;
-    } else {
-        $_SESSION['auth'] = false;
-        $error = "Invalid password.";
-    }
-}
-
-if (empty($_SESSION['auth'])): ?>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login to SMS Viewer</title>
-<style>
-body { font-family: sans-serif; background-color: #f0d5b8; margin: 0; padding: 20px; }
-.container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 10px; }
-input, button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; font-size: 1.1em; box-sizing: border-box; }
-button { background: #2b2a28; color: white; border: none; cursor:pointer; }
-.modal { display: <?= isset($error) ? 'block' : 'none' ?>; position: fixed; inset: 0; background: rgba(0,0,0,0.5); }
-.modal-content { background: white; padding: 20px; border-radius: 8px; margin: 100px auto; max-width: 300px; text-align: center; }
-</style>
-</head>
-<body>
-<div class="container">
-  <h2>Login to SMS Viewer</h2>
-  <form method="post">
-    <label>Password:</label>
-    <input type="password" name="password" required>
-    <button type="submit">Login</button>
-  </form>
-</div>
-<div class="modal">
-  <div class="modal-content">
-    <p><?= isset($error)? htmlspecialchars($error):'' ?></p>
-    <button onclick="this.closest('.modal').style.display='none'">OK</button>
-  </div>
-</div>
-</body>
-</html>
-<?php exit; endif;
+$CONTACTS_FILE = '/var/opt/my_contacts.txt';
 
 // ================== Load contacts ==================
 $contacts = [];
