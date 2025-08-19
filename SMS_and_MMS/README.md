@@ -344,3 +344,53 @@ Finally we just need to reload the dialplan and then you can test receiving SMS 
 ```
 /usr/sbin/asterisk -rx 'dialplan reload'
 ```
+
+## SMS sender script
+
+SMS sender script is based on Chan_Dongle SMS Script by Troy Nahrwold, which was developed many years ago. This updated script is:
+- mobile friendly
+- has switchable regex for local or E.164 phone number formats
+- does real-time JS sanitizing and server side phone number validation (currently you can allow only Slovenian numbers or international numbers in E.164 format)
+- does show how many characters is left for SMS message (160 max.)
+- transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
+- logs sent messages to `/var/opt/raspbx/sent_messages/`
+
+SMS viewer script:
+- shows you all sent messages (stored in `/var/opt/raspbx/sent_messages/`)
+- uses `my_contacts.txt` file to show the name of the contact
+
+Both scripts are using common authentication system - you can have multiple users and passwords are stored in bcrypt format.
+
+When you send the SMS message, SMS sender script shows the Asterisk answer, which is basically the SMS queue ID. For now, it does not show if SMS was sent successfully, but you can manually check Asterisk log:
+```
+cat /var/log/asterisk/full | grep <queue_ID>
+```
+
+If there was an error seding SMSm you will see something like:
+```
+cat /var/log/asterisk/full | grep 0xb4005c60
+
+[2025-08-11 21:18:00] VERBOSE[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
+[2025-08-11 09:18:00] ERROR[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
+```
+If SMS was sent successfully, you will see:
+```
+cat /var/log/asterisk/full | grep 0xb3e61a00
+
+[2025-08-11 21:22:07] VERBOSE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
+[2025-08-11 21:22:07] NOTICE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
+```
+
+**How to install it?** Just put [index.php](index.php), [auth.php](auth.php) and [view.php](view.php) in a folder `/var/www/html/sms`.
+
+In [auth.php](auth.php) look for users and change default password:
+```
+$USERS = [
+    "admin" => '$2y$10$D0FeVomZHGimeJ6cNaQLA.jOT1bfCQB6L.KRXLPNhY3B/rSQmKC.a', 
+    // hash for "ChangeYourPassword"
+    // IMPORTANT: you can change default (or forgotten) password by typing this command to terminal:
+    // php -r "echo password_hash('ChangeYourPassword', PASSWORD_DEFAULT) . PHP_EOL;"
+```
+
+In [index.php](index.php) select the correct regex for phone number validation (currently it is enabled Slovenian phone numbers validation).
+
