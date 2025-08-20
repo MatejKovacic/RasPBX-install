@@ -344,6 +344,13 @@ Finally we just need to reload the dialplan and then you can test receiving SMS 
 ```
 /usr/sbin/asterisk -rx 'dialplan reload'
 ```
+### Received SMS message
+
+<img width="759" height="330" alt="SMS" src="https://github.com/user-attachments/assets/11efbf82-d012-4617-a44b-982c9643fd1c" />
+
+### Received MMS message
+
+<img width="759" height="330" alt="MMS" src="https://github.com/user-attachments/assets/60926c42-fc36-4786-9364-413b71087cbf" />
 
 ## SMS sender and SMS viewer script
 
@@ -405,3 +412,10 @@ In [index.php](index.php) select the correct regex for phone number validation (
 ### SMS viewer
 
 <img width="1245" height="409" alt="image" src="https://github.com/user-attachments/assets/05020a7a-b34b-450b-bc1e-51e27aff586e" />
+
+## To do
+- CSRF protection and security headers
+- phone number as input URL parameter for SMS sender
+- show received messages in SMS viewer
+- strip "Message: " part in SMS viewer
+- add log parsing to check if SMS was sent successfully
