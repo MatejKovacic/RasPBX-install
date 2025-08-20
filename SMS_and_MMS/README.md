@@ -157,7 +157,7 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
   /bin/echo "You have received SMS from number ${FROM} (${CONTACT_NAME})."
   /bin/echo "Date and time of received SMS: ${TIMESTAMP}."
   /bin/echo
-  /bin/echo "You can reply to this SMS via SMS reply page."
+  /bin/echo "You can reply to this SMS via: http://reply_page/sms?number=${FROM}"
   /bin/echo
   /bin/echo "SMS content:"
   /bin/echo
@@ -173,6 +173,7 @@ exit 0
   /bin/echo "From: obvestilo@myserver.si"
   /bin/echo "To: me@myserver.si"
 ```
+Also change URL to **your** SMS sender script.
 
 Now make both scripts executable (and owned by Asterisk) and you are good to go:
 ```
@@ -229,9 +230,12 @@ NOTIFICATION
 You have received MMS from number +$SENDER ($CONTACT_NAME).
 Date and time of receiving: $(date "+%d. %m. %Y ob %H:%M:%S").
 MMS content can not be downloaded, URL to download MMS multimedia is: $MMS_URL
+You can send SMS to the sender via: http://reply_page/sms?number=$SENDER
 
 EOF
 ```
+
+Change URL to **your** SMS sender script.
 
 Make the script executable (and owned by Asterisk), and you are good to go:
 ```
@@ -415,7 +419,6 @@ In [index.php](index.php) select the correct regex for phone number validation (
 
 ## To do
 - CSRF protection and security headers
-- phone number as input URL parameter for SMS sender
 - show received messages in SMS viewer
 - strip "Message: " part in SMS viewer
 - add log parsing to check if SMS was sent successfully
