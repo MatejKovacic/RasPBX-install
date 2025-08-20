@@ -18,7 +18,7 @@
  *  - Transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
  *    (for this transliterator_transliterate PHP function is used. You can check if it is installed
  *    with command "php -m | grep intl" - if you see "intl", then function is installed)
- *  - Logs sent messages to /var/opt/raspbx/sent_messages/
+ *  - Logs sent messages to /var/opt/sent_messages/
  *
  *  You can view the status of the queued SMS message by issuing a command:
  *  cat /var/log/asterisk/full | grep <queue_ID>
@@ -62,6 +62,24 @@ $phoneRegex = '/^\+386(30|40|68|69|31|41|51|65|70|71|64|65)[0-9]{6}$/';
 // Allow international in E.164 format:
 //$phoneRegex = '/^\+[1-9][0-9]{7,14}$/';
 
+// Prefill phone number from query string (?number=+38641234567 or ?number=%2B38641234567)
+$prefillNumber = '';
+if (isset($_GET['number'])) {
+    $candidate = $_GET['number'];
+
+    // If "+" was converted to a space, restore it
+    if (strpos($candidate, ' ') === 0) {
+        $candidate = '+' . ltrim($candidate);
+    }
+
+    // Remove accidental whitespace
+    $candidate = trim($candidate);
+
+    if (preg_match($phoneRegex, $candidate)) {
+        $prefillNumber = htmlspecialchars($candidate, ENT_QUOTES, 'UTF-8');
+    }
+}
+
 // Remove the delimiters:
 $patternOnly = trim($phoneRegex, '/');
 $jsPhoneRegex = addslashes($patternOnly);
@@ -104,7 +122,7 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'sendSMS') {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
     $date = date('Ymd_His');
     $rand = substr(md5(uniqid('', true)), 0, 3);
-    $logFile = "/var/opt/raspbx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
+    $logFile = "/var/opt/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
     $logData = "Date/Time: " . date('Y-m-d H:i:s') . "\n"
              . "Sender IP: $ip\n"
              . "Phone Number: $phone\n"
@@ -211,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>
   body {
     margin: 0;
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
     background: #f0d5b8; /* restored your background */
   }
 
@@ -320,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <form id="smsForm" onsubmit="sendSMS(event)">
       <label>Phone Number:</label>
       <p class="note">Format: international E.164 (e.g. +38640123456)</p>
-      <input type="text" id="phonenumbers" name="phonenumbers" required>
+      <input type="text" id="phonenumbers" name="phonenumbers" value="<?= $prefillNumber ?>" required>
 
       <label>Message:</label>
       <p class="note">(Max 160 characters)</p>
@@ -341,4 +359,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 </body>
 </html>
-
