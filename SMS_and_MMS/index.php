@@ -124,7 +124,7 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'sendSMS') {
 <title>Send SMS</title>
 <style>
 body { font-family: sans-serif; background-color: #f0d5b8; margin: 0; padding: 20px; }
-.container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 10px; }
+.container { max-width: 600px; margin: auto; background: white; border-radius: 10px; }
 textarea, input, button { width: 100%; box-sizing: border-box; }
 input[type=text] { padding: 12px; font-size: 1.1em; border: 2px solid #ddd; border-radius: 8px; }
 textarea { padding: 12px; font-size: 1.1em; border: 2px solid #ddd; border-radius: 8px; resize: none; height: 100px; }
