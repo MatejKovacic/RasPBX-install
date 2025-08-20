@@ -407,7 +407,7 @@ In [index.php](index.php) select the correct regex for phone number validation (
 
 ### SMS sender
 
-<img width="873" height="626" alt="image" src="https://github.com/user-attachments/assets/c163e89a-69ee-45f4-a105-4d8e22593323" />
+<img width="1076" height="752" alt="image" src="https://github.com/user-attachments/assets/4fdcbc96-b9c5-4bfa-a06b-0fc4d596ff23" />
 
 ### SMS viewer
 
