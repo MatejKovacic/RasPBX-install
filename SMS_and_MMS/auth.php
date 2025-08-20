@@ -16,6 +16,10 @@ $USERS = [
 // Helper: check login state
 function check_login() {
     if (empty($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+        // Preserve ?number=... if present
+        if (isset($_GET['number'])) {
+            $_SESSION['prefill_number'] = $_GET['number'];
+        }
         show_login_form();
         exit;
     }
@@ -158,11 +162,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['p
     if (isset($USERS[$user]) && password_verify($pass, $USERS[$user])) {
         $_SESSION['loggedin'] = true;
         $_SESSION['username'] = $user;
-        header("Location: " . $_SERVER['PHP_SELF']);
+
+        // Restore ?number=... if we stashed it
+        $redirectUrl = $_SERVER['PHP_SELF'];
+        if (isset($_SESSION['prefill_number'])) {
+            $redirectUrl .= "?number=" . urlencode($_SESSION['prefill_number']);
+            unset($_SESSION['prefill_number']); // clean up
+        }
+
+        header("Location: " . $redirectUrl);
         exit;
     } else {
         show_login_form("Wrong username or password.");
         exit;
     }
 }
+
 
