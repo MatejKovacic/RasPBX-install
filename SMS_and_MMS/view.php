@@ -1,12 +1,9 @@
 <?php
-
 require_once __DIR__ . '/auth.php';
 check_login();
 
-session_start();
-
 // ================== Configuration ==================
-$MESSAGE_DIR   = '/var/opt/raspbx/sent_messages';
+$MESSAGE_DIR   = '/var/opt/sent_messages';
 $CONTACTS_FILE = '/var/opt/my_contacts.txt';
 
 // ================== Load contacts ==================
@@ -26,24 +23,45 @@ $messages = [];
 if (is_dir($MESSAGE_DIR)) {
     foreach (scandir($MESSAGE_DIR) as $file) {
         if (preg_match('/^SMS_(\+?\d+)_([0-9]{8})_([0-9]{6})_/', $file, $m)) {
-            $filepath = $MESSAGE_DIR.'/'.$file;
+            $filepath = $MESSAGE_DIR . '/' . $file;
+            if (!is_readable($filepath)) continue;
+
             $content  = file_get_contents($filepath);
             $lines    = explode("\n", $content);
-            $dt = ''; $ip = ''; $queue_id = ''; $msg_text = '';
-            $phone = preg_replace('/[^0-9+]/','',$m[1]);
 
+            $dt = ''; $ip = ''; $queue_id = ''; $msg_text = '';
+            $phone = preg_replace('/[^0-9+]/', '', $m[1]);
+
+            // Extract datetime, IP, queue id
             foreach ($lines as $line) {
-                if (!$dt && preg_match('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $line, $d)) $dt = $d[0];
+                if (!$dt && preg_match('/\b\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\b/', $line, $d)) $dt = $d[0];
                 if (!$ip && preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/', $line, $i)) $ip = $i[0];
-                if (!$queue_id && preg_match('/id\s+(0x[0-9a-fA-F]+)/', $line, $q)) $queue_id = $q[1];
+                if (!$queue_id && preg_match('/\bid\s+(0x[0-9a-fA-F]+)\b/', $line, $q)) $queue_id = $q[1];
             }
-            foreach ($lines as $line) {
-                if (!preg_match('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $line) &&
-                    !preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/', $line) &&
-                    stripos($line, 'queued for send') === false) {
-                    if (strlen($line) > strlen($msg_text)) $msg_text = trim($line);
+
+            // Preferred: take the "Message: ..." line exactly
+            if (preg_match('/^Message:\s*(.*)$/mi', $content, $mm)) {
+                $msg_text = trim($mm[1]);
+            } else {
+                // Fallback: choose the longest non-meta line and strip "Message: " if present
+                $candidate = '';
+                foreach ($lines as $line) {
+                    if (!preg_match('/\b\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\b/', $line) && // not a timestamp line
+                        !preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/', $line) &&              // not an IP line
+                        stripos($line, 'queued for send') === false) {                      // not a queue status line
+                        $clean = trim($line);
+                        // strip leading "Message: " if present
+                        if (stripos($clean, 'Message: ') === 0) {
+                            $clean = substr($clean, 9);
+                        }
+                        if (strlen($clean) > strlen($candidate)) {
+                            $candidate = $clean;
+                        }
+                    }
                 }
+                $msg_text = $candidate;
             }
+
             $name = isset($contacts[$phone]) ? $contacts[$phone] : '';
             $messages[] = [
                 'dt'       => $dt,
@@ -73,7 +91,7 @@ header { background:#2b2a28; color:white; padding:15px; position:sticky; top:0; 
 h1 { margin:0; font-size:20px; }
 .actions { display:flex; gap:15px; align-items:center; }
 .actions a { color:white; text-decoration:none; font-size:16px; }
-.filters { margin-top:10px; display:flex; gap:10px; }
+.filters { margin-top:10px; display:flex; gap:10px; padding: 0 15px; }
 .filters input { flex:2; padding:8px; border-radius:6px; font-size:14px; border:1px solid #ccc; }
 .filters select { flex:1; padding:8px; border-radius:6px; font-size:14px; border:1px solid #ccc; }
 table { width:100%; border-collapse:collapse; font-size:15px; margin-top:10px; }
@@ -123,13 +141,16 @@ header h1 { margin:0; font-size:1.5em; }
 <tr><th>Date/Time</th><th>Phone / Name</th><th>Message</th><th>Sender IP</th><th>Queue ID</th></tr>
 </thead>
 <tbody>
-<?php foreach($messages as $m): ?>
+<?php foreach ($messages as $m): ?>
 <tr data-dt="<?= htmlspecialchars($m['dt']) ?>">
-<td><?= htmlspecialchars($m['dt']) ?></td>
-<td><div><strong><?= htmlspecialchars($m['phone']) ?></strong></div><div class="muted"><?= htmlspecialchars($m['name']) ?></div></td>
-<td class="wrap"><?= htmlspecialchars($m['message']) ?></td>
-<td><?= htmlspecialchars($m['ip']) ?></td>
-<td><span class="pill" title="<?= htmlspecialchars($m['file']) ?>"><?= htmlspecialchars($m['queue_id']) ?></span></td>
+  <td><?= htmlspecialchars($m['dt']) ?></td>
+  <td>
+    <div><strong><?= htmlspecialchars($m['phone']) ?></strong></div>
+    <div class="muted"><?= htmlspecialchars($m['name']) ?></div>
+  </td>
+  <td class="wrap"><?= htmlspecialchars($m['message']) ?></td>
+  <td><?= htmlspecialchars($m['ip']) ?></td>
+  <td><span class="pill" title="<?= htmlspecialchars($m['file']) ?>"><?= htmlspecialchars($m['queue_id']) ?></span></td>
 </tr>
 <?php endforeach; ?>
 </tbody>
@@ -161,4 +182,3 @@ header h1 { margin:0; font-size:1.5em; }
 </script>
 </body>
 </html>
-
