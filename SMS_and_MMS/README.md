@@ -230,7 +230,7 @@ NOTIFICATION
 You have received MMS from number +$SENDER ($CONTACT_NAME).
 Date and time of receiving: $(date "+%d. %m. %Y ob %H:%M:%S").
 MMS content can not be downloaded, URL to download MMS multimedia is: $MMS_URL
-You can send SMS to the sender via: http://reply_page/sms?number=$SENDER
+You can send SMS to the sender via: http://reply_page/sms?number=+$SENDER
 
 EOF
 ```
