@@ -419,5 +419,5 @@ In [index.php](index.php) select the correct regex for phone number validation (
 
 ## To do
 - CSRF protection and security headers
-- show received messages in SMS viewer
 - add log parsing to check if SMS was sent successfully
+- add contact list to SMS sender
