@@ -315,7 +315,7 @@ exten => mmsproc,1,Verbose(Processing as MMS)
  ; Send email (via external script)
  same => n,System(/usr/local/bin/send_mms_email.sh "obvestilo@myserver.si" "me@myserver.si" "${MMS_SENDER_CLEAN}" "${MMS_URL_CLEAN}")
 
- same => n,System(rm -f ${DECTMP} ${RAWFILE} /tmp/${BASEFILENAME}_url.txt /tmp/${BASEFILENAME}_from.txt)
+ same => n,System(rm -f ${DECTMP} /tmp/${BASEFILENAME}_url.txt /tmp/${BASEFILENAME}_from.txt)
  same => n,Hangup()
 
 ; --------------------------------------------------------
