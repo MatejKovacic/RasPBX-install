@@ -114,21 +114,29 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'sendSMS') {
     $asteriskReply = implode("\n", $cmdOutput);
     if (preg_match('/id\s+(\S+)/', $asteriskReply, $m)) {
         $queueId = $m[1];
-        $shortReply = "SMS message queue ID: $queueId";
-    } else {
-        $shortReply = "Asterisk response: $asteriskReply";
+
+        // Log file (moved before exit)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+        $date = date('Ymd_His');
+        $rand = substr(md5(uniqid('', true)), 0, 3);
+        $logFile = "/var/opt/raspbx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
+        $logData = "Date/Time: " . date('Y-m-d H:i:s') . "\n"
+                 . "Sender IP: $ip\n"
+                 . "Phone Number: $phone\n"
+                 . "Message: $message\n"
+                 . "Queue ID: $queueId\n"
+                 . "Asterisk Reply: $asteriskReply\n";
+        file_put_contents($logFile, $logData);
+
+        echo json_encode([
+            'status' => 'queued',
+            'queueId' => $queueId,
+            'number' => $phone,
+            'text' => $message
+        ]);
+        exit;
     }
 
-    // Log file
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
-    $date = date('Ymd_His');
-    $rand = substr(md5(uniqid('', true)), 0, 3);
-    $logFile = "/var/opt/raspbx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
-    $logData = "Date/Time: " . date('Y-m-d H:i:s') . "\n"
-             . "Sender IP: $ip\n"
-             . "Phone Number: $phone\n"
-             . "Message: $message\n"
-             . "Asterisk Reply: $asteriskReply\n";
     file_put_contents($logFile, $logData);
 
     echo json_encode(['status' => 'success', 'number' => $phone, 'text' => $message, 'reply' => $shortReply]);
@@ -204,7 +212,12 @@ function sendSMS(e) {
     fetch('', { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
-        if (data.status === 'success') {
+        if (data.status === 'queued') {
+            showModal("Message queued. Waiting for confirmation...");
+            pollStatus(data.queueId);
+            document.getElementById('smsForm').reset();
+            updateCharCounter();
+        } else if (data.status === 'success') {
             showModal(
                 "<strong>Message sent successfully!</strong><br>" +
                 "Number: " + data.number + "<br>" +
@@ -217,6 +230,25 @@ function sendSMS(e) {
         }
     })
     .catch(err => showModal('Error: ' + err));
+}
+
+function pollStatus(queueId, attempts = 0) {
+    if (attempts > 10) { // ~20s max wait
+        showModal("No response from modem yet (still pending).");
+        return;
+    }
+    fetch("check_sms_status.php?id=" + encodeURIComponent(queueId))
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                showModal("SMS sent successfully!");
+            } else if (data.status === "failed") {
+                showModal("SMS failed to send.");
+            } else {
+                setTimeout(() => pollStatus(queueId, attempts + 1), 2000);
+            }
+        })
+        .catch(err => showModal("Error checking status: " + err));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
