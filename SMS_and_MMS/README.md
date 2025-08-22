@@ -430,7 +430,17 @@ SMS message sent.
 <img src="./screenschoots/SMS_viewer.png" alt="SMS and MMS viewer" style="width:40%;"/>
 SMS and MMS viewer (you can view received SMS and MMS messages and sent SMS messages).
 
+<img src="./screenschoots/SMS_viewer_mobile.png" alt="SMS and MMS viewer" style="width:15%;"/>
+Mobile version of SMS and MMS viewer.
+
 ## To do
 - CSRF protection and security headers
 - add Asterisk log parsing to check if SMS was sent successfully
-- small error in SMS viewer (does not show MMS_URL)
+```
+cat /var/log/asterisk/full | grep <ID>
+[2025-08-11 21:18:00] VERBOSE[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
+[2025-08-11 09:18:00] ERROR[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
+
+[2025-08-11 21:22:07] VERBOSE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
+[2025-08-11 21:22:07] NOTICE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
+```
