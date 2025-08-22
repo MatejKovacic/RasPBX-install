@@ -10,6 +10,7 @@
  *
  *  Updated features:
  *  =================
+ *  - Contact list support
  *  - Mobile friendly
  *  - Switchable regex for local or E.164 phone number formats
  *  - One phone number only (no multiple recipients)
@@ -222,7 +223,102 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('phonenumbers').addEventListener('input', sanitizePhoneInput);
     document.getElementById('message').addEventListener('input', updateCharCounter);
     updateCharCounter();
+
+    // Load contacts first
+    loadContacts().then(() => {
+        // If phone field already has a number (from ?number=...), try to match name
+        const phoneInput = document.getElementById('phonenumbers');
+        const num = phoneInput.value.trim();
+        if (num) {
+            const match = contacts.find(c => c.number === num);
+            if (match) {
+                document.getElementById('contactSearch').value = match.name;
+            }
+        }
+
+        // Keep sync working when user types/pastes later
+        phoneInput.addEventListener('input', () => {
+            const num = phoneInput.value.trim();
+            const match = contacts.find(c => c.number === num);
+            if (match) {
+                document.getElementById('contactSearch').value = match.name;
+            } else {
+                document.getElementById('contactSearch').value = "";
+            }
+        });
+    });
 });
+
+let contacts = [];
+
+async function loadContacts() {
+  try {
+    const res = await fetch('get_contacts.php');
+    contacts = await res.json();
+  } catch (err) {
+    console.error("Failed to load contacts:", err);
+  }
+}
+
+function filterContacts(query) {
+  query = query.toLowerCase();
+  return contacts.filter(c => c.name.toLowerCase().includes(query));
+}
+
+function showDropdown(results) {
+  const dropdown = document.getElementById('contactDropdown');
+  dropdown.innerHTML = "";
+  if (results.length === 0) {
+    dropdown.style.display = "none";
+    return;
+  }
+  results.forEach(c => {
+    const div = document.createElement('div');
+    div.textContent = c.name + " (" + c.number + ")";
+    div.onclick = () => {
+      document.getElementById('phonenumbers').value = c.number;
+      document.getElementById('contactSearch').value = c.name;  // set full name
+      dropdown.style.display = "none";
+    };
+    dropdown.appendChild(div);
+  });
+  dropdown.style.display = "block";
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadContacts();
+
+  const searchInput = document.getElementById('contactSearch');
+  searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+
+      // If user cleared the contact search box → clear phone field too
+      if (query.length === 0) {
+          document.getElementById('phonenumbers').value = "";
+          document.getElementById('contactDropdown').style.display = "none";
+          return;
+      }
+
+      const results = filterContacts(query);
+
+      // If exactly one match and user typed full name (case-insensitive) → autofill phone
+      if (results.length === 1 && results[0].name.toLowerCase() === query.toLowerCase()) {
+          document.getElementById('phonenumbers').value = results[0].number;
+          document.getElementById('contactDropdown').style.display = "none";
+          return;
+      }
+
+      // Otherwise, show dropdown for selection
+      showDropdown(results);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#contactSearch') && !e.target.closest('#contactDropdown')) {
+      document.getElementById('contactDropdown').style.display = "none";
+    }
+  });
+});
+
 </script>
 </head>
 <body>
@@ -319,6 +415,40 @@ document.addEventListener('DOMContentLoaded', () => {
     border-radius: 6px;
     text-align: center;
   }
+
+  /* Contact search styling */
+  #contactSearch {
+    width: 100%;
+    max-width: 400px;   /* prevents it from being too wide */
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  #contactDropdown {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 400px;   /* same width as search input */
+    z-index: 1000;
+    display: none;
+  }
+
+  #contactDropdown div {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.95em;
+  }
+
+  #contactDropdown div:hover {
+    background: #f5f5f5;
+  }
 </style>
 
 <div class="container">
@@ -336,6 +466,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <div class="content">
     <form id="smsForm" onsubmit="sendSMS(event)">
+
+      <label>Search Contact:</label>
+      <div style="position: relative; max-width: 400px;">
+        <input type="text" id="contactSearch" placeholder="Type a contact name..." autocomplete="off">
+        <div id="contactDropdown" class="dropdown"></div>
+      </div>
+
       <label>Phone Number:</label>
       <p class="note">Format: international E.164 (e.g. +38640123456)</p>
       <input type="text" id="phonenumbers" name="phonenumbers" value="<?= $prefillNumber ?>" required>
