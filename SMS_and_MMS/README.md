@@ -350,11 +350,11 @@ Finally we just need to reload the dialplan and then you can test receiving SMS 
 ```
 ### Received SMS message
 
-<img width="759" height="330" alt="SMS" src="https://github.com/user-attachments/assets/11efbf82-d012-4617-a44b-982c9643fd1c" />
+<img src="./screenschoots/SMS.png" alt="Received SMS message" style="width:30%;"/>
 
 ### Received MMS message
 
-<img width="759" height="330" alt="MMS" src="https://github.com/user-attachments/assets/60926c42-fc36-4786-9364-413b71087cbf" />
+<img src="./screenschoots/MMS.png" alt="Received MMS message" style="width:30%;"/>
 
 ## SMS sender and SMS viewer script
 
@@ -392,7 +392,7 @@ cat /var/log/asterisk/full | grep 0xb3e61a00
 [2025-08-11 21:22:07] NOTICE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
 ```
 
-**How to install it?** Just put [index.php](index.php), [auth.php](auth.php) and [view.php](view.php) in a folder `/var/www/html/sms`.
+**How to install it?** Just put [index.php](index.php), [auth.php](auth.php), [view.php](view.php) and [get_contacts.php](get_contacts.php)in a folder `/var/www/html/sms`.
 
 In [auth.php](auth.php) look for users and change default password:
 ```
@@ -405,19 +405,32 @@ $USERS = [
 
 In [index.php](index.php) select the correct regex for phone number validation (currently it is enabled Slovenian phone numbers validation).
 
+In [get_contacts.php](get_contacts.php) just check that your contacts file is on the correct location (`/var/opt/raspbx/my_contacts.txt`).
+
+## Screenscoots of the RasPBX SMS system
+
 ### Login window
 
-<img width="446" height="336" alt="image" src="https://github.com/user-attachments/assets/727a5f97-1295-4357-b415-218b9d5939c2" />
+<img src="./screenschoots/login.png" alt="Login" style="width:15%;"/>
+Login window on a mobile phone.
 
 ### SMS sender
 
-<img width="1076" height="752" alt="image" src="https://github.com/user-attachments/assets/4fdcbc96-b9c5-4bfa-a06b-0fc4d596ff23" />
+<img src="./screenschoots/select_receiver.png" alt="Select contact" style="width:15%;"/>
+Select contact from the list.
+
+<img src="./screenschoots/send_SMS.png" alt="SMS sender" style="width:15%;"/>
+SMS sender.
+
+<img src="./screenschoots/message_sent.png" alt="SMS message sent." style="width:15%;"/>
+SMS message sent.
 
 ### SMS viewer
 
-<img width="1245" height="409" alt="image" src="https://github.com/user-attachments/assets/05020a7a-b34b-450b-bc1e-51e27aff586e" />
+<img src="./screenschoots/SMS_viewer.png" alt="SMS and MMS viewer" style="width:40%;"/>
+SMS and MMS viewer (you can view received SMS and MMS messages and sent SMS messages).
 
 ## To do
 - CSRF protection and security headers
-- add log parsing to check if SMS was sent successfully
-- add contact list to SMS sender
+- add Asterisk log parsing to check if SMS was sent successfully
+- small error in SMS viewer (does not show MMS_URL)
