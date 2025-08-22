@@ -33,7 +33,7 @@ function show_login_form($error = "") {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login to RasPBX SMS system</title>
+        <title>RasPBX SMS system</title>
         <style>
             body {
                 margin: 0;
@@ -120,12 +120,19 @@ function show_login_form($error = "") {
                     padding: 16px;
                 }
             }
+            .header img.login-icon {
+                width: 32px;
+                height: 32px;
+                object-fit: contain; /* keeps aspect ratio */
+                margin-right: 12px;  /* small space from the right edge */
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h2>Login to RasPBX SMS system</h2>
+                <h2>RasPBX SMS login</h2>
+                <img src="icons/logo.png" alt="Login icon" class="login-icon">
             </div>
             <div class="content">
                 <?php if ($error) { echo "<div class='error'>".htmlspecialchars($error)."</div>"; } ?>
@@ -177,5 +184,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['p
         exit;
     }
 }
-
 
