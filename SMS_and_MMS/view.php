@@ -56,7 +56,7 @@ if (is_dir($SENT_DIR)) {
             foreach ($lines as $line) {
                 if (stripos($line, 'Message:') === 0) {
                     $msg_text = trim(substr($line, 8));
-                    break; // only one Message: line per file
+                    break;
                 }
             }
             $name = $contacts[$phone] ?? '';
@@ -79,12 +79,12 @@ if (is_dir($RECEIVED_DIR)) {
     foreach (scandir($RECEIVED_DIR) as $file) {
         if (preg_match('/^MSG_.*\.meta$/', $file)) {
             $filepath = $RECEIVED_DIR.'/'.$file;
-            $lines = file($filepath, FILE_IGNORE_NEW_LINES); // keep all lines
+            $lines = file($filepath, FILE_IGNORE_NEW_LINES);
             $info = ['type'=>'','from'=>'','date'=>'','decoded'=>'','mms_url'=>''];
             
             foreach ($lines as $line) {
-                $line = trim($line); // remove whitespace at start/end
-                if ($line === '') continue; // skip empty lines
+                $line = trim($line);
+                if ($line === '') continue;
                 
                 if (preg_match('/^Type:\s*(.+)$/i',$line,$m)) $info['type']=trim($m[1]);
                 if (preg_match('/^From:\s*(.+)$/i',$line,$m)) $info['from']=normalize_phone($m[1]);
@@ -94,12 +94,23 @@ if (is_dir($RECEIVED_DIR)) {
             }
 
             $msg_text = '';
-            if ($info['decoded'] && file_exists($info['decoded'])) {
-                $msg_text = trim(file_get_contents($info['decoded']));
-            }
-            if ($info['type']==='MMS' && $info['mms_url']) {
-                if ($msg_text) $msg_text .= "\n";
-                $msg_text .= "[MMS content: ".$info['mms_url']."]";
+
+            if (strcasecmp($info['type'], 'MMS') === 0 && !empty($info['mms_url'])) {
+                // For MMS, ignore decoded file completely — just show the URL
+                $msg_text = "[MMS content: " . $info['mms_url'] . "]";
+            } else {
+                // For SMS or other types, load the decoded file if available
+                if (!empty($info['decoded']) && is_readable($info['decoded'])) {
+                    $decoded_raw = file_get_contents($info['decoded']);
+                    if ($decoded_raw !== false) {
+                        // Remove control characters that might break HTML
+                        $decoded_clean = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $decoded_raw);
+                        $decoded_clean = trim($decoded_clean);
+                        if ($decoded_clean !== '') {
+                            $msg_text = $decoded_clean;
+                        }
+                    }
+                }
             }
 
             $name = $contacts[$info['from']] ?? '';
@@ -166,6 +177,44 @@ tbody tr:nth-child(even) { background:#f9e6d2; }
 .phone-link:hover {
   text-decoration:underline;
 }
+
+/* --- Mobile Friendly Adjustments --- */
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr { display: block; }
+  thead { display: none; }
+  tbody tr {
+    margin: 10px 0;
+    padding: 12px;
+    background: #fff3e6;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  tbody td { border: none; padding: 6px 0; }
+  tbody td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: block;
+    color: #444;
+    margin-bottom: 2px;
+  }
+  .wrap { font-size: 14px; }
+}
+
+@media (max-width: 600px) {
+  .filters { flex-direction: column; }
+  .filters input, .filters select { width: 100%; }
+}
+
+@media (max-width: 400px) {
+  header h1 { font-size: 16px; }
+  .actions a { font-size: 14px; }
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  margin-left: 8px;
+}
 </style>
 </head>
 <body>
@@ -211,9 +260,9 @@ tbody tr:nth-child(even) { background:#f9e6d2; }
   $msgHtml = nl2br(htmlspecialchars($m['message']));
 ?>
 <tr data-dt="<?= htmlspecialchars($m['dt']) ?>" data-type="<?= htmlspecialchars($m['type']) ?>">
-<td><span class="type-cell <?= $typeClass ?>"><?= htmlspecialchars($m['type']) ?></span></td>
-<td><?= htmlspecialchars($m['dt']) ?></td>
-<td>
+<td data-label="Type"><span class="type-cell <?= $typeClass ?>"><?= htmlspecialchars($m['type']) ?></span></td>
+<td data-label="Date/Time"><?= htmlspecialchars($m['dt']) ?></td>
+<td data-label="Phone / Name">
   <div>
     <a href="index.php?number=<?= urlencode($m['phone']) ?>" class="phone-link">
       <strong><?= htmlspecialchars($m['phone']) ?></strong>
@@ -221,9 +270,9 @@ tbody tr:nth-child(even) { background:#f9e6d2; }
   </div>
   <div class="muted"><?= htmlspecialchars($m['name']) ?></div>
 </td>
-<td class="wrap"><?= $msgHtml ?></td>
-<td><?= htmlspecialchars($m['ip']) ?></td>
-<td>
+<td data-label="Message" class="wrap"><?= $msgHtml ?></td>
+<td data-label="Sender IP"><?= htmlspecialchars($m['ip']) ?></td>
+<td data-label="Queue ID">
   <?php if ($m['queue_id']): ?>
     <span class="queue-pill"><?= htmlspecialchars($m['queue_id']) ?></span>
   <?php endif; ?>
