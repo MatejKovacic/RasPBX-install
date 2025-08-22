@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /*********************************************************************
  *  Chan_Dongle SMS Sender v0.1- AJAX Version
@@ -123,7 +123,7 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'sendSMS') {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
     $date = date('Ymd_His');
     $rand = substr(md5(uniqid('', true)), 0, 3);
-    $logFile = "/var/opt/raspbx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
+    $logFile = "/var/opt/raspx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
     $logData = "Date/Time: " . date('Y-m-d H:i:s') . "\n"
              . "Sender IP: $ip\n"
              . "Phone Number: $phone\n"
