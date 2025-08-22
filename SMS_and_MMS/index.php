@@ -19,7 +19,7 @@
  *  - Transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
  *    (for this transliterator_transliterate PHP function is used. You can check if it is installed
  *    with command "php -m | grep intl" - if you see "intl", then function is installed)
- *  - Logs sent messages to /var/opt/sent_messages/
+ *  - Logs sent messages to /var/opt/raspbx/sent_messages/
  *
  *  You can view the status of the queued SMS message by issuing a command:
  *  cat /var/log/asterisk/full | grep <queue_ID>
@@ -123,7 +123,7 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'sendSMS') {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
     $date = date('Ymd_His');
     $rand = substr(md5(uniqid('', true)), 0, 3);
-    $logFile = "/var/opt/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
+    $logFile = "/var/opt/raspbx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
     $logData = "Date/Time: " . date('Y-m-d H:i:s') . "\n"
              . "Sender IP: $ip\n"
              . "Phone Number: $phone\n"
