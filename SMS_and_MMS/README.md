@@ -4,9 +4,11 @@ Original RasPBX system can receive SMS messages and forward it to your e-mail ad
 
 You can also send SMS messages, but again, there is no log of sent messages, there is no phone number sanitiziang and validaton, and original SMS send script does not look good on mobile version.
 
-And the most painful issue is, that receiving MMS messages does not work at all, when someone will send you a MMS message, you will even not receive the sending number, just a message, that you received SMS from number `MMSC` with empty content.
+And the most painful issue is that receiving MMS messages does not work at all. When someone will send you a MMS message, you will even not receive the sending number, just a message, that you received SMS from number `MMSC` with empty content.
 
-So I decided to change that and here are the scripts for your RasPBX system, that will allow you to receive and send SMS messages in more friendly way and to receive the sender of the MMS message.
+So one day someone sent me a MMS message (I still don't know what is was!) and then I decided to change the original RasPBX scripts for handling SMS and MMS messages. Now you can use improved scripts, that will allow you to receive and send SMS messages in more friendly way, to receive the sender of the MMS message and much more!
+
+Let's see some screenschoots first.
 
 Login and SMS sender:
 
@@ -21,24 +23,24 @@ SMS and MMS messages are received via e-mail, and you can see them also via SMS 
 <img src="./screenschoots/SMS.png" alt="Received SMS message" style="width:30%;"/> <img src="./screenschoots/MMS.png" alt="Received MMS message" style="width:30%;"/> 
 <img src="./screenschoots/SMS_viewer.png" alt="SMS and MMS viewer" style="width:40%;"/>
 
-**SMS sender** script is based on Chan_Dongle SMS Script by *Troy Nahrwold*, which was developed many years ago. This updated script is:
-- mobile friendly
-- has support for contact list
-- has support for phone number validation (currently you can allow only Slovenian numbers or international numbers in E.164 format)
-- does show how many characters is left for SMS message (160 max.)
-- transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
-- checks the status of the sent SMS (successfully sent or if there was an error)
-- logs sent messages
+**SMS sender** script is based on *Chan_Dongle SMS Script* by *Troy Nahrwold*, which was developed many years ago. This updated script is:
+- mobile friendly,
+- has support for contact list,
+- has support for phone number validation (currently you can allow only Slovenian numbers or international numbers in E.164 format),
+- does show how many characters is left for SMS message (160 max.),
+- transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS,
+- checks the status of the sent SMS (successfully sent or if there was an error),
+- logs sent messages.
 
 **Received SMS and MMS messages** are sent to your e-mail and stored on a system too.
 
 **SMS viewer** script:
-- shows all received SMS and MMS messages
-- shows all sent SMS messages
-- has support for contact list
-- mobile friendly
+- shows all received SMS and MMS messages,
+- shows all sent SMS messages,
+- has support for contact list,
+- mobile friendly.
 
-Both scripts are using common authentication system - you can have multiple users, and passwords are stored in `bcrypt` format.
+Both scripts are using common authentication system - you can have multiple users, and passwords are stored in modern `bcrypt` format.
 
 ## Installation
 
@@ -73,7 +75,7 @@ Please note that this script does not do any checks or converting phone numbers 
 
 As already mentioned, some SMS messages are received by USB dongle in several parts, which means, you will receive several e-mail messages for one received such a SMS.
 
-When you send or receive SMS, the GSM standard limits a single SMS to 140 bytes. Depending on encoding this could be maximum 160 characters per SMS (if GSM-7 encoding is used) or maximum 70 characters per SMS (if UCS-2 encoding is used (Unicode)). If the message exceeds these limits the network will split the message into multiple parts. A proper SMS client is able to reassemble those multi parts automatically, but if since we are logging raw SMS from the USB dongle, Asterisk see multiple parts separately. Also, there seems to be a hardware limitation of (some?) USB dongles, which can not extract reference numbers of multipart SMS messages.
+When you send or receive SMS, the GSM standard limits a single SMS to 140 bytes. Depending on encoding this could be maximum 160 characters per SMS (if GSM-7 encoding is used) or maximum 70 characters per SMS (if UCS-2 encoding is used (Unicode)). If the message exceeds these limits the network will split the message into multiple parts. A proper SMS client is able to reassemble those multi parts automatically, but since we are logging raw SMS from the USB dongle, Asterisk see multiple parts separately. Also, there seems to be a hardware limitation of (some?) USB dongles, which can not extract reference numbers of multipart SMS messages.
 
 So here are two scripts, `sms_buffer.sh` and `sms_finalize.sh` which take care of that probem. When receiving a SMS, first script will create a temporary buffer file for that phone number. Then it will wait up to 5 seconds (see parameter `QUIET=5`). If in that time a new part from the same sender arrives, this new message will be added to this temporary buffer. If not, it will be sent as an e-mail by the second script. This ensures multipart SMS are assembled correctly per sender and you don’t get multiple emails for one SMS.
 
@@ -223,7 +225,7 @@ Now, the problem is, that MMS messages are encoded in slightly different way tha
 
 So I created an updated Asterisk dialplan to decode MMS message and sent a notification, which contains sender's phone number (and his/her name, if it is on your contact list). Decoder also extracts URL to download multimedia content. However, this URL is accessible from your mobile operator's network. So if you would like to donwload multimedia content, you would need to open data connection from your USB dongle, download MMS content and then close the connection.
 
-This is quite complicated process and on my USB dongle I even have some hardware limitations, so for now, I just extract this information and send a notification e-mail. In that case you will at least see who is the sender and they you can send him (or her) a SMS and ask to send you the message through other communication channel.
+This is quite complicated process and on my USB dongle I even have some hardware limitations to do that. So for now, I just extract this information and send a notification e-mail. In that case you will at least see who is the sender and they you can send him (or her) a SMS and ask to send you the message through other communication channel.
 
 So here is the script for sending e-mail about recieved MMS:
 
@@ -279,7 +281,7 @@ chown asterisk:asterisk /usr/local/bin/send_mms_email.sh
 
 #### Updated dialplan
 
-Now we can update our Asterisk dialplan for handling incoming SMS and MMS messages. Dialplan for that is stored in `extensions_custom.conf`.
+Now we need to update our Asterisk dialplan for handling incoming SMS and MMS messages. Dialplan for that is stored in `extensions_custom.conf`.
 
 `nano /etc/asterisk/extensions_custom.conf`:
 
@@ -372,16 +374,18 @@ MSG_+38641123456_20250818_204519_783.meta
 ```
 File names contain sender's number, date and time of receiving and some random text in so the files won't overwrite if you by some chance receive two SMS messages from the same number on exact same time.
 
-MMS Messages are also stored, but in two files: `.decoded`, which contains decoded MMS (with some binary data also - from this data we parse sender's number and MMS URL), and `.meta`, which contains medatata (basically sender's number and date/time). Example:
+MMS Messages are also stored in three files: `.b64`, which is the original data received from USB dongle, `.decoded`, which contains decoded MMS (with some binary data also - from this data we parse sender's number and MMS URL), and `.meta`, which contains medatata (basically sender's number and date/time). Example:
 ```
+MSG_MMSC_20250815_234458_504.b64
 MSG_MMSC_20250815_234458_504.decoded
 MSG_MMSC_20250815_234458_504.meta
 ```
 
-Finally we just need to reload the dialplan and then you can test receiving SMS and MMS messages:
+Finally we just need to reload the dialplan and then you can start receiving SMS and MMS messages:
 ```
 /usr/sbin/asterisk -rx 'dialplan reload'
 ```
+
 ### Installation of SMS sender and SMS viewer
 
 This is simple. Just put all PHP files in a folder `/var/www/html/sms`.
