@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/auth.php';
+check_login();
+
 session_start();
 
 $queueId = $_GET['id'] ?? '';
