@@ -8,9 +8,41 @@ And the most painful issue is, that receiving MMS messages does not work at all,
 
 So I decided to change that and here are the scripts for your RasPBX system, that will allow you to receive and send SMS messages in more friendly way and to receive the sender of the MMS message.
 
-So let's start!
+Login and SMS sender:
 
-## Store your contact list on RasPBX system
+<img src="./screenschoots/login.png" alt="Login" style="width:15%;"/> <img src="./screenschoots/select_receiver.png" alt="Select contact" style="width:15%;"/> <img src="./screenschoots/send_SMS.png" alt="SMS sender" style="width:15%;"/>
+
+SMS sender and SMS viewer (mobile version):
+
+<img src="./screenschoots/message_queued.png" alt="SMS message queued." style="width:15%;"/> <img src="./screenschoots/message_sent.png" alt="SMS message sent." style="width:15%;"/>  <img src="./screenschoots/SMS_viewer_mobile.png" alt="SMS and MMS viewer" style="width:15%;"/>
+
+SMS and MMS messages are received via e-mail, and you can see them also via SMS viewer:
+
+<img src="./screenschoots/SMS.png" alt="Received SMS message" style="width:30%;"/> <img src="./screenschoots/MMS.png" alt="Received MMS message" style="width:30%;"/> 
+<img src="./screenschoots/SMS_viewer.png" alt="SMS and MMS viewer" style="width:40%;"/>
+
+**SMS sender** script is based on Chan_Dongle SMS Script by *Troy Nahrwold*, which was developed many years ago. This updated script is:
+- mobile friendly
+- has support for contact list
+- has support for phone number validation (currently you can allow only Slovenian numbers or international numbers in E.164 format)
+- does show how many characters is left for SMS message (160 max.)
+- transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
+- checks the status of the sent SMS (successfully sent or if there was an error)
+- logs sent messages
+
+**Received SMS and MMS messages** are sent to your e-mail and stored on a system too.
+
+**SMS viewer** script:
+- shows all received SMS and MMS messages
+- shows all sent SMS messages
+- has support for contact list
+- mobile friendly
+
+Both scripts are using common authentication system - you can have multiple users, and passwords are stored in `bcrypt` format.
+
+## Installation
+
+### Store your contact list on RasPBX system
 
 The first step is to prepare and store your contact list on your RasPBX system. First we would need to create a directory where we will have our contact list, received and sent messages:
 ```
@@ -35,7 +67,9 @@ python3 vcf_4_raspbx.py MyContacts.vcf > my_contacts.txt
 
 Please note that this script does not do any checks or converting phone numbers from local to international format, so you might want to check the final `my_contacts.txt` file if it looks fine!
 
-## Script for receiving (multipart) SMS messages
+### Receiving SMS and MMS messages
+
+#### Script for receiving (multipart) SMS messages
 
 As already mentioned, some SMS messages are received by USB dongle in several parts, which means, you will receive several e-mail messages for one received such a SMS.
 
@@ -181,7 +215,7 @@ chmod +x /usr/local/bin/sms_buffer.sh /usr/local/bin/sms_finalize.sh
 chown asterisk:asterisk /usr/local/bin/sms_buffer.sh /usr/local/bin/sms_finalize.sh
 ```
 
-## Script for receiving MMS messages
+#### Script for receiving MMS messages
 
 As mentioned, RasPBX originally does not support receiving MMS messages. When you receive a MMS message, you just get will an empty a message with subject saying that you received SMS from number `MMSC`.
 
@@ -243,7 +277,7 @@ chmod +x /usr/local/bin/send_mms_email.sh
 chown asterisk:asterisk /usr/local/bin/send_mms_email.sh
 ```
 
-## Updated dialplan
+#### Updated dialplan
 
 Now we can update our Asterisk dialplan for handling incoming SMS and MMS messages. Dialplan for that is stored in `extensions_custom.conf`.
 
@@ -348,51 +382,9 @@ Finally we just need to reload the dialplan and then you can test receiving SMS 
 ```
 /usr/sbin/asterisk -rx 'dialplan reload'
 ```
-### Received SMS message
+### Installation of SMS sender and SMS viewer
 
-<img src="./screenschoots/SMS.png" alt="Received SMS message" style="width:30%;"/>
-
-### Received MMS message
-
-<img src="./screenschoots/MMS.png" alt="Received MMS message" style="width:30%;"/>
-
-## SMS sender and SMS viewer script
-
-SMS sender script is based on Chan_Dongle SMS Script by Troy Nahrwold, which was developed many years ago. This updated script is:
-- mobile friendly
-- has switchable regex for local or E.164 phone number formats
-- does real-time JS sanitizing and server side phone number validation (currently you can allow only Slovenian numbers or international numbers in E.164 format)
-- does show how many characters is left for SMS message (160 max.)
-- transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
-- logs sent messages to `/var/opt/raspbx/sent_messages/`
-
-SMS viewer script:
-- shows you all sent messages (stored in `/var/opt/raspbx/sent_messages/`)
-- uses `my_contacts.txt` file to show the name of the contact
-
-Both scripts are using common authentication system - you can have multiple users and passwords are stored in bcrypt format.
-
-When you send the SMS message, SMS sender script shows the Asterisk answer, which is basically the SMS queue ID. For now, it does not show if SMS was sent successfully, but you can manually check Asterisk log:
-```
-cat /var/log/asterisk/full | grep <queue_ID>
-```
-
-If there was an error seding SMSm you will see something like:
-```
-cat /var/log/asterisk/full | grep 0xb4005c60
-
-[2025-08-11 21:18:00] VERBOSE[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
-[2025-08-11 09:18:00] ERROR[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
-```
-If SMS was sent successfully, you will see:
-```
-cat /var/log/asterisk/full | grep 0xb3e61a00
-
-[2025-08-11 21:22:07] VERBOSE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
-[2025-08-11 21:22:07] NOTICE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
-```
-
-**How to install it?** Just put [index.php](index.php), [auth.php](auth.php), [view.php](view.php) and [get_contacts.php](get_contacts.php)in a folder `/var/www/html/sms`.
+This is simple. Just put all PHP files in a folder `/var/www/html/sms`.
 
 In [auth.php](auth.php) look for users and change default password:
 ```
@@ -403,39 +395,13 @@ $USERS = [
     // php -r "echo password_hash('ChangeYourPassword', PASSWORD_DEFAULT) . PHP_EOL;"
 ```
 
-In [index.php](index.php) select the correct regex for phone number validation (currently it is enabled Slovenian phone numbers validation).
+In [index.php](index.php) select the correct regex for phone number validation (currently it is enabled Slovenian phone numbers validation, you can enable E.164 format or write your own rules).
 
-In [get_contacts.php](get_contacts.php) just check that your contacts file is on the correct location (`/var/opt/raspbx/my_contacts.txt`).
+In [get_contacts.php](get_contacts.php) just check that your contacts file is on the correct location (`/var/opt/raspbx/my_contacts.txt`) and in correct format.
 
-## Screenscoots of the RasPBX SMS system
-
-### Login window
-
-<img src="./screenschoots/login.png" alt="Login" style="width:15%;"/>
-Login window on a mobile phone.
-
-### SMS sender
-
-<img src="./screenschoots/select_receiver.png" alt="Select contact" style="width:15%;"/>
-Select contact from the list.
-
-<img src="./screenschoots/send_SMS.png" alt="SMS sender" style="width:15%;"/>
-SMS sender.
-
-<img src="./screenschoots/message_queued.png" alt="SMS message queued." style="width:15%;"/>
-SMS message in queue (app is checking if it is sent successfully or there was an error).
-
-<img src="./screenschoots/message_sent.png" alt="SMS message sent." style="width:15%;"/>
-SMS message sent.
-
-### SMS viewer
-
-<img src="./screenschoots/SMS_viewer.png" alt="SMS and MMS viewer" style="width:40%;"/>
-SMS and MMS viewer (you can view received SMS and MMS messages and sent SMS messages).
-
-<img src="./screenschoots/SMS_viewer_mobile.png" alt="SMS and MMS viewer" style="width:15%;"/>
-Mobile version of SMS and MMS viewer.
+File [check_sms_status.php](check_sms_status.php) is used for checking Asterisk logs for SMS status (sent successfully or error sending). Currently it is repeating check every 2 seconds (2000 miliseconds) for 10 times. So 20 seconds of checking, and then timeout.
 
 ## To do
 - CSRF protection and security headers
+- log SMS status, including possible timeout
 - show status of the sent SMS in SMS viewer (in SMS sender status is already checked and user notified)
