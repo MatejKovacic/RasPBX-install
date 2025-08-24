@@ -40,7 +40,7 @@ SMS and MMS messages are received via e-mail, and you can see them also via SMS 
 - has support for contact list,
 - mobile friendly.
 
-Both scripts are using common authentication system - you can have multiple users, and passwords are stored in modern `bcrypt` format.
+Both, SMS sender and SMS receiver, are using common authentication system and provide security headers. You can have multiple users, and passwords are stored in modern `bcrypt` format.
 
 ## Installation
 
@@ -406,6 +406,6 @@ In [get_contacts.php](get_contacts.php) just check that your contacts file is on
 File [check_sms_status.php](check_sms_status.php) is used for checking Asterisk logs for SMS status (sent successfully or error sending). Currently it is repeating check every 2 seconds (2000 miliseconds) for 10 times. So 20 seconds of checking, and then timeout.
 
 ## To do
-- CSRF protection and security headers
+- CSRF protection
 - log SMS status, including possible timeout
 - show status of the sent SMS in SMS viewer (in SMS sender status is already checked and user notified)
