@@ -422,6 +422,9 @@ Select contact from the list.
 <img src="./screenschoots/send_SMS.png" alt="SMS sender" style="width:15%;"/>
 SMS sender.
 
+<img src="./screenschoots/message_queued.png" alt="SMS message queued." style="width:15%;"/>
+SMS message in queue (app is checking if it is sent successfully or there was an error).
+
 <img src="./screenschoots/message_sent.png" alt="SMS message sent." style="width:15%;"/>
 SMS message sent.
 
@@ -435,12 +438,4 @@ Mobile version of SMS and MMS viewer.
 
 ## To do
 - CSRF protection and security headers
-- add Asterisk log parsing to check if SMS was sent successfully
-```
-cat /var/log/asterisk/full | grep <ID>
-[2025-08-11 21:18:00] VERBOSE[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
-[2025-08-11 09:18:00] ERROR[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
-
-[2025-08-11 21:22:07] VERBOSE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
-[2025-08-11 21:22:07] NOTICE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
-```
+- show status of the sent SMS in SMS viewer (in SMS sender status is already checked and user notified)
