@@ -1,4 +1,4 @@
-# Advanced SMS and MMS handling
+# Advanced SMS and MMS handling for RasPBX
 
 Original RasPBX system can receive SMS messages and forward it to your e-mail address, but the received message looks really poor. You can see only the phone number, and no name of the contact, which means that you will need to lookup your contact list manually. Also, some SMS messages are split into several parts, so you will receive several e-mail messages for one SMS message, which really doesn't look cool.
 
