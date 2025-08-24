@@ -1,3 +1,148 @@
+<?php
+
+/*********************************************************************
+ *  Chan_Dongle SMS Sender v0.1- AJAX Version
+ *  for The Raspberry Asterisk
+ *
+ *  Author: Matej Kovacic, 2025
+ *  The script is based on Chan_Dongle SMS Script by Troy Nahrwold
+ *  from Eternal Works company (https://www.eternalworks.com)
+ *
+ *  Updated features:
+ *  =================
+ *  - Contact list support
+ *  - Mobile friendly
+ *  - Switchable regex for local or E.164 phone number formats
+ *  - One phone number only (no multiple recipients)
+ *  - Real-time JS sanitizing and server side phone number validation
+ *  - Showing how many characters is left for a message
+ *  - Transliterate UTF-8 to ASCII to handle special characters that can not be sent in normal SMS
+ *    (for this transliterator_transliterate PHP function is used. You can check if it is installed
+ *    with command "php -m | grep intl" - if you see "intl", then function is installed)
+ *  - Logs sent messages to /var/opt/raspbx/sent_messages/
+ *
+ *  You can view the status of the queued SMS message by issuing a command:
+ *  cat /var/log/asterisk/full | grep <queue_ID>
+ * 
+ *  Example for error (SMS not sent):
+ *  cat /var/log/asterisk/full | grep 0xb4005c60
+ * 
+ * [2025-08-11 21:18:00] VERBOSE[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
+ * [2025-08-11 09:18:00] ERROR[1604] at_response.c: [dongle0] Error sending SMS message 0xb4005c60
+ * 
+ * Example for success (SMS sent successfully):
+ * cat /var/log/asterisk/full | grep 0xb3e61a00
+ * [2025-08-11 21:22:07] VERBOSE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
+ * [2025-08-11 21:22:07] NOTICE[1604] at_response.c: [dongle0] Successfully sent SMS message 0xb3e61a00
+ * 
+ *********************************************************************
+ * Please see the settings below! You may want to:
+ *  - set your own secure password
+ *  - select regex for phone number validation
+ *********************************************************************/
+
+require_once __DIR__ . '/auth.php';
+check_login();
+?>
+
+<?php
+
+// Enable those two for debug purposes only:
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+
+session_start();
+
+// SETTINGS
+$dongle = "dongle sms dongle0 ";
+$ini = "'";
+
+// IMPORTANT: choose ONE phone regex by uncommenting:
+// Allow only local Slovenian numbers: 9 digits, specific prefixes
+$phoneRegex = '/^\+386(30|40|68|69|31|41|51|65|70|71|64|65)[0-9]{6}$/';
+// Allow international in E.164 format:
+//$phoneRegex = '/^\+[1-9][0-9]{7,14}$/';
+
+// Prefill phone number from query string (?number=+38641234567 or ?number=%2B38641234567)
+$prefillNumber = '';
+if (isset($_GET['number'])) {
+    $candidate = $_GET['number'];
+
+    // If "+" was converted to a space, restore it
+    if (strpos($candidate, ' ') === 0) {
+        $candidate = '+' . ltrim($candidate);
+    }
+
+    // Remove accidental whitespace
+    $candidate = trim($candidate);
+
+    if (preg_match($phoneRegex, $candidate)) {
+        $prefillNumber = htmlspecialchars($candidate, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+// Remove the delimiters:
+$patternOnly = trim($phoneRegex, '/');
+$jsPhoneRegex = addslashes($patternOnly);
+
+// AJAX SMS SEND HANDLER
+if (isset($_POST['ajax']) && $_POST['ajax'] === 'sendSMS') {
+    header('Content-Type: application/json');
+    $phone = trim($_POST['phonenumbers']);
+    $message = substr(trim($_POST['message']), 0, 160);
+
+    // Transliterate UTF-8 to ASCII to handle special characters like č, š, ž
+    $message = transliterator_transliterate('Any-Latin; Latin-ASCII;', $message);
+
+    // Replace newlines with spaces to keep SMS on one line:
+    $message = str_replace(["\r\n", "\r", "\n"], ' ', $message); // remove newlines
+
+    if (!preg_match($phoneRegex, $phone)) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid phone number format.']);
+        exit;
+    }
+
+    if ($message === '') {
+        echo json_encode(['status' => 'error', 'message' => 'Message cannot be empty.']);
+        exit;
+    }
+
+    $fullCommand = $dongle . $phone . ' ' . $message;
+    $cmd = '/usr/sbin/asterisk -rx ' . escapeshellarg($fullCommand);
+    exec($cmd . ' 2>&1', $cmdOutput, $returnVar);
+
+    $asteriskReply = implode("\n", $cmdOutput);
+    if (preg_match('/id\s+(\S+)/', $asteriskReply, $m)) {
+        $queueId = $m[1];
+
+        // Log file (moved before exit)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+        $date = date('Ymd_His');
+        $rand = substr(md5(uniqid('', true)), 0, 3);
+        $logFile = "/var/opt/raspbx/sent_messages/SMS_{$phone}_{$date}_{$rand}.txt";
+        $logData = "Date/Time: " . date('Y-m-d H:i:s') . "\n"
+                 . "Sender IP: $ip\n"
+                 . "Phone Number: $phone\n"
+                 . "Message: $message\n"
+                 . "Queue ID: $queueId\n"
+                 . "Asterisk Reply: $asteriskReply\n";
+        file_put_contents($logFile, $logData);
+
+        echo json_encode([
+            'status' => 'queued',
+            'queueId' => $queueId,
+            'number' => $phone,
+            'text' => $message
+        ]);
+        exit;
+    }
+
+    file_put_contents($logFile, $logData);
+
+    echo json_encode(['status' => 'success', 'number' => $phone, 'text' => $message, 'reply' => $shortReply]);
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -110,7 +255,102 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('phonenumbers').addEventListener('input', sanitizePhoneInput);
     document.getElementById('message').addEventListener('input', updateCharCounter);
     updateCharCounter();
+
+    // Load contacts first
+    loadContacts().then(() => {
+        // If phone field already has a number (from ?number=...), try to match name
+        const phoneInput = document.getElementById('phonenumbers');
+        const num = phoneInput.value.trim();
+        if (num) {
+            const match = contacts.find(c => c.number === num);
+            if (match) {
+                document.getElementById('contactSearch').value = match.name;
+            }
+        }
+
+        // Keep sync working when user types/pastes later
+        phoneInput.addEventListener('input', () => {
+            const num = phoneInput.value.trim();
+            const match = contacts.find(c => c.number === num);
+            if (match) {
+                document.getElementById('contactSearch').value = match.name;
+            } else {
+                document.getElementById('contactSearch').value = "";
+            }
+        });
+    });
 });
+
+let contacts = [];
+
+async function loadContacts() {
+  try {
+    const res = await fetch('get_contacts.php');
+    contacts = await res.json();
+  } catch (err) {
+    console.error("Failed to load contacts:", err);
+  }
+}
+
+function filterContacts(query) {
+  query = query.toLowerCase();
+  return contacts.filter(c => c.name.toLowerCase().includes(query));
+}
+
+function showDropdown(results) {
+  const dropdown = document.getElementById('contactDropdown');
+  dropdown.innerHTML = "";
+  if (results.length === 0) {
+    dropdown.style.display = "none";
+    return;
+  }
+  results.forEach(c => {
+    const div = document.createElement('div');
+    div.textContent = c.name + " (" + c.number + ")";
+    div.onclick = () => {
+      document.getElementById('phonenumbers').value = c.number;
+      document.getElementById('contactSearch').value = c.name;  // set full name
+      dropdown.style.display = "none";
+    };
+    dropdown.appendChild(div);
+  });
+  dropdown.style.display = "block";
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadContacts();
+
+  const searchInput = document.getElementById('contactSearch');
+  searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+
+      // If user cleared the contact search box → clear phone field too
+      if (query.length === 0) {
+          document.getElementById('phonenumbers').value = "";
+          document.getElementById('contactDropdown').style.display = "none";
+          return;
+      }
+
+      const results = filterContacts(query);
+
+      // If exactly one match and user typed full name (case-insensitive) → autofill phone
+      if (results.length === 1 && results[0].name.toLowerCase() === query.toLowerCase()) {
+          document.getElementById('phonenumbers').value = results[0].number;
+          document.getElementById('contactDropdown').style.display = "none";
+          return;
+      }
+
+      // Otherwise, show dropdown for selection
+      showDropdown(results);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#contactSearch') && !e.target.closest('#contactDropdown')) {
+      document.getElementById('contactDropdown').style.display = "none";
+    }
+  });
+});
+
 </script>
 </head>
 <body>
@@ -286,77 +526,5 @@ document.addEventListener('DOMContentLoaded', () => {
     <button onclick="closeModal()">OK</button>
   </div>
 </div>
-
-<script>
-let contacts = [];
-
-async function loadContacts() {
-  try {
-    const res = await fetch('get_contacts.php');
-    contacts = await res.json();
-    console.log("Contacts loaded:", contacts); // Debug
-  } catch (err) {
-    console.error("Failed to load contacts:", err);
-  }
-}
-
-function filterContacts(query) {
-  query = query.toLowerCase();
-  return contacts.filter(c => c.name.toLowerCase().includes(query));
-}
-
-function showDropdown(results) {
-  const dropdown = document.getElementById('contactDropdown');
-  dropdown.innerHTML = "";
-  if (results.length === 0) {
-    dropdown.style.display = "none";
-    return;
-  }
-  results.forEach(c => {
-    const div = document.createElement('div');
-    div.textContent = c.name + " (" + c.number + ")";
-    div.onclick = () => {
-      document.getElementById('phonenumbers').value = c.number;
-      document.getElementById('contactSearch').value = c.name;
-      dropdown.style.display = "none";
-    };
-    dropdown.appendChild(div);
-  });
-  dropdown.style.display = "block";
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadContacts();
-
-  const searchInput = document.getElementById('contactSearch');
-  const phoneInput = document.getElementById('phonenumbers');
-
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.trim();
-
-    if (query.length === 0) {
-      phoneInput.value = "";
-      document.getElementById('contactDropdown').style.display = "none";
-      return;
-    }
-
-    const results = filterContacts(query);
-
-    if (results.length === 1 && results[0].name.toLowerCase() === query.toLowerCase()) {
-      phoneInput.value = results[0].number;
-      document.getElementById('contactDropdown').style.display = "none";
-      return;
-    }
-
-    showDropdown(results);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('#contactSearch') && !e.target.closest('#contactDropdown')) {
-      document.getElementById('contactDropdown').style.display = "none";
-    }
-  });
-});
-</script>
 </body>
 </html>
