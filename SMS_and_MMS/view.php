@@ -283,7 +283,7 @@ tbody tr:nth-child(even) { background:#f9e6d2; }
 </table>
 </main>
 
-<script>
+<script nonce="<?= $nonce ?>">
 const q = document.getElementById('q');
 const when = document.getElementById('when');
 const type = document.getElementById('type');
