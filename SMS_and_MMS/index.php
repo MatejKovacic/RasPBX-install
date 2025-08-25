@@ -163,7 +163,7 @@ button { padding: 15px; background: #2b2a28; color: white; border: none; border-
 .modal-content { background: white; padding: 20px; border-radius: 8px; margin: 100px auto; max-width: 400px; text-align: center; }
 .modal-content small { font-size: 0.85em; color: #555; }
 </style>
-<script>
+<script nonce="<?= $nonce ?>">
 const phoneRegex = new RegExp('<?= $jsPhoneRegex ?>');
 
 function updateCharCounter() {
