@@ -5,16 +5,21 @@ header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
 header("Referrer-Policy: strict-origin-when-cross-origin");
-// Works with inline JS, but is less secure:
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; style-src 'self' 'unsafe-inline'");
 
 // Start session
 session_start();
 
+// Generate a random nonce for inline scripts
+$nonce = base64_encode(random_bytes(16));
+
+// Send CSP header with the nonce included
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-$nonce'; img-src 'self' data:; style-src 'self' 'unsafe-inline'");
+
+
 // --- CONFIG ---
 // Define valid users here (username => bcrypt hash)
 $USERS = [
-    "admin" => '$2y$10$D0FeVomZHGimeJ6cNaQLA.jOT1bfCQB6L.KRXLPNhY3B/rSQmKC.a', 
+    "matej" => '$2y$10$gP0B/fGmgzew1qVfdTC7yuVzHRG5DN2rO1.mmk9VWt3N9Rsaoh0Ai',
     // hash for "ChangeYourPassword"
     // IMPORTANT: you can change default (or forgotten) password by typing this command to terminal:
     // php -r "echo password_hash('ChangeYourPassword', PASSWORD_DEFAULT) . PHP_EOL;"
@@ -193,4 +198,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['p
         exit;
     }
 }
-
