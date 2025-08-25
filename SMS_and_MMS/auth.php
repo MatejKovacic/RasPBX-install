@@ -19,7 +19,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-$n
 // --- CONFIG ---
 // Define valid users here (username => bcrypt hash)
 $USERS = [
-    "matej" => '$2y$10$gP0B/fGmgzew1qVfdTC7yuVzHRG5DN2rO1.mmk9VWt3N9Rsaoh0Ai',
+    "admin" => '$2y$10$8RVq260n.fnSKtNUPplDouMHC7aHLZevPP7igQVfswB/hBcUjQa0u',
     // hash for "ChangeYourPassword"
     // IMPORTANT: you can change default (or forgotten) password by typing this command to terminal:
     // php -r "echo password_hash('ChangeYourPassword', PASSWORD_DEFAULT) . PHP_EOL;"
