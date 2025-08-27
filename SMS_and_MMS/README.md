@@ -409,3 +409,4 @@ File [check_sms_status.php](check_sms_status.php) is used for checking Asterisk 
 - CSRF protection
 - log SMS status, including possible timeout
 - show status of the sent SMS in SMS viewer (in SMS sender status is already checked and user notified)
+- check if dongle is actually present and active (`/usr/sbin/asterisk -rx 'dongle sms dongle0 +38640XXXXXX Test!'` -> `[dongle0] device disabled`)
