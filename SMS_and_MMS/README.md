@@ -403,7 +403,19 @@ In [index.php](index.php) select the correct regex for phone number validation (
 
 In [get_contacts.php](get_contacts.php) just check that your contacts file is on the correct location (`/var/opt/raspbx/my_contacts.txt`) and in correct format.
 
-File [check_sms_status.php](check_sms_status.php) is used for checking Asterisk logs for SMS status (sent successfully or error sending). Currently it is repeating check every 2 seconds (2000 miliseconds) for 10 times. So 20 seconds of checking, and then timeout.
+File [check_sms_status.php](check_sms_status.php) is used for checking Asterisk logs for SMS status (sent successfully or error sending). Currently it is repeating check every 3 seconds (3000 miliseconds) for 15 times. So 45 seconds of checking, and then timeout. My tests have shown that if there is an error sending SMS, it is reflected in Asterisk logs in around 35 seconds. If SMS is sent successfully, this reflects in Asterisk logs in a couple of seconds.
+
+However, if you want to increase time for checking, open [index.php](index.php) and look for:
+```
+setTimeout(() => pollStatus(queueId, attempts + 1), 3000);
+```
+Change `3000` (miliseconds) to a higher number of miliseconds.
+
+You can also look for
+```
+if (attempts > 15) { // ~45s max wait
+```
+...and change number of attempts from 15 to a higher number.
 
 ## To do
 - CSRF protection
