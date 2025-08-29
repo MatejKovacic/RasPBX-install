@@ -166,6 +166,14 @@ button { padding: 15px; background: #2b2a28; color: white; border: none; border-
 <script nonce="<?= $nonce ?>">
 const phoneRegex = new RegExp('<?= $jsPhoneRegex ?>');
 
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('smsForm').addEventListener('submit', sendSMS);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('modalOkBtn').addEventListener('click', closeModal);
+});
+
 function updateCharCounter() {
     const msg = document.getElementById('message');
     const counter = document.getElementById('charCounter');
@@ -233,8 +241,8 @@ function sendSMS(e) {
 }
 
 function pollStatus(queueId, attempts = 0) {
-    if (attempts > 10) { // ~20s max wait
-        showModal("No response from modem yet (still pending).");
+    if (attempts > 15) { // ~45s max wait
+        showModal("No response from modem yet. Please check Asterisk logs manually.");
         return;
     }
     fetch("check_sms_status.php?id=" + encodeURIComponent(queueId))
@@ -243,9 +251,9 @@ function pollStatus(queueId, attempts = 0) {
             if (data.status === "success") {
                 showModal("SMS sent successfully!");
             } else if (data.status === "failed") {
-                showModal("SMS failed to send.");
+                showModal("SMS failed to send. SMS queue ID is: " + encodeURIComponent(queueId));
             } else {
-                setTimeout(() => pollStatus(queueId, attempts + 1), 2000);
+                setTimeout(() => pollStatus(queueId, attempts + 1), 3000);
             }
         })
         .catch(err => showModal("Error checking status: " + err));
@@ -497,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <div class="content">
-    <form id="smsForm" onsubmit="sendSMS(event)">
+    <form id="smsForm">
 
       <label>Search Contact:</label>
       <div style="position: relative; max-width: 400px;">
@@ -523,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="modal" id="resultModal">
   <div class="modal-content">
     <p id="modalText"></p>
-    <button onclick="closeModal()">OK</button>
+    <button id="modalOkBtn">OK</button>
   </div>
 </div>
 </body>
